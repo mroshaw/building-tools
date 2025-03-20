@@ -1,0 +1,22 @@
+{
+  "name": "com.daftapplegames.building-tools",
+  "version": "0.0.1",
+  "displayName": "Unity Building Tools",
+  "description": "Components and Editor Tools designed to help configure and optimise buildings in Unity projects",
+  "unity": "6000.0",
+  "documentationUrl": "https://github.com/mroshaw/3dforge-tools/blob/main/README.md",
+  "changelogUrl": "https://github.com/mroshaw/3dforge-tools/blob/main/README.md",
+  "licensesUrl": "https://github.com/mroshaw/3dforge-tools/blob/main/LICENSE",
+  "dependencies": {
+    "com.unity.splines": "2.7.2"
+ },
+ "keywords": [
+    "buildings",
+    "3dforge"
+  ],
+  "author": {
+    "name": "Oli Ollerenshaw",
+    "email": "oli@mroshaw.co.uk",
+    "url": "https://github.com/mroshaw"
+  }
+}
