@@ -1,7 +1,7 @@
 {
   "name": "com.daftapplegames.building-tools",
   "version": "0.0.1",
-  "displayName": "Unity Building Tools",
+  "displayName": "Daft Apple Building Tools",
   "description": "Components and Editor Tools designed to help configure and optimise buildings in Unity projects",
   "unity": "6000.0",
   "documentationUrl": "https://github.com/mroshaw/3dforge-tools/blob/main/README.md",
