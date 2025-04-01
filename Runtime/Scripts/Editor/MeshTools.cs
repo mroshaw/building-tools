@@ -13,10 +13,7 @@ namespace DaftAppleGames.BuildingTools.Editor
     /// </summary>
     internal enum MeshProperties { CastShadows, StaticShadowCaster, ContributeGI, ReceiveGI, MotionVectors, DynamicOcclusion, RenderLayerMask, Priority }
 
-    /// <summary>
-    /// Used to assign specific Light Layers to meshes
-    /// </summary>
-    internal enum LightLayerMode { Interior, Exterior, Both }
+
 
     /// <summary>
     /// Static methods for working with Meshes
@@ -24,16 +21,11 @@ namespace DaftAppleGames.BuildingTools.Editor
     internal static class MeshTools
     {
         #region Static properties
-        internal static Dictionary<LightLayerMode, uint> lightLayerMasks;
+
 
         static MeshTools()
         {
-            lightLayerMasks = new Dictionary<LightLayerMode, uint>
-            {
-                { LightLayerMode.Interior, RenderingLayerMask.GetMask("Exterior") },
-                { LightLayerMode.Exterior, RenderingLayerMask.GetMask("Exterior") },
-                { LightLayerMode.Both, RenderingLayerMask.GetMask("Interior", "Exterior") }
-            };
+
         }
         #endregion
 
@@ -58,6 +50,7 @@ namespace DaftAppleGames.BuildingTools.Editor
             internal bool ContributeGI;
             internal ReceiveGI ReceiveGlobalGI;
             internal LightLayerMode LightLayerMode;
+            internal string LayerName;
         }
         #endregion
 
@@ -103,7 +96,10 @@ namespace DaftAppleGames.BuildingTools.Editor
             }
 
             // Apply the Light Layer Mask using the static dictionary
-            renderer.renderingLayerMask = lightLayerMasks[configureMeshParameters.LightLayerMode];
+            renderer.renderingLayerMask = LightTools.GetMaskByMode(configureMeshParameters.LightLayerMode);
+
+            // Set the layer
+            renderer.gameObject.layer = LayerMask.NameToLayer(configureMeshParameters.LayerName);
 
             // Update the static flags, based on whether ConfigureGI is true or false
             StaticEditorFlags flags = GameObjectUtility.GetStaticEditorFlags(renderer.gameObject);
@@ -117,7 +113,7 @@ namespace DaftAppleGames.BuildingTools.Editor
         /// Combines all meshes in the given GameObject, writing the resulting Mesh as an asset to the given path.
         /// Any components with the 'MeshCombineExcluder' component will be ignored by the process
         /// </summary>
-        private static void CombineGameObjectMeshes(GameObject parentGameObject, CombineMeshParameters combineMeshParameters, ConfigureMeshParameters newMeshParameters)
+        internal static void CombineGameObjectMeshes(GameObject parentGameObject, CombineMeshParameters combineMeshParameters, ConfigureMeshParameters newMeshParameters)
         {
             if (!ValidateCombineMeshParameters(combineMeshParameters))
             {
@@ -264,6 +260,52 @@ namespace DaftAppleGames.BuildingTools.Editor
                 resultGO.transform.position = originalPosition;
                 resultGO.transform.rotation = originalRotation;
             }
+        }
+        #endregion
+
+        #region Volume helper methods
+
+        /// <summary>
+        /// Returns the size of a box that encloses the meshes in the Game Object
+        /// </summary>
+        internal static void GetMeshSize(GameObject parentGameObject, LayerMask includeLayerMask, string[] ignoreNames, out Vector3 meshSize, out Vector3 meshCenter)
+        {
+            Bounds meshBounds = GetMeshBounds(parentGameObject, includeLayerMask, ignoreNames);
+            meshSize = meshBounds.size;
+            meshCenter = meshBounds.center;
+        }
+
+        /// <summary>
+        /// Return the bounds of the enclosing meshes in the Game Object
+        /// </summary>
+        internal static Bounds GetMeshBounds(GameObject parentGameObject, LayerMask includeLayerMask, string[] ignoreNames)
+        {
+            Bounds combinedBounds = new(Vector3.zero, Vector3.zero);
+            bool hasValidRenderer = false;
+
+            foreach (MeshRenderer childRenderer in parentGameObject.GetComponentsInChildren<MeshRenderer>(true))
+            {
+                if ((includeLayerMask & (1 << childRenderer.gameObject.layer)) == 0 ||
+                    (ignoreNames.Length != 0 && ignoreNames.ItemInString(childRenderer.gameObject.name)))
+                {
+                    continue;
+                }
+
+                Bounds meshBounds = childRenderer.bounds;
+
+                // Initialize or expand the combined bounds
+                if (!hasValidRenderer)
+                {
+                    combinedBounds = meshBounds;
+                    hasValidRenderer = true;
+                }
+                else
+                {
+                    combinedBounds.Encapsulate(meshBounds);
+                }
+            }
+
+            return combinedBounds;
         }
         #endregion
     }

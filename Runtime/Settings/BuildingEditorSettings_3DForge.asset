@@ -12,3 +12,68 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66ad843f52d862f4a9e666dc55699f9f, type: 3}
   m_Name: BuildingEditorSettings_3DForge
   m_EditorClassIdentifier: 
+  buildingExteriorLayer: BuildingExterior
+  buildingExteriorLightLayerMode: 1
+  buildingInteriorLayer: BuildingInterior
+  buildingInteriorLightLayerMode: 0
+  exteriorPropsLayer: ExteriorProps
+  exteriorPropsLightLayerMode: 1
+  interiorPropsLayer: InteriorProps
+  interiorPropsLightLayerMode: 0
+  boxColliderNames:
+  - crate
+  - chair
+  - table
+  - bed
+  sphereColliderNames: []
+  capsuleColliderNames:
+  - barrel
+  meshColliderNames:
+  - woven
+  doorNames:
+  - vil_door
+  doorOpeningClips: []
+  doorOpenClips: []
+  doorClosingClips: []
+  doorClosedClips: []
+  doorSfxGroup: {fileID: -5427569144899992052, guid: 4235e817e54366e4bbba250d4b315442, type: 2}
+  doorTriggerLayerMask:
+    serializedVersion: 2
+    m_Bits: 8
+  doorTriggerTags:
+  - Player
+  indoorCandleSettings:
+    buildingLightType: 0
+    meshNames:
+    - props_candle
+    flameNames:
+    - Flame
+    range: 5
+    intensity: 15
+    radius: 0.025
+    layerMode: 0
+  indoorFireSettings:
+    buildingLightType: 1
+    meshNames:
+    - cooking_fire
+    flameNames:
+    - Flame
+    range: 0
+    intensity: 0
+    radius: 0
+    layerMode: 0
+  outdoorLightSettings:
+    buildingLightType: 3
+    meshNames: []
+    flameNames: []
+    range: 0
+    intensity: 0
+    radius: 0
+    layerMode: 0
+  meshSizeIgnoreNames:
+  - tries
+  - plinth
+  meshSizeIncludeLayers:
+    serializedVersion: 2
+    m_Bits: 64
+  meshAssetOutputPath: Assets/building-tools/Runtime/PrefabVariants/CombinedMeshes

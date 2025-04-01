@@ -6,7 +6,9 @@ using Sirenix.OdinInspector;
 using DaftAppleGames.Attributes;
 #endif
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.Events;
+using DaftAppleGames.Extensions;
 
 namespace DaftAppleGames.Darskerry.Core.Buildings
 {
@@ -14,14 +16,14 @@ namespace DaftAppleGames.Darskerry.Core.Buildings
     internal enum DoorState { Open, Opening, Closing, Closed }
     public class Door : MonoBehaviour
     {
-        [BoxGroup("Settings")] [SerializeField] public float openAngle = 110.0f;
-        [BoxGroup("Settings")] [SerializeField] public float openingTime = 2.0f;
-        [BoxGroup("Settings")] [SerializeField] public float stayOpenTime = 5.0f;
-        [BoxGroup("Settings")] [SerializeField] public float closingTime = 2.0f;
+        [BoxGroup("Settings")] [SerializeField] private float openAngle = 110.0f;
+        [BoxGroup("Settings")] [SerializeField] private float openingTime = 2.0f;
+        [BoxGroup("Settings")] [SerializeField] private float stayOpenTime = 5.0f;
+        [BoxGroup("Settings")] [SerializeField] private float closingTime = 2.0f;
 
-        [BoxGroup("Audio")] [SerializeField] public AudioClip[] openingClips;
-        [BoxGroup("Audio")] [SerializeField] public AudioClip[] closingClips;
-        [BoxGroup("Audio")] [SerializeField] public AudioClip[] closedClips;
+        [BoxGroup("Audio")] [SerializeField] private AudioClip[] openingClips;
+        [BoxGroup("Audio")] [SerializeField] private AudioClip[] closingClips;
+        [BoxGroup("Audio")] [SerializeField] private AudioClip[] closedClips;
 
         [FoldoutGroup("Events")] public UnityEvent onStartOpeningInwards;
         [FoldoutGroup("Events")] public UnityEvent onStartOpeningOutwards;
@@ -64,7 +66,6 @@ namespace DaftAppleGames.Darskerry.Core.Buildings
             return _blockers.Count == 0;
         }
 
-        [Button("Open and Close Door")]
         public void OpenAndCloseDoor(DoorOpenDirection doorOpenDirection)
         {
             if (IsMoving || IsOpen)
@@ -75,15 +76,20 @@ namespace DaftAppleGames.Darskerry.Core.Buildings
             StartCoroutine(OpenAndCloseDoorAsync(doorOpenDirection));
         }
 
-        [Button("Open Door")]
-        public void OpenDoor(DoorOpenDirection direction)
+        public void OpenDoor(DoorOpenDirection direction, bool immediate = false)
         {
             if (IsMoving || IsOpen)
             {
                 return;
             }
 
-            StartCoroutine(OpenDoorAsync(direction));
+            if (!immediate)
+            {
+                StartCoroutine(OpenDoorAsync(direction));
+            }
+
+            transform.localRotation = gameObject.transform.localRotation * Quaternion.Euler(gameObject.transform.up * (direction == DoorOpenDirection.Inwards ? -openAngle : openAngle));
+            _doorState = DoorState.Open;
         }
 
         private IEnumerator OpenDoorAsync(DoorOpenDirection direction)
@@ -113,20 +119,25 @@ namespace DaftAppleGames.Darskerry.Core.Buildings
             }
 
             _doorState = DoorState.Open;
-
             openingEndEvent.Invoke();
         }
 
 
         [Button("Close Door")]
-        public void CloseDoor()
+        public void CloseDoor(bool immediate = false)
         {
             if (IsMoving || !IsOpen)
             {
                 return;
             }
 
-            StartCoroutine(CloseDoorAsync());
+            if (!immediate)
+            {
+                StartCoroutine(CloseDoorAsync());
+            }
+
+            transform.localRotation = _doorClosedRotation;
+            _doorState = DoorState.Closed;
         }
 
         private IEnumerator CloseDoorAsync()
@@ -172,5 +183,40 @@ namespace DaftAppleGames.Darskerry.Core.Buildings
 
             _audioSource.PlayOneShot(clips[Random.Range(0, clips.Length)]);
         }
+
+        #region Unity Editor methods
+        #if UNITY_EDITOR
+        public void ConfigureInEditor(AudioMixerGroup audioMixerGroup, AudioClip[] newOpeningClips, AudioClip[] newOpenClips, AudioClip[] newClosingClips, AudioClip[] newClosedClips)
+        {
+            if (!_audioSource)
+            {
+                _audioSource = this.EnsureComponent<AudioSource>();
+            }
+            _audioSource.outputAudioMixerGroup = audioMixerGroup;
+            openingClips = newOpeningClips;
+            openingClips = newOpenClips;
+            closingClips = newClosingClips;
+            closedClips = newClosedClips;
+        }
+
+        [Button("Open Door (Inward)")]
+        internal void OpenDoorInwardEditor()
+        {
+            OpenDoor(DoorOpenDirection.Inwards, true);
+        }
+
+        [Button("Open Door (Outward)")]
+        internal void OpenDoorOutwardEditor()
+        {
+            OpenDoor(DoorOpenDirection.Outwards, true);
+        }
+
+        [Button("Close Door")]
+        internal void CloseDoorEditor()
+        {
+            CloseDoor(true);
+        }
+        #endif
+        #endregion
     }
 }

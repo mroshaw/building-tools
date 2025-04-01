@@ -13,6 +13,9 @@ namespace DaftAppleGames.Darskerry.Core.Buildings
     {
         [SerializeField] private Door door;
         [SerializeField] private DoorOpenDirection doorOpenDirection;
+
+        public DoorOpenDirection DoorOpenDirection => doorOpenDirection;
+
         private void Start()
         {
             // Move from parent so not animated with the door
@@ -48,5 +51,16 @@ namespace DaftAppleGames.Darskerry.Core.Buildings
         {
             door.CloseDoor();
         }
+
+        #region Unity Editor methods
+        #if UNITY_EDITOR
+        public void ConfigureInEditor(Door newDoor, LayerMask newTriggerLayerMask, string[] newTriggerTags, DoorOpenDirection newDoorOpenDirection)
+        {
+            door = newDoor;
+            doorOpenDirection = newDoorOpenDirection;
+            base.ConfigureInEditor(newTriggerLayerMask, newTriggerTags);
+        }
+        #endif
+        #endregion
     }
 }

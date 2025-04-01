@@ -22,8 +22,8 @@ namespace DaftAppleGames.Darskerry.Core.Buildings
 
         [BoxGroup("Settings")] [SerializeField] private bool findLightsOnAwake;
         [BoxGroup("Settings")] [SerializeField] public BuildingLightType buildingLightType;
-        [BoxGroup("Lights")] [SerializeField] private Light[] lights;
-        [BoxGroup("Lights")] [SerializeField] private ParticleSystem[] particles;
+        [BoxGroup("Lights")] [SerializeField] private Light light;
+        [BoxGroup("Lights")] [SerializeField] private ParticleSystem particles;
         public BuildingLightType BuildingLightType => buildingLightType;
 
         #endregion
@@ -40,19 +40,18 @@ namespace DaftAppleGames.Darskerry.Core.Buildings
 
         #endregion
 
-
         #region Class Methods
 
         [Button("Update Lights")]
         public void UpdateLights()
         {
-            lights = gameObject.GetComponentsInChildren<Light>(true);
-            particles = gameObject.GetComponentsInChildren<ParticleSystem>(true);
+            light = gameObject.GetComponentInChildren<Light>(true);
+            particles = gameObject.GetComponentInChildren<ParticleSystem>(true);
         }
 
-        public Light[] GetLights()
+        public Light GetLights()
         {
-            return lights;
+            return light;
         }
 
         [Button("Turn On")]
@@ -69,17 +68,23 @@ namespace DaftAppleGames.Darskerry.Core.Buildings
 
         public void SetLightState(bool state)
         {
-            foreach (Light currLight in lights)
-            {
-                currLight.gameObject.SetActive(state);
-            }
-
-            foreach (ParticleSystem currParticle in particles)
-            {
-                currParticle.gameObject.SetActive(state);
-            }
+            light.gameObject.SetActive(state);
+            particles.gameObject.SetActive(state);
         }
 
         #endregion
+
+
+        #region Unity Editor methods
+        #if UNITY_EDITOR
+        public void ConfigureInEditor(BuildingLightType newLightType, Light newLight, ParticleSystem newParticles)
+        {
+            buildingLightType = newLightType;
+            light = newLight;
+            particles = newParticles;
+        }
+        #endif
+        #endregion
+
     }
 }
