@@ -5,6 +5,7 @@ using System;
 using DaftAppleGames.Darskerry.Core.Buildings;
 using UnityEngine;
 using UnityEngine.Audio;
+using UnityEngine.Rendering;
 #if ODIN_INSPECTOR
 using Sirenix.OdinInspector;
 #else
@@ -57,11 +58,11 @@ namespace DaftAppleGames.BuildingTools.Editor
 
         [BoxGroup("Volumes")] [SerializeField] internal string[] meshSizeIgnoreNames;
         [BoxGroup("Volumes")] [SerializeField] internal LayerMask meshSizeIncludeLayers;
-
+        [BoxGroup("Volumes")] [SerializeField] internal VolumeProfile interiorVolumeProfile;
         [BoxGroup("CombineMeshes")] [SerializeField] internal string meshAssetOutputPath;
 
         #region Editor scripts
-        #if UNITY_EDITOR
+
         [Button("Save A Copy")]
         internal BuildingEditorSettings SaveALocalCopy()
         {
@@ -73,7 +74,7 @@ namespace DaftAppleGames.BuildingTools.Editor
 
             if (string.IsNullOrEmpty(pathToSave))
             {
-                return (this);
+                return this;
             }
 
             string relativePath = "Assets" + pathToSave.Substring(Application.dataPath.Length);
@@ -82,7 +83,7 @@ namespace DaftAppleGames.BuildingTools.Editor
             AssetDatabase.CreateAsset(newEditorSettings, relativePath);
             return newEditorSettings;
         }
-        #endif
+
         #endregion
     }
 }

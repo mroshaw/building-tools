@@ -33,10 +33,13 @@ MonoBehaviour:
   doorNames:
   - vil_door
   doorOpeningClips: []
-  doorOpenClips: []
-  doorClosingClips: []
-  doorClosedClips: []
-  doorSfxGroup: {fileID: -5427569144899992052, guid: 4235e817e54366e4bbba250d4b315442, type: 2}
+  doorOpenClips:
+  - {fileID: 8300000, guid: 60c475a6d5bffdb43bb4b71eb69b9132, type: 3}
+  doorClosingClips:
+  - {fileID: 8300000, guid: 60c475a6d5bffdb43bb4b71eb69b9132, type: 3}
+  doorClosedClips:
+  - {fileID: 8300000, guid: 80f85f7c9156d914890d35c6b2be956f, type: 3}
+  doorSfxGroup: {fileID: 0}
   doorTriggerLayerMask:
     serializedVersion: 2
     m_Bits: 8
@@ -76,4 +79,5 @@ MonoBehaviour:
   meshSizeIncludeLayers:
     serializedVersion: 2
     m_Bits: 64
+  interiorVolumeProfile: {fileID: 11400000, guid: 1761b5ab9cf40da4d9c05adcf2661828, type: 2}
   meshAssetOutputPath: Assets/building-tools/Runtime/PrefabVariants/CombinedMeshes
