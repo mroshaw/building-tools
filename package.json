@@ -1,6 +1,6 @@
 {
   "name": "com.daftapplegames.building-tools",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "displayName": "Daft Apple Building Tools",
   "description": "Components and Editor Tools designed to help configure and optimise buildings in Unity projects",
   "unity": "6000.0",
@@ -9,8 +9,8 @@
   "licensesUrl": "https://github.com/mroshaw/3dforge-tools/blob/main/LICENSE",
   "dependencies": {
     "com.unity.splines": "2.7.2"
- },
- "keywords": [
+  },
+  "keywords": [
     "buildings",
     "3dforge"
   ],

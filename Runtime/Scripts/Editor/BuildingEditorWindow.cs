@@ -12,9 +12,10 @@ namespace DaftAppleGames.BuildingTools.Editor
         /// <summary>
         /// Custom editor overrides
         /// </summary>
-        protected override string WindowTitle => "Building Editor";
         protected override string ToolTitle => "Building Editor";
+
         protected override string IntroText => "Welcome to Building Tools by Daft Apple Games!";
+
         protected override string WelcomeLogText =>
             "Welcome to Building Tools! Select some building preset settings, then select a Game Object in the hierarchy or a prefab asset, then click the buttons to configure your building.";
 
@@ -53,6 +54,7 @@ namespace DaftAppleGames.BuildingTools.Editor
                 _addBuildingComponentButton.clicked -= AddBuildingComponent;
                 _addBuildingComponentButton.clicked += AddBuildingComponent;
             }
+
             _configureLayersButton = rootVisualElement.Q<Button>("ConfigureLayersButton");
             if (_configureLayersButton != null)
             {
@@ -114,12 +116,14 @@ namespace DaftAppleGames.BuildingTools.Editor
         /// </summary>
         private void SetButtonToolTips()
         {
-            #if !DAG_HDRP
+#if !DAG_HDRP
             _configureLightingButton.tooltip = "Currently only supported in HDRP! URP and BIRP support coming soon!";
             _configureVolumesButton.tooltip = "Currently only supported in HDRP! URP and BIRP support coming soon!";
-            #endif
+#endif
         }
+
         #endregion
+
         /// <summary>
         /// Update the GUI when selection changes
         /// </summary>
@@ -178,7 +182,8 @@ namespace DaftAppleGames.BuildingTools.Editor
 
             if (BuildingTools.ArePropsInMainBuildingStructure(selectedGameObject))
             {
-                log.Log(LogLevel.Error, "The selected GameObject is a prefab or prefab instance, and it's props GameObjects are children of the main building structure. Please amend the prefab and re-parent the props outside of the building structure.");
+                log.Log(LogLevel.Error,
+                    "The selected GameObject is a prefab or prefab instance, and it's props GameObjects are children of the main building structure. Please amend the prefab and re-parent the props outside of the building structure.");
                 return false;
             }
 
@@ -194,6 +199,7 @@ namespace DaftAppleGames.BuildingTools.Editor
             {
                 return;
             }
+
             log.Log(LogLevel.Info, "Adding building component...", true);
             BuildingTools.AddBuildingComponent(selectedGameObject, log);
             log.Log(LogLevel.Info, "Done!", true);
@@ -209,6 +215,7 @@ namespace DaftAppleGames.BuildingTools.Editor
             {
                 return;
             }
+
             log.Log(LogLevel.Info, "Configuring layers...", true);
             BuildingTools.ConfigureLayers(selectedGameObject, buildingEditorSettings, log);
             log.Log(LogLevel.Info, "Done!", true);
@@ -219,10 +226,11 @@ namespace DaftAppleGames.BuildingTools.Editor
         /// </summary>
         private void ConfigureColliders()
         {
-            if(!Validate(true))
+            if (!Validate(true))
             {
                 return;
             }
+
             log.Log(LogLevel.Info, "Configuring colliders...", true);
             BuildingTools.ConfigureColliders(selectedGameObject, buildingEditorSettings, log);
             log.Log(LogLevel.Info, "Done!", true);
@@ -233,10 +241,11 @@ namespace DaftAppleGames.BuildingTools.Editor
         /// </summary>
         private void ConfigureVolumes()
         {
-            if(!Validate(true))
+            if (!Validate(true))
             {
                 return;
             }
+
             log.Log(LogLevel.Info, "Configuring colliders...", true);
             BuildingTools.ConfigureVolumes(selectedGameObject, buildingEditorSettings, log);
             log.Log(LogLevel.Info, "Done!", true);
@@ -267,6 +276,7 @@ namespace DaftAppleGames.BuildingTools.Editor
             {
                 return;
             }
+
             log.Log(LogLevel.Info, "Configuring doors...", true);
             BuildingTools.ConfigureDoors(selectedGameObject, buildingEditorSettings, log);
             log.Log(LogLevel.Info, "Done!", true);
