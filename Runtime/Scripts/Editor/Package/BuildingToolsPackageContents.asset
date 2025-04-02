@@ -13,9 +13,24 @@ MonoBehaviour:
   m_Name: BuildingToolsPackageContents
   m_EditorClassIdentifier: 
   packageInstallFolder: BuildingTools
-  packageItems: []
+  allowUninstall: 0
+  isInstalled: 0
+  packageItems:
+  - itemAsset: {fileID: 11400000, guid: 1761b5ab9cf40da4d9c05adcf2661828, type: 2}
+    destinationFolder: VolumeProfiles
+    overwriteExisting: 1
+  - itemAsset: {fileID: 24100000, guid: 4235e817e54366e4bbba250d4b315442, type: 2}
+    destinationFolder: Audio
+    overwriteExisting: 1
+  - itemAsset: {fileID: 8300000, guid: 80f85f7c9156d914890d35c6b2be956f, type: 3}
+    destinationFolder: Audio
+    overwriteExisting: 1
+  - itemAsset: {fileID: 8300000, guid: 60c475a6d5bffdb43bb4b71eb69b9132, type: 3}
+    destinationFolder: Audio
+    overwriteExisting: 1
+  - itemAsset: {fileID: 11400000, guid: b5889aec21a516d4dbf79dd0fcd92edd, type: 2}
+    destinationFolder: Settings
+    overwriteExisting: 1
   onInstallStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  isInstalled: 0
-  showInstallWindowAtStartup: 0
