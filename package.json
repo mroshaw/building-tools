@@ -12,9 +12,9 @@
   },
   "samples": [
     {
-      "displayName": "3D Forge",
+      "displayName": "Samples",
       "description": "Contains sample settings and files to use with 3D Forge building assets",
-      "path": "Samples~/3D Forge"
+      "path": "Samples~/DaftAppleGames"
     }
   ],
   "keywords": [
