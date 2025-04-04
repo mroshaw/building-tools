@@ -18,25 +18,29 @@ namespace DaftAppleGames.BuildingTools.Editor
 
         static BuildingTools()
         {
-
         }
+
         #endregion
 
         #region Tool prarameter structs
+
         /// <summary>
         /// Struct to consolidate parameters for use with the static methods
         /// </summary>
         internal struct ConfigureBuildingParameters
         {
         }
+
         #endregion
 
         #region Base methods
+
         internal static void AddBuildingComponent(GameObject parentGameObject, EditorLog log)
         {
             Building building = parentGameObject.EnsureComponent<Building>();
             log.Log(LogLevel.Info, $"Added Building component to {parentGameObject.name}.");
         }
+
         #endregion
 
         #region Layers methods
@@ -76,6 +80,11 @@ namespace DaftAppleGames.BuildingTools.Editor
         {
             foreach (GameObject prop in props)
             {
+                if (!prop)
+                {
+                    continue;
+                }
+
                 if (prop.IsParentedByAny(buildingMeshes, out GameObject parentGameObject))
                 {
                     log.Log(LogLevel.Info, $"Moving Props GameObject {prop.name} out of {parentGameObject.name} into {parentGameObject.transform.parent.gameObject.name}...");
@@ -92,19 +101,25 @@ namespace DaftAppleGames.BuildingTools.Editor
         {
             Building building = buildingGameObject.GetComponent<Building>();
 
-            foreach (GameObject prop in building.interiorProps)
+            if (building.interiorProps != null && building.interiorProps.Length > 0)
             {
-                if (prop.IsParentedByAny(building.interiors, out GameObject parentGameObject))
+                foreach (GameObject prop in building.interiorProps)
                 {
-                    return true;
+                    if (prop.IsParentedByAny(building.interiors, out GameObject parentGameObject))
+                    {
+                        return true;
+                    }
                 }
             }
 
-            foreach (GameObject prop in building.exteriorProps)
+            if (building.exteriorProps != null && building.exteriorProps.Length > 0)
             {
-                if (prop.IsParentedByAny(building.exteriors, out GameObject parentGameObject))
+                foreach (GameObject prop in building.exteriorProps)
                 {
-                    return true;
+                    if (prop.IsParentedByAny(building.exteriors, out GameObject parentGameObject))
+                    {
+                        return true;
+                    }
                 }
             }
 
@@ -116,7 +131,7 @@ namespace DaftAppleGames.BuildingTools.Editor
         /// </summary>
         private static void SetLayerInChildren(GameObject parentGameObject, string layerName, EditorLog log, bool includeParent = true)
         {
-            foreach (Transform child in parentGameObject.transform)
+            foreach (MeshRenderer child in parentGameObject.GetComponentsInChildren<MeshRenderer>(true))
             {
                 child.gameObject.layer = LayerMask.NameToLayer(layerName);
                 log.Log(LogLevel.Info, $"Layer set to {layerName} in {child.gameObject}.");
@@ -128,6 +143,7 @@ namespace DaftAppleGames.BuildingTools.Editor
                 log.Log(LogLevel.Info, $"Layer set to {layerName} in {parentGameObject.gameObject}.");
             }
         }
+
         #endregion
 
         #region Collider methods
@@ -174,15 +190,18 @@ namespace DaftAppleGames.BuildingTools.Editor
                 log.Log(LogLevel.Warning, $"{colliderGameObject.name} already has a {typeof(T)} component.");
             }
         }
+
         #endregion
 
         #region Volume methods
 
         internal static void ConfigureVolumes(GameObject parentGameObject, BuildingEditorSettings buildingSettings, EditorLog log)
         {
-            MeshTools.GetMeshSize(parentGameObject, buildingSettings.meshSizeIncludeLayers, buildingSettings.meshSizeIgnoreNames, out Vector3 buildingSize, out Vector3 buildingCenter);
+            MeshTools.GetMeshSize(parentGameObject, buildingSettings.meshSizeIncludeLayers, buildingSettings.meshSizeIgnoreNames, out Vector3 buildingSize,
+                out Vector3 buildingCenter);
             log.Log(LogLevel.Info, $"Building size is: {buildingSize}, local center is at: {buildingCenter}");
         }
+
         #endregion
 
         #region Lighting methods
@@ -211,7 +230,7 @@ namespace DaftAppleGames.BuildingTools.Editor
 
         internal static void ConfigureBuildingLight(GameObject lightGameObject, LightingSettings lightingSettings, BuildingEditorSettings buildingSettings, EditorLog log)
         {
-            if (!lightGameObject.TryGetComponentInChildren<Light>( out Light light, true))
+            if (!lightGameObject.TryGetComponentInChildren<Light>(out Light light, true))
             {
                 log.Log(LogLevel.Warning, $"No light found on parent mesh {lightGameObject.name}.");
                 return;
@@ -251,12 +270,13 @@ namespace DaftAppleGames.BuildingTools.Editor
             Door door = doorGameObject.EnsureComponent<Door>();
             // We don't want to combine this mesh, as it needs to move
             doorGameObject.EnsureComponent<MeshCombineExcluder>();
-            door.ConfigureInEditor(buildingSettings.doorSfxGroup, buildingSettings.doorOpeningClips, buildingSettings.doorOpenClips, buildingSettings.doorClosingClips,buildingSettings.doorClosedClips);
+            door.ConfigureInEditor(buildingSettings.doorSfxGroup, buildingSettings.doorOpeningClips, buildingSettings.doorOpenClips, buildingSettings.doorClosingClips,
+                buildingSettings.doorClosedClips);
             CreateOrUpdateDoorTriggers(door, buildingSettings, log);
         }
 
 
-        private static void CreateOrUpdateDoorTriggers(Door door, BuildingEditorSettings buildingSettings,  EditorLog log)
+        private static void CreateOrUpdateDoorTriggers(Door door, BuildingEditorSettings buildingSettings, EditorLog log)
         {
             DoorTrigger[] doorTriggers = door.GetComponentsInChildren<DoorTrigger>(true);
 
@@ -279,7 +299,7 @@ namespace DaftAppleGames.BuildingTools.Editor
         private static void CreateDoorTrigger(Door door, BuildingEditorSettings buildingSettings, DoorOpenDirection openDirection, EditorLog log)
         {
             string gameObjectName = openDirection == DoorOpenDirection.Outwards ? "Inside Trigger" : "Outside Trigger";
-            GameObject triggerGameObject = new GameObject(gameObjectName);
+            GameObject triggerGameObject = new(gameObjectName);
             triggerGameObject.transform.SetParent(door.gameObject.transform);
             triggerGameObject.transform.localPosition = Vector3.zero;
             triggerGameObject.transform.localRotation = Quaternion.identity;
@@ -288,10 +308,10 @@ namespace DaftAppleGames.BuildingTools.Editor
             ConfigureDoorTrigger(door, trigger, buildingSettings, openDirection, log);
         }
 
-        private static void ConfigureDoorTrigger(Door door, DoorTrigger doorTrigger, BuildingEditorSettings buildingSettings,DoorOpenDirection openDirection, EditorLog log)
+        private static void ConfigureDoorTrigger(Door door, DoorTrigger doorTrigger, BuildingEditorSettings buildingSettings, DoorOpenDirection openDirection, EditorLog log)
         {
             doorTrigger.ConfigureInEditor(door, buildingSettings.doorTriggerLayerMask, buildingSettings.doorTriggerTags, openDirection);
-            MeshTools.GetMeshSize(doorTrigger.transform.parent.gameObject, ~0, new string[] {}, out Vector3 meshSize, out Vector3 center);
+            MeshTools.GetMeshSize(doorTrigger.transform.parent.gameObject, ~0, new string[] { }, out Vector3 meshSize, out Vector3 center);
             float distanceFromDoor = openDirection == DoorOpenDirection.Inwards ? 0.3f : -(0.3f + meshSize.x);
             float triggerWidth = meshSize.z;
             float triggerLocalCenter = meshSize.z / 2;
@@ -301,8 +321,8 @@ namespace DaftAppleGames.BuildingTools.Editor
             boxCollider.size = new Vector3(1.0f, 1.0f, triggerWidth);
             boxCollider.center = new Vector3(distanceFromDoor, 0, triggerLocalCenter);
             boxCollider.isTrigger = true;
-
         }
+
         #endregion
 
         #region Optimisation methods
@@ -319,7 +339,7 @@ namespace DaftAppleGames.BuildingTools.Editor
                 CreateOutputFolder = true
             };
 
-            MeshTools.ConfigureMeshParameters newMeshParameters = new MeshTools.ConfigureMeshParameters();
+            MeshTools.ConfigureMeshParameters newMeshParameters = new();
 
             // Set properties and merge exterior meshes
             newMeshParameters.LightLayerMode = buildingSettings.buildingExteriorLightLayerMode;
@@ -334,7 +354,8 @@ namespace DaftAppleGames.BuildingTools.Editor
             OptimiseMeshGroup(building.interiorProps, "interiorProps", combineMeshParameters, newMeshParameters, log);
         }
 
-        private static void OptimiseMeshGroup(GameObject[] allGameObjects, string namePrefix, MeshTools.CombineMeshParameters combineMeshParameters, MeshTools.ConfigureMeshParameters newMeshParameters, EditorLog log)
+        private static void OptimiseMeshGroup(GameObject[] allGameObjects, string namePrefix, MeshTools.CombineMeshParameters combineMeshParameters,
+            MeshTools.ConfigureMeshParameters newMeshParameters, EditorLog log)
         {
             foreach (GameObject gameObjectParent in allGameObjects)
             {

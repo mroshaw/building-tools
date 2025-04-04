@@ -11,8 +11,17 @@ namespace DaftAppleGames.BuildingTools.Editor
     /// <summary>
     /// Used by static methods to configure specific attributes of a Mesh, while being able to ignore others
     /// </summary>
-    internal enum MeshProperties { CastShadows, StaticShadowCaster, ContributeGI, ReceiveGI, MotionVectors, DynamicOcclusion, RenderLayerMask, Priority }
-
+    internal enum MeshProperties
+    {
+        CastShadows,
+        StaticShadowCaster,
+        ContributeGI,
+        ReceiveGI,
+        MotionVectors,
+        DynamicOcclusion,
+        RenderLayerMask,
+        Priority
+    }
 
 
     /// <summary>
@@ -22,14 +31,14 @@ namespace DaftAppleGames.BuildingTools.Editor
     {
         #region Static properties
 
-
         static MeshTools()
         {
-
         }
+
         #endregion
 
         #region Tool prarameter structs
+
         /// <summary>
         /// Struct to consolidate parameters for use with the 'CombineMesh' tool
         /// </summary>
@@ -52,6 +61,7 @@ namespace DaftAppleGames.BuildingTools.Editor
             internal LightLayerMode LightLayerMode;
             internal string LayerName;
         }
+
         #endregion
 
         #region Configure Mesh methoods
@@ -75,12 +85,13 @@ namespace DaftAppleGames.BuildingTools.Editor
                 Debug.LogError($"Combined Mesh output folder does not exist: {fullOutputPath}. Aborting!");
                 return false;
             }
+
             return true;
         }
 
         internal static void ConfigureMeshOnGameObject(GameObject parentGameObject, ConfigureMeshParameters configureMeshParameters)
         {
-            if(!parentGameObject.TryGetComponent(out MeshRenderer renderer))
+            if (!parentGameObject.TryGetComponent(out MeshRenderer renderer))
             {
                 Debug.LogWarning($"No MeshRenderer found on {parentGameObject.name}");
                 return;
@@ -103,12 +114,14 @@ namespace DaftAppleGames.BuildingTools.Editor
 
             // Update the static flags, based on whether ConfigureGI is true or false
             StaticEditorFlags flags = GameObjectUtility.GetStaticEditorFlags(renderer.gameObject);
-            GameObjectUtility.SetStaticEditorFlags(renderer.gameObject, configureMeshParameters.ContributeGI ? flags | StaticEditorFlags.ContributeGI : flags & ~StaticEditorFlags.ContributeGI);
-
+            GameObjectUtility.SetStaticEditorFlags(renderer.gameObject,
+                configureMeshParameters.ContributeGI ? flags | StaticEditorFlags.ContributeGI : flags & ~StaticEditorFlags.ContributeGI);
         }
+
         #endregion
 
         #region Combine Mesh methods
+
         /// <summary>
         /// Combines all meshes in the given GameObject, writing the resulting Mesh as an asset to the given path.
         /// Any components with the 'MeshCombineExcluder' component will be ignored by the process
@@ -205,7 +218,7 @@ namespace DaftAppleGames.BuildingTools.Editor
 
                 // Create a new mesh using the combined properties
                 IndexFormat format = combineMeshParameters.Is32BIT ? IndexFormat.UInt32 : IndexFormat.UInt16;
-                UnityEngine.Mesh combinedMesh = new UnityEngine.Mesh { indexFormat = format };
+                Mesh combinedMesh = new() { indexFormat = format };
                 combinedMesh.CombineMeshes(combine);
 
                 if (combineMeshParameters.GenerateSecondaryUVs)
@@ -223,8 +236,8 @@ namespace DaftAppleGames.BuildingTools.Editor
                 AssetDatabase.CreateAsset(combinedMesh, Path.Combine(fullOutputPath, $"{combineMeshParameters.AssetFileNamePrefix}CombinedMeshes_{materialName}.asset"));
 
                 // Create game object
-                string combinedMeshGoName = (materialToMeshFilterList.Count > 1) ? "CombinedMeshes_" + materialName : "CombinedMeshes_" + parentGameObject.name;
-                GameObject combinedMeshGameObject = new GameObject(combinedMeshGoName);
+                string combinedMeshGoName = materialToMeshFilterList.Count > 1 ? "CombinedMeshes_" + materialName : "CombinedMeshes_" + parentGameObject.name;
+                GameObject combinedMeshGameObject = new(combinedMeshGoName);
                 MeshFilter filter = combinedMeshGameObject.AddComponent<MeshFilter>();
                 filter.sharedMesh = combinedMesh;
                 MeshRenderer renderer = combinedMeshGameObject.AddComponent<MeshRenderer>();
@@ -261,6 +274,7 @@ namespace DaftAppleGames.BuildingTools.Editor
                 resultGO.transform.rotation = originalRotation;
             }
         }
+
         #endregion
 
         #region Volume helper methods
@@ -291,7 +305,7 @@ namespace DaftAppleGames.BuildingTools.Editor
                     continue;
                 }
 
-                Bounds meshBounds = childRenderer.bounds;
+                Bounds meshBounds = childRenderer.localBounds;
 
                 // Initialize or expand the combined bounds
                 if (!hasValidRenderer)
@@ -307,6 +321,7 @@ namespace DaftAppleGames.BuildingTools.Editor
 
             return combinedBounds;
         }
+
         #endregion
     }
 }

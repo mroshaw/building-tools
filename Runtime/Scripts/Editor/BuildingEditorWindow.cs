@@ -24,7 +24,7 @@ namespace DaftAppleGames.BuildingTools.Editor
 
         private Button _addBuildingComponentButton;
         private Button _configureLayersButton;
-        private Button _configureCollidersButton;
+        private Button _configurePropsButton;
         private Button _configureVolumesButton;
         private Button _optimiseMeshesButton;
         private Button _configureLightingButton;
@@ -69,11 +69,11 @@ namespace DaftAppleGames.BuildingTools.Editor
                 _configureLayersButton.clicked += ConfigureLayers;
             }
 
-            _configureCollidersButton = rootVisualElement.Q<Button>("ConfigureCollidersButton");
-            if (_configureCollidersButton != null)
+            _configurePropsButton = rootVisualElement.Q<Button>("ConfigurePropsButton");
+            if (_configurePropsButton != null)
             {
-                _configureCollidersButton.clicked -= ConfigureColliders;
-                _configureCollidersButton.clicked += ConfigureColliders;
+                _configurePropsButton.clicked -= ConfigureProps;
+                _configurePropsButton.clicked += ConfigureProps;
             }
 
             _configureVolumesButton = rootVisualElement.Q<Button>("ConfigureVolumesButton");
@@ -235,7 +235,7 @@ namespace DaftAppleGames.BuildingTools.Editor
         /// </summary>
         private void ConfigureLayers()
         {
-            if (!Validate() || !ValidateLayerSetup())
+            if (!Validate() || !ValidateLayerSetup() || !ValidateGameObject(selectedGameObject))
             {
                 return;
             }
@@ -248,7 +248,7 @@ namespace DaftAppleGames.BuildingTools.Editor
         /// <summary>
         /// Handle the Colliders button click
         /// </summary>
-        private void ConfigureColliders()
+        private void ConfigureProps()
         {
             if (!Validate(true))
             {
@@ -316,7 +316,7 @@ namespace DaftAppleGames.BuildingTools.Editor
             {
                 _addBuildingComponentButton.SetEnabled(false);
                 _configureLayersButton.SetEnabled(false);
-                _configureCollidersButton.SetEnabled(false);
+                _configurePropsButton.SetEnabled(false);
                 _configureVolumesButton.SetEnabled(false);
                 _configureDoorsButton.SetEnabled(false);
                 _optimiseMeshesButton.SetEnabled(false);
@@ -331,7 +331,7 @@ namespace DaftAppleGames.BuildingTools.Editor
 
             // Enable the remaining buttons only once the building component has been added.
             _configureLayersButton.SetEnabled(hasBuildingComponent);
-            _configureCollidersButton.SetEnabled(hasBuildingComponent);
+            _configurePropsButton.SetEnabled(hasBuildingComponent);
 #if !DAG_HDRP
             _configureVolumesButton.SetEnabled(false);
             _configureLightingButton.SetEnabled(false);
@@ -341,6 +341,28 @@ namespace DaftAppleGames.BuildingTools.Editor
 #endif
             _configureDoorsButton.SetEnabled(hasBuildingComponent);
             _optimiseMeshesButton.SetEnabled(hasBuildingComponent);
+        }
+
+        /// <summary>
+        /// Checks the state of the GameObject
+        /// </summary>
+        private bool ValidateGameObject(GameObject gameObject)
+        {
+            if (!gameObject.TryGetComponent<Building>(out Building building))
+            {
+                log.Log(LogLevel.Error, "The selected GameObject must contain a building component!");
+                return false;
+            }
+
+            if (building.interiors == null || building.interiors.Length == 0 ||
+                building.exteriors == null || building.exteriors.Length == 0)
+
+            {
+                log.Log(LogLevel.Error, "You must configure the Interior, Exterior objects on the building before you can use the tools. Please set the props too!");
+                return false;
+            }
+
+            return true;
         }
     }
 }

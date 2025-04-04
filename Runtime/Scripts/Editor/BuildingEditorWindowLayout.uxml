@@ -2,11 +2,11 @@
     <Style src="project://database/Assets/daftapple-core/Runtime/Scripts/Editor/EditorWindowStyles.uss?fileID=7433441132597879392&amp;guid=b92b529d400a4f84db355c6f295a3efa&amp;type=3#EditorWindowStyles" />
     <editor:ObjectField label="Building Settings:" name="BuildingSettingsField" type="DaftAppleGames.BuildingTools.Editor.BuildingEditorSettings, DaftAppleGames.BuildingTools.Editor" binding-path="buildingEditorSettings" class="Field" />
     <engine:Button text="Save a copy..." name="SaveLocalSettingsCopyButton" class="SkinnyButton" />
-    <engine:Button text="Configure Tags and Layers" name="ConfigureTagsAndLayersButton" tooltip="Adds Layer and Tags required by the process, and renames Rendering Layer 1 and 2." class="Button" />
+    <engine:Button text="Set Up Tags and Layers" name="ConfigureTagsAndLayersButton" tooltip="Adds Layer and Tags required by the process, and renames Rendering Layer 1 and 2." class="Button" />
     <editor:ObjectField label="Selected GameObject:" type="UnityEngine.GameObject, UnityEngine.CoreModule" binding-path="selectedGameObject" class="Field" />
     <engine:Button text="Add Building Components" name="AddBuildingComponentButton" tooltip="Adds the base components to the selected GameObject. Required by all subsequent functions." class="Button" />
     <engine:Button text="Configure Layers" name="ConfigureLayersButton" tooltip="Set up interior and exterior mesh layers." class="Button" />
-    <engine:Button text="Configure Colliders" name="ConfigureCollidersButton" tooltip="Adds missing colliders to props in the selected building." class="Button" />
+    <engine:Button text="Configure Props" name="ConfigurePropsButton" tooltip="Adds missing colliders to props in the selected building and aligns exterior props to the ground" class="Button" />
     <engine:Button text="Configure Doors" name="ConfigureDoorsButton" tooltip="Adds door functionality to all doors in the selected game object." class="Button" />
     <engine:Button text="Configure Volumes" name="ConfigureVolumesButton" tooltip="Creates useful volumes emcompassing the building." class="Button" />
     <engine:Button text="Configure Lighting" name="ConfigureLightingButton" tooltip="Adds a lighting controller and configures various aspects of candles, fires and exterior lights." class="Button" />
