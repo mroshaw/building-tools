@@ -47,6 +47,13 @@ namespace DaftAppleGames.BuildingTools.Editor
         {
             base.CreateGUI();
 
+            Button configureTagsAndLayersButton = rootVisualElement.Q<Button>("ConfigureTagsAndLayersButton");
+            if (configureTagsAndLayersButton != null)
+            {
+                configureTagsAndLayersButton.clicked -= ConfigureTagsAndLayers;
+                configureTagsAndLayersButton.clicked += ConfigureTagsAndLayers;
+            }
+
             // Register buttons
             _addBuildingComponentButton = rootVisualElement.Q<Button>("AddBuildingComponentButton");
             if (_addBuildingComponentButton != null)
@@ -139,6 +146,23 @@ namespace DaftAppleGames.BuildingTools.Editor
             {
                 buildingEditorSettings = buildingEditorSettings.SaveALocalCopy();
             }
+        }
+
+        /// <summary>
+        /// Adds required Layers and Tags, and renames Rendering Layers 1 and 2
+        /// </summary>
+        private void ConfigureTagsAndLayers()
+        {
+            log.Log(LogLevel.Info, "Creating tags...");
+            CustomEditorTools.AddTag("Player");
+            log.Log(LogLevel.Info, "Creating layers...");
+            CustomEditorTools.AddLayer("BuildingExterior");
+            CustomEditorTools.AddLayer("BuildingInterior");
+            CustomEditorTools.AddLayer("InteriorProps");
+            CustomEditorTools.AddLayer("ExteriorProps");
+            log.Log(LogLevel.Info, "Renaming Rendering Layers...");
+            CustomEditorTools.RenameRenderingLayer(1, "Exterior");
+            CustomEditorTools.RenameRenderingLayer(2, "Interior");
         }
 
         /// <summary>
