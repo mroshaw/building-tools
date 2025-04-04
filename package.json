@@ -12,7 +12,7 @@
   },
   "samples": [
     {
-      "displayName": "Samples",
+      "displayName": "3DForgeSample",
       "description": "Contains sample settings and files to use with 3D Forge building assets",
       "path": "Samples~/BuildingTools"
     }
