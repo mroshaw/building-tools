@@ -10,6 +10,13 @@
   "dependencies": {
     "com.unity.splines": "2.7.2"
   },
+  "samples": [
+    {
+      "displayName": "3D Forge",
+      "description": "Contains sample settings and files to use with 3D Forge building assets",
+      "path": "Samples~/3D Forge"
+    }
+  ],
   "keywords": [
     "buildings",
     "3dforge"

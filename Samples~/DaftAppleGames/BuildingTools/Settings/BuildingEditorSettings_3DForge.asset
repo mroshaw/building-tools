@@ -39,7 +39,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 60c475a6d5bffdb43bb4b71eb69b9132, type: 3}
   doorClosedClips:
   - {fileID: 8300000, guid: 80f85f7c9156d914890d35c6b2be956f, type: 3}
-  doorSfxGroup: {fileID: 0}
+  doorSfxGroup: {fileID: -5427569144899992052, guid: 886da7d8b4ce9b44bbdfcf31ab9530f9, type: 2}
   doorTriggerLayerMask:
     serializedVersion: 2
     m_Bits: 8
