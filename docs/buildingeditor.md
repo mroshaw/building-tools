@@ -30,3 +30,6 @@ Daft Apple Games > Building Tools > Building Editor
 The window looks like this:
 
 ![](.\media\buildingeditorwindow.png)
+
+### Set Up Tags and Layers
+
