@@ -26,6 +26,7 @@ url: "https://mroshaw.github.io" # the base hostname & protocol for your site, e
 
 # Build settings
 remote_theme: just-the-docs/just-the-docs
+color_scheme: dark
 plugins:
   - jekyll-feed
 
