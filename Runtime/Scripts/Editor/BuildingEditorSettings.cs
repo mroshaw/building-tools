@@ -1,6 +1,4 @@
-#if UNITY_EDITOR
 using UnityEditor;
-#endif
 using System;
 using DaftAppleGames.Darskerry.Core.Buildings;
 using UnityEngine;
@@ -58,10 +56,9 @@ namespace DaftAppleGames.BuildingTools.Editor
 
         [BoxGroup("Volumes")] [SerializeField] internal string[] meshSizeIgnoreNames;
         [BoxGroup("Volumes")] [SerializeField] internal LayerMask meshSizeIncludeLayers;
+        [BoxGroup("Volumes")] [SerializeField] internal string interiorVolumeGameObjectName;
         [BoxGroup("Volumes")] [SerializeField] internal VolumeProfile interiorVolumeProfile;
         [BoxGroup("CombineMeshes")] [SerializeField] internal string meshAssetOutputPath;
-
-        #region Editor scripts
 
         [Button("Save A Copy")]
         internal BuildingEditorSettings SaveALocalCopy()
@@ -83,7 +80,5 @@ namespace DaftAppleGames.BuildingTools.Editor
             AssetDatabase.CreateAsset(newEditorSettings, relativePath);
             return newEditorSettings;
         }
-
-        #endregion
     }
 }

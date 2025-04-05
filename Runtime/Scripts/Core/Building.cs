@@ -9,12 +9,12 @@ namespace DaftAppleGames.Darskerry.Core.Buildings
 {
     public class Building : MonoBehaviour
     {
-        [BoxGroup("Meshes")] [SerializeField] public GameObject[] interiors;
+        [FoldoutGroup("Meshes")] [SerializeField] public GameObject[] interiors;
 
-        [BoxGroup("Meshes")] [SerializeField] public GameObject[] exteriors;
+        [FoldoutGroup("Meshes")] [SerializeField] public GameObject[] exteriors;
 
-        [BoxGroup("Meshes")] [SerializeField] public GameObject[] interiorProps;
+        [FoldoutGroup("Meshes")] [SerializeField] public GameObject[] interiorProps;
 
-        [BoxGroup("Meshes")] [SerializeField] public GameObject[] exteriorProps;
+        [FoldoutGroup("Meshes")] [SerializeField] public GameObject[] exteriorProps;
     }
 }
