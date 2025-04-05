@@ -33,3 +33,5 @@ The window looks like this:
 
 ### Set Up Tags and Layers
 
+### Add Building Components
+
