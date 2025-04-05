@@ -35,3 +35,5 @@ The window looks like this:
 
 ### Add Building Components
 
+### Configure Layers
+
