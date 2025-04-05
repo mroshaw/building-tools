@@ -21,8 +21,8 @@
 title: Daft Apple Games - Building Tools
 email: oli@mroshaw.co.uk
 description: A user guide for the Building Tools component of the Daft Apple Games Unity Framework
-baseurl: "/mroshaw/building-tools" # the subpath of your site, e.g. /blog
-url: "https://github.com" # the base hostname & protocol for your site, e.g. http://example.com
+baseurl: "/building-tools" # the subpath of your site, e.g. /blog
+url: "https://mroshaw.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 
 # Build settings
 remote_theme: just-the-docs/just-the-docs
