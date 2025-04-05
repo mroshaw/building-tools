@@ -21,7 +21,7 @@
 title: Daft Apple Games - Building Tools
 email: your-email@example.com
 description: A user guide for the Building Tools component of the Daft Apple Games Unity Framework
-baseurl: "" # the subpath of your site, e.g. /blog
+baseurl: "/building-tools" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: jekyllrb
 github_username:  jekyll
