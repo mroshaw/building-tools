@@ -1,3 +1,8 @@
+---
+title: The Building Editor Tool
+nav_order: 2
+---
+
 # Building Editor Tool
 
 ## Introduction
