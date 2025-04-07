@@ -257,7 +257,8 @@ namespace DaftAppleGames.BuildingTools.Editor
         {
             // Raycast down from the GameObject, see what's there
             LayerMask rayLayerMask = ~0;
-            bool isHit = Physics.Raycast(gameObject.transform.position, gameObject.transform.up * -1, out RaycastHit raycastHit, 0.5f, rayLayerMask,
+            bool isHit = Physics.Raycast(gameObject.transform.position + gameObject.transform.up * 0.1f, gameObject.transform.up * -1, out RaycastHit raycastHit, 0.5f,
+                rayLayerMask,
                 QueryTriggerInteraction.UseGlobal);
             if (!isHit)
             {
