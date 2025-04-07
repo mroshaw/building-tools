@@ -51,7 +51,6 @@ namespace DaftAppleGames.Darskerry.Core.Buildings
                     case BuildingLightType.OutdoorCandle:
                         outdoorLights.Add(currLight);
                         break;
-
                 }
             }
         }
@@ -93,7 +92,7 @@ namespace DaftAppleGames.Darskerry.Core.Buildings
         }
 
 
-        private void SetLightsState(List<BuildingLight> lights, bool state)
+        private static void SetLightsState(List<BuildingLight> lights, bool state)
         {
             foreach (BuildingLight currLight in lights)
             {

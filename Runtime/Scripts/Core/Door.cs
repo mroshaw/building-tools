@@ -12,8 +12,20 @@ using DaftAppleGames.Extensions;
 
 namespace DaftAppleGames.Darskerry.Core.Buildings
 {
-    public enum DoorOpenDirection { Inwards, Outwards}
-    internal enum DoorState { Open, Opening, Closing, Closed }
+    public enum DoorOpenDirection
+    {
+        Inwards,
+        Outwards
+    }
+
+    internal enum DoorState
+    {
+        Open,
+        Opening,
+        Closing,
+        Closed
+    }
+
     public class Door : MonoBehaviour
     {
         [BoxGroup("Settings")] [SerializeField] private float openAngle = 110.0f;
@@ -36,8 +48,8 @@ namespace DaftAppleGames.Darskerry.Core.Buildings
 
         private AudioSource _audioSource;
 
-        public bool IsOpen => _doorState == DoorState.Open;
-        public bool IsMoving => _doorState == DoorState.Opening || _doorState == DoorState.Closing;
+        private bool IsOpen => _doorState == DoorState.Open;
+        private bool IsMoving => _doorState == DoorState.Opening || _doorState == DoorState.Closing;
 
         private DoorState _doorState = DoorState.Closed;
         private Quaternion _doorClosedRotation;
@@ -88,7 +100,8 @@ namespace DaftAppleGames.Darskerry.Core.Buildings
                 StartCoroutine(OpenDoorAsync(direction));
             }
 
-            transform.localRotation = gameObject.transform.localRotation * Quaternion.Euler(gameObject.transform.up * (direction == DoorOpenDirection.Inwards ? -openAngle : openAngle));
+            transform.localRotation = gameObject.transform.localRotation *
+                                      Quaternion.Euler(gameObject.transform.up * (direction == DoorOpenDirection.Inwards ? -openAngle : openAngle));
             _doorState = DoorState.Open;
         }
 
@@ -109,7 +122,8 @@ namespace DaftAppleGames.Darskerry.Core.Buildings
             float timer = 0;
             Quaternion startValue = transform.localRotation;
 
-            Quaternion doorOpenRotation = gameObject.transform.localRotation * Quaternion.Euler(gameObject.transform.up * (direction == DoorOpenDirection.Inwards ? -openAngle : openAngle));
+            Quaternion doorOpenRotation = gameObject.transform.localRotation *
+                                          Quaternion.Euler(gameObject.transform.up * (direction == DoorOpenDirection.Inwards ? -openAngle : openAngle));
 
             while (timer < openingTime)
             {
@@ -185,13 +199,16 @@ namespace DaftAppleGames.Darskerry.Core.Buildings
         }
 
         #region Unity Editor methods
-        #if UNITY_EDITOR
-        public void ConfigureInEditor(AudioMixerGroup audioMixerGroup, AudioClip[] newOpeningClips, AudioClip[] newOpenClips, AudioClip[] newClosingClips, AudioClip[] newClosedClips)
+
+#if UNITY_EDITOR
+        public void ConfigureInEditor(AudioMixerGroup audioMixerGroup, AudioClip[] newOpeningClips, AudioClip[] newOpenClips, AudioClip[] newClosingClips,
+            AudioClip[] newClosedClips)
         {
             if (!_audioSource)
             {
                 _audioSource = this.EnsureComponent<AudioSource>();
             }
+
             _audioSource.outputAudioMixerGroup = audioMixerGroup;
             openingClips = newOpeningClips;
             openingClips = newOpenClips;
@@ -216,7 +233,8 @@ namespace DaftAppleGames.Darskerry.Core.Buildings
         {
             CloseDoor(true);
         }
-        #endif
+#endif
+
         #endregion
     }
 }

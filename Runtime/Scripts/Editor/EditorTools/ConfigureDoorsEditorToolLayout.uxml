@@ -1,0 +1,8 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Assets/daftapple-core/Runtime/Scripts/Editor/EditorWindowStyles.uss?fileID=7433441132597879392&amp;guid=b92b529d400a4f84db355c6f295a3efa&amp;type=3#EditorWindowStyles" />
+    <engine:Foldout text="Configure Doors Options" name="ToolOptionsFoldout" value="false" class="Foldout">
+        <engine:Toggle label="Configure Meshes:" name="ConfigureMeshesToggle" value="true" />
+        <engine:Toggle label="Set Static Flags:" name="SetStaticFlagsToggle" value="true" />
+    </engine:Foldout>
+    <engine:Button text="Configure Doors" name="ConfigureDoorsButton" class="Button" />
+</engine:UXML>

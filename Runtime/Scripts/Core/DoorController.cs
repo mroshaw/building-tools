@@ -12,7 +12,7 @@ namespace DaftAppleGames.Darskerry.Core.Buildings
     public class DoorController : MonoBehaviour
     {
         [BoxGroup("Settings")] [SerializeField] private bool findLightsOnAwake;
-        [BoxGroup("Building Doors")] [SerializeField] private List<Door> doors = new List<Door>();
+        [BoxGroup("Building Doors")] [SerializeField] private List<Door> doors = new();
 
         [Button("Refresh Door List")]
         private void RefreshDoorList()
@@ -51,5 +51,12 @@ namespace DaftAppleGames.Darskerry.Core.Buildings
             }
         }
 
+        public void AddDoor(Door newDoor)
+        {
+            if (!doors.Contains(newDoor))
+            {
+                doors.Add(newDoor);
+            }
+        }
     }
 }

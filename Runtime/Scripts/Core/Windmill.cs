@@ -21,7 +21,7 @@ namespace DaftAppleGames.Darskerry.Core.Buildings
         {
             if (!windMillBlades)
             {
-                windMillBlades = this.gameObject;
+                windMillBlades = gameObject;
             }
 
         }

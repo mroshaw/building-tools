@@ -6,12 +6,11 @@ using RenderingLayerMask = UnityEngine.RenderingLayerMask;
 #if DAG_HDRP
 using UnityEngine.Rendering.HighDefinition;
 #endif
-#if DAG_URP
 
+#if DAG_URP
 #endif
 
 #if DAG_BIRP
-
 #endif
 
 
@@ -20,18 +19,23 @@ namespace DaftAppleGames.BuildingTools.Editor
     /// <summary>
     /// Used to assign specific Light Layers to lights and meshes
     /// </summary>
-    public enum LightLayerMode { Interior, Exterior, Both }
+    public enum LightLayerMode
+    {
+        Interior,
+        Exterior,
+        Both
+    }
 
     /// <summary>
     /// Static methods for working with Lighting
     /// </summary>
     internal static class LightTools
     {
-        internal static Dictionary<LightLayerMode, uint> lightLayerMasks;
+        private static readonly Dictionary<LightLayerMode, uint> LightLayerMasks;
 
         static LightTools()
         {
-            lightLayerMasks = new Dictionary<LightLayerMode, uint>
+            LightLayerMasks = new Dictionary<LightLayerMode, uint>
             {
                 { LightLayerMode.Interior, RenderingLayerMask.GetMask("Exterior") },
                 { LightLayerMode.Exterior, RenderingLayerMask.GetMask("Exterior") },
@@ -44,10 +48,11 @@ namespace DaftAppleGames.BuildingTools.Editor
         /// </summary>
         internal static RenderingLayerMask GetMaskByMode(LightLayerMode layerMode)
         {
-            return lightLayerMasks[layerMode];
+            return LightLayerMasks[layerMode];
         }
 
         #region Tool prarameter structs
+
         /// <summary>
         /// Struct to consolidate parameters for Lighting config
         /// </summary>
@@ -61,7 +66,9 @@ namespace DaftAppleGames.BuildingTools.Editor
             internal float Radius;
             internal LightLayerMode LayerMode;
         }
+
         #endregion
+
         #region Configure Lights methoods
 
         /// <summary>
@@ -83,15 +90,12 @@ namespace DaftAppleGames.BuildingTools.Editor
 #endif
 
 #if DAG_URP
-
 #endif
 
 #if DAG_BIRP
-
 #endif
         }
 
-    #endregion
-
+        #endregion
     }
 }

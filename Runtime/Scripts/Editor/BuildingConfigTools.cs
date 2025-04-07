@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using DaftAppleGames.Darskerry.Core.Buildings;
 using DaftAppleGames.Editor;
 using UnityEngine;
@@ -12,16 +11,8 @@ namespace DaftAppleGames.BuildingTools.Editor
     /// <summary>
     /// Static methods for working with Buildings
     /// </summary>
-    internal static class BuildingTools
+    internal static class BuildingConfigTools
     {
-        #region Static properties
-
-        static BuildingTools()
-        {
-        }
-
-        #endregion
-
         #region Tool prarameter structs
 
         /// <summary>
@@ -37,13 +28,36 @@ namespace DaftAppleGames.BuildingTools.Editor
 
         internal static void AddBuildingComponent(GameObject parentGameObject, EditorLog log)
         {
-            Building building = parentGameObject.EnsureComponent<Building>();
+            _ = parentGameObject.EnsureComponent<Building>();
             log.Log(LogLevel.Info, $"Added Building component to {parentGameObject.name}.");
         }
 
         #endregion
 
-        #region Layers methods
+        #region Mesh config methods
+
+        /// <summary>
+        /// Applies layers, static and lighting properties to meshes
+        /// </summary>
+        internal static void ConfigureMeshes(GameObject parentGameObject, BuildingEditorSettings buildingSettings, EditorLog log)
+        {
+            log.Log(LogLevel.Info, "Configuring layers...");
+            ConfigureLayers(parentGameObject, buildingSettings, log);
+            log.Log(LogLevel.Info, "Configuring static flags...");
+            ConfigureStaticFlags(parentGameObject, buildingSettings, log);
+        }
+
+        /// <summary>
+        /// Sets the static flags on all child mesh renderers
+        /// </summary>
+        internal static void ConfigureStaticFlags(GameObject parentGameObject, BuildingEditorSettings buildingSettings, EditorLog log)
+        {
+            foreach (MeshRenderer meshRenderer in parentGameObject.GetComponentsInChildren<MeshRenderer>(true))
+            {
+                log.Log(LogLevel.Debug, $"Setting static flags on {meshRenderer.gameObject.name} to {buildingSettings.staticMeshFlags}");
+                GameObjectUtility.SetStaticEditorFlags(meshRenderer.gameObject, buildingSettings.staticMeshFlags);
+            }
+        }
 
         /// <summary>
         /// Configure the Building layers
@@ -85,12 +99,14 @@ namespace DaftAppleGames.BuildingTools.Editor
                     continue;
                 }
 
-                if (prop.IsParentedByAny(buildingMeshes, out GameObject parentGameObject))
+                if (!prop.IsParentedByAny(buildingMeshes, out GameObject parentGameObject))
                 {
-                    log.Log(LogLevel.Info, $"Moving Props GameObject {prop.name} out of {parentGameObject.name} into {parentGameObject.transform.parent.gameObject.name}...");
-                    prop.name = newName;
-                    prop.transform.SetParent(parentGameObject.transform.parent);
+                    continue;
                 }
+
+                log.Log(LogLevel.Debug, $"Moving Props GameObject {prop.name} out of {parentGameObject.name} into {parentGameObject.transform.parent.gameObject.name}...");
+                prop.name = newName;
+                prop.transform.SetParent(parentGameObject.transform.parent);
             }
         }
 
@@ -105,18 +121,22 @@ namespace DaftAppleGames.BuildingTools.Editor
             {
                 foreach (GameObject prop in building.interiorProps)
                 {
-                    if (prop.IsParentedByAny(building.interiors, out GameObject parentGameObject))
+                    if (prop.IsParentedByAny(building.interiors, out _))
                     {
                         return true;
                     }
                 }
             }
 
-            if (building.exteriorProps != null && building.exteriorProps.Length > 0)
+            if (building.exteriorProps == null || building.exteriorProps.Length <= 0)
+            {
+                return false;
+            }
+
             {
                 foreach (GameObject prop in building.exteriorProps)
                 {
-                    if (prop.IsParentedByAny(building.exteriors, out GameObject parentGameObject))
+                    if (prop.IsParentedByAny(building.exteriors, out _))
                     {
                         return true;
                     }
@@ -134,24 +154,34 @@ namespace DaftAppleGames.BuildingTools.Editor
             foreach (MeshRenderer child in parentGameObject.GetComponentsInChildren<MeshRenderer>(true))
             {
                 child.gameObject.layer = LayerMask.NameToLayer(layerName);
-                log.Log(LogLevel.Info, $"Layer set to {layerName} in {child.gameObject}.");
+                log.Log(LogLevel.Debug, $"Layer set to {layerName} in {child.gameObject}.");
             }
 
-            if (includeParent)
+            if (!includeParent)
             {
-                parentGameObject.layer = LayerMask.NameToLayer(layerName);
-                log.Log(LogLevel.Info, $"Layer set to {layerName} in {parentGameObject.gameObject}.");
+                return;
             }
+
+            parentGameObject.layer = LayerMask.NameToLayer(layerName);
+            log.Log(LogLevel.Debug, $"Layer set to {layerName} in {parentGameObject.gameObject}.");
         }
 
         #endregion
 
-        #region Collider methods
+        #region Props methods
+
+        internal static void ConfigureProps(GameObject parentGameObject, BuildingEditorSettings buildingSettings, EditorLog log)
+        {
+            log.Log(LogLevel.Info, "Configuring colliders...");
+            ConfigureColliders(parentGameObject, buildingSettings, log);
+            log.Log(LogLevel.Info, "Aligning props to terrain...");
+            AlignExteriorPropsToTerrain(parentGameObject, buildingSettings, log);
+        }
 
         /// <summary>
         /// Look for GameObjects with the names given and add appropriate colliders
         /// </summary>
-        internal static void ConfigureColliders(GameObject parentGameObject, BuildingEditorSettings buildingSettings, EditorLog log)
+        private static void ConfigureColliders(GameObject parentGameObject, BuildingEditorSettings buildingSettings, EditorLog log)
         {
             Renderer[] allRenderers = parentGameObject.GetComponentsInChildren<Renderer>(true);
             foreach (Renderer renderer in allRenderers)
@@ -183,12 +213,58 @@ namespace DaftAppleGames.BuildingTools.Editor
             T component = colliderGameObject.GetComponent<T>();
             if (component == null)
             {
-                log.Log(LogLevel.Info, $"Added {typeof(T)} to {colliderGameObject.name}.");
+                log.Log(LogLevel.Debug, $"Added {typeof(T)} to {colliderGameObject.name}.");
             }
             else
             {
                 log.Log(LogLevel.Warning, $"{colliderGameObject.name} already has a {typeof(T)} component.");
             }
+        }
+
+        /// <summary>
+        /// Aligns each External Prop mesh renderer to the terrain, if there is one
+        /// </summary>
+        private static void AlignExteriorPropsToTerrain(GameObject parentGameObject, BuildingEditorSettings buildingSettings, EditorLog log)
+        {
+            Building building = parentGameObject.GetComponent<Building>();
+
+            if (Terrain.activeTerrain == null)
+            {
+                log.Log(LogLevel.Warning, $"There is no active terrain in the scene, so exterior props will not be aligned.");
+                return;
+            }
+
+            foreach (GameObject externalPropParent in building.exteriorProps)
+            {
+                foreach (MeshRenderer propRenderer in externalPropParent.GetComponentsInChildren<MeshRenderer>(true))
+                {
+                    // Check to see if the renderer is already on top of another mesh renderer
+                    if (IsGameObjectOnMeshRenderer(propRenderer.gameObject))
+                    {
+                        continue;
+                    }
+
+                    // If not, align to terrain
+
+                    log.Log(LogLevel.Debug, $"Aligning prop to terrain: {propRenderer.gameObject.name}.");
+                    Terrain.activeTerrain.AlignObject(propRenderer.gameObject, buildingSettings.terrainAlignPosition, buildingSettings.terrainAlignRotation,
+                        buildingSettings.terrainAlignX, buildingSettings.terrainAlignY, buildingSettings.terrainAlignZ);
+                }
+            }
+        }
+
+        private static bool IsGameObjectOnMeshRenderer(GameObject gameObject)
+        {
+            // Raycast down from the GameObject, see what's there
+            LayerMask rayLayerMask = ~0;
+            bool isHit = Physics.Raycast(gameObject.transform.position, gameObject.transform.up * -1, out RaycastHit raycastHit, 0.5f, rayLayerMask,
+                QueryTriggerInteraction.UseGlobal);
+            if (!isHit)
+            {
+                return false;
+            }
+
+            return raycastHit.collider.gameObject.GetComponent<Terrain>() == null;
         }
 
         #endregion
@@ -228,15 +304,15 @@ namespace DaftAppleGames.BuildingTools.Editor
             lightingController.UpdateLights();
         }
 
-        internal static void ConfigureBuildingLight(GameObject lightGameObject, LightingSettings lightingSettings, BuildingEditorSettings buildingSettings, EditorLog log)
+        private static void ConfigureBuildingLight(GameObject lightGameObject, LightingSettings lightingSettings, BuildingEditorSettings buildingSettings, EditorLog log)
         {
-            if (!lightGameObject.TryGetComponentInChildren<Light>(out Light light, true))
+            if (!lightGameObject.TryGetComponentInChildren(out Light light, true))
             {
                 log.Log(LogLevel.Warning, $"No light found on parent mesh {lightGameObject.name}.");
                 return;
             }
 
-            if (!lightGameObject.TryGetComponentInChildren<ParticleSystem>(out ParticleSystem flameParticleSystem, true))
+            if (!lightGameObject.TryGetComponentInChildren(out ParticleSystem flameParticleSystem, true))
             {
                 log.Log(LogLevel.Warning, $"No flame particle system found on parent mesh {lightGameObject.name}.");
             }
@@ -257,22 +333,28 @@ namespace DaftAppleGames.BuildingTools.Editor
             MeshRenderer[] allMeshRenderers = parentGameObject.GetComponentsInChildren<MeshRenderer>(true);
             foreach (MeshRenderer renderer in allMeshRenderers)
             {
-                if (buildingSettings.doorNames.ItemInString(renderer.gameObject.name))
+                if (!buildingSettings.doorNames.ItemInString(renderer.gameObject.name))
                 {
-                    ConfigureDoor(renderer.gameObject, buildingSettings, log);
+                    continue;
                 }
+
+                Door newDoor = ConfigureDoor(renderer.gameObject, buildingSettings, log);
+                doorController.AddDoor(newDoor);
             }
         }
 
-        private static void ConfigureDoor(GameObject doorGameObject, BuildingEditorSettings buildingSettings, EditorLog log)
+        private static Door ConfigureDoor(GameObject doorGameObject, BuildingEditorSettings buildingSettings, EditorLog log)
         {
             log.Log(LogLevel.Info, $"Configuring door on {doorGameObject.name}.");
             Door door = doorGameObject.EnsureComponent<Door>();
             // We don't want to combine this mesh, as it needs to move
             doorGameObject.EnsureComponent<MeshCombineExcluder>();
+            // Set the static flags, as the door will move
+            GameObjectUtility.SetStaticEditorFlags(door.gameObject, buildingSettings.moveableMeshFlags);
             door.ConfigureInEditor(buildingSettings.doorSfxGroup, buildingSettings.doorOpeningClips, buildingSettings.doorOpenClips, buildingSettings.doorClosingClips,
                 buildingSettings.doorClosedClips);
             CreateOrUpdateDoorTriggers(door, buildingSettings, log);
+            return door;
         }
 
 
@@ -339,11 +421,13 @@ namespace DaftAppleGames.BuildingTools.Editor
                 CreateOutputFolder = true
             };
 
-            MeshTools.ConfigureMeshParameters newMeshParameters = new();
+            MeshTools.ConfigureMeshParameters newMeshParameters = new()
+            {
+                // Set properties and merge exterior meshes
+                LightLayerMode = buildingSettings.buildingExteriorLightLayerMode,
+                LayerName = buildingSettings.buildingExteriorLayer
+            };
 
-            // Set properties and merge exterior meshes
-            newMeshParameters.LightLayerMode = buildingSettings.buildingExteriorLightLayerMode;
-            newMeshParameters.LayerName = buildingSettings.buildingExteriorLayer;
             OptimiseMeshGroup(building.exteriorProps, "exteriorProps", combineMeshParameters, newMeshParameters, log);
             OptimiseMeshGroup(building.exteriors, "exteriors", combineMeshParameters, newMeshParameters, log);
 

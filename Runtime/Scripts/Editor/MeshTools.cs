@@ -29,14 +29,6 @@ namespace DaftAppleGames.BuildingTools.Editor
     /// </summary>
     internal static class MeshTools
     {
-        #region Static properties
-
-        static MeshTools()
-        {
-        }
-
-        #endregion
-
         #region Tool prarameter structs
 
         /// <summary>
@@ -69,7 +61,7 @@ namespace DaftAppleGames.BuildingTools.Editor
         /// <summary>
         /// Validate the CombineMeshParameters
         /// </summary>
-        internal static bool ValidateCombineMeshParameters(CombineMeshParameters combineMeshParameters)
+        private static bool ValidateCombineMeshParameters(CombineMeshParameters combineMeshParameters)
         {
             // Check the base asset folder exists
             if (!Directory.Exists(combineMeshParameters.BaseAssetOutputPath))
@@ -80,16 +72,16 @@ namespace DaftAppleGames.BuildingTools.Editor
 
             string fullOutputPath = Path.Combine(combineMeshParameters.BaseAssetOutputPath, combineMeshParameters.AssetOutputFolder);
 
-            if (!combineMeshParameters.CreateOutputFolder && !Directory.Exists(fullOutputPath))
+            if (combineMeshParameters.CreateOutputFolder || Directory.Exists(fullOutputPath))
             {
-                Debug.LogError($"Combined Mesh output folder does not exist: {fullOutputPath}. Aborting!");
-                return false;
+                return true;
             }
 
-            return true;
+            Debug.LogError($"Combined Mesh output folder does not exist: {fullOutputPath}. Aborting!");
+            return false;
         }
 
-        internal static void ConfigureMeshOnGameObject(GameObject parentGameObject, ConfigureMeshParameters configureMeshParameters)
+        private static void ConfigureMeshOnGameObject(GameObject parentGameObject, ConfigureMeshParameters configureMeshParameters)
         {
             if (!parentGameObject.TryGetComponent(out MeshRenderer renderer))
             {
@@ -101,9 +93,9 @@ namespace DaftAppleGames.BuildingTools.Editor
             renderer.staticShadowCaster = configureMeshParameters.StaticShadowCaster;
 
             // Apply ContributeGI only if renderer is a MeshRenderer
-            if (renderer is MeshRenderer meshRenderer)
+            if (renderer != null)
             {
-                meshRenderer.receiveGI = configureMeshParameters.ReceiveGlobalGI;
+                renderer.receiveGI = configureMeshParameters.ReceiveGlobalGI;
             }
 
             // Apply the Light Layer Mask using the static dictionary
@@ -192,11 +184,11 @@ namespace DaftAppleGames.BuildingTools.Editor
                 }
                 else
                 {
-                    materialToMeshFilterList.Add(material, new List<MeshFilter>() { meshFilter });
+                    materialToMeshFilterList.Add(material, new List<MeshFilter> { meshFilter });
                 }
 
                 // Disable the MeshRenderer
-                if (meshFilter.TryGetComponent<Renderer>(out Renderer renderer))
+                if (meshFilter.TryGetComponent(out Renderer renderer))
                 {
                     renderer.enabled = false;
                 }
@@ -249,30 +241,32 @@ namespace DaftAppleGames.BuildingTools.Editor
             }
 
             // If there was more than one material, and thus multiple GOs created, parent them and work with result
-            GameObject resultGO = null;
+            GameObject resultGameObject;
             if (combinedObjects.Count > 1)
             {
-                resultGO = new GameObject("CombinedMeshes_" + parentGameObject.name);
-                foreach (GameObject combinedObject in combinedObjects) combinedObject.transform.parent = resultGO.transform;
+                resultGameObject = new GameObject("CombinedMeshes_" + parentGameObject.name);
+                foreach (GameObject combinedObject in combinedObjects) combinedObject.transform.parent = resultGameObject.transform;
             }
             else
             {
-                resultGO = combinedObjects[0];
+                resultGameObject = combinedObjects[0];
             }
 
             // Create prefab
-            string prefabPath = Path.Combine(fullOutputPath, resultGO.name + ".prefab");
-            PrefabUtility.SaveAsPrefabAssetAndConnect(resultGO, prefabPath, InteractionMode.UserAction);
+            string prefabPath = Path.Combine(fullOutputPath, resultGameObject.name + ".prefab");
+            PrefabUtility.SaveAsPrefabAssetAndConnect(resultGameObject, prefabPath, InteractionMode.UserAction);
 
             // Return both to original positions
             parentGameObject.transform.position = originalPosition;
             parentGameObject.transform.rotation = originalRotation;
-            if (parentGameObject.transform.parent != null)
+            if (parentGameObject.transform.parent == null)
             {
-                resultGO.transform.SetParent(parentGameObject.transform.parent, false);
-                resultGO.transform.position = originalPosition;
-                resultGO.transform.rotation = originalRotation;
+                return;
             }
+
+            resultGameObject.transform.SetParent(parentGameObject.transform.parent, false);
+            resultGameObject.transform.position = originalPosition;
+            resultGameObject.transform.rotation = originalRotation;
         }
 
         #endregion
@@ -292,7 +286,7 @@ namespace DaftAppleGames.BuildingTools.Editor
         /// <summary>
         /// Return the bounds of the enclosing meshes in the Game Object
         /// </summary>
-        internal static Bounds GetMeshBounds(GameObject parentGameObject, LayerMask includeLayerMask, string[] ignoreNames)
+        private static Bounds GetMeshBounds(GameObject parentGameObject, LayerMask includeLayerMask, string[] ignoreNames)
         {
             Bounds combinedBounds = new(Vector3.zero, Vector3.zero);
             bool hasValidRenderer = false;

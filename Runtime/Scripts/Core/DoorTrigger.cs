@@ -23,12 +23,12 @@ namespace DaftAppleGames.Darskerry.Core.Buildings
             gameObject.transform.SetParent(doorParent.transform);
         }
 
-        public override void TriggerEnter(Collider other)
+        protected override void TriggerEnter(Collider other)
         {
             OpenDoor();
         }
 
-        public override void TriggerExit(Collider other)
+        protected override void TriggerExit(Collider other)
         {
             CloseDoor();
         }
@@ -53,14 +53,16 @@ namespace DaftAppleGames.Darskerry.Core.Buildings
         }
 
         #region Unity Editor methods
-        #if UNITY_EDITOR
+
+#if UNITY_EDITOR
         public void ConfigureInEditor(Door newDoor, LayerMask newTriggerLayerMask, string[] newTriggerTags, DoorOpenDirection newDoorOpenDirection)
         {
             door = newDoor;
             doorOpenDirection = newDoorOpenDirection;
             base.ConfigureInEditor(newTriggerLayerMask, newTriggerTags);
         }
-        #endif
+#endif
+
         #endregion
     }
 }

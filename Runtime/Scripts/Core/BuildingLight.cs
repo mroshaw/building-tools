@@ -22,7 +22,7 @@ namespace DaftAppleGames.Darskerry.Core.Buildings
 
         [BoxGroup("Settings")] [SerializeField] private bool findLightsOnAwake;
         [BoxGroup("Settings")] [SerializeField] public BuildingLightType buildingLightType;
-        [BoxGroup("Lights")] [SerializeField] private Light light;
+        [BoxGroup("Lights")] [SerializeField] private Light lightComponent;
         [BoxGroup("Lights")] [SerializeField] private ParticleSystem particles;
         public BuildingLightType BuildingLightType => buildingLightType;
 
@@ -45,13 +45,13 @@ namespace DaftAppleGames.Darskerry.Core.Buildings
         [Button("Update Lights")]
         public void UpdateLights()
         {
-            light = gameObject.GetComponentInChildren<Light>(true);
+            lightComponent = gameObject.GetComponentInChildren<Light>(true);
             particles = gameObject.GetComponentInChildren<ParticleSystem>(true);
         }
 
         public Light GetLights()
         {
-            return light;
+            return lightComponent;
         }
 
         [Button("Turn On")]
@@ -68,7 +68,7 @@ namespace DaftAppleGames.Darskerry.Core.Buildings
 
         public void SetLightState(bool state)
         {
-            light.gameObject.SetActive(state);
+            lightComponent.gameObject.SetActive(state);
             particles.gameObject.SetActive(state);
         }
 
@@ -76,15 +76,16 @@ namespace DaftAppleGames.Darskerry.Core.Buildings
 
 
         #region Unity Editor methods
-        #if UNITY_EDITOR
+
+#if UNITY_EDITOR
         public void ConfigureInEditor(BuildingLightType newLightType, Light newLight, ParticleSystem newParticles)
         {
             buildingLightType = newLightType;
-            light = newLight;
+            lightComponent = newLight;
             particles = newParticles;
         }
-        #endif
-        #endregion
+#endif
 
+        #endregion
     }
 }
