@@ -9,8 +9,8 @@ namespace DaftAppleGames.Editor
     [CreateAssetMenu(fileName = "ConfigureMeshesEditorTool", menuName = "Daft Apple Games/Editor Tools/Configure Meshes Tool")]
     internal class ConfigureMeshesEditorTool : EditorTool
     {
-        [SerializeField] private bool configureMeshLayersOption;
-        [SerializeField] private bool setStaticFlagsOption;
+        private bool _configureMeshLayersOption;
+        private bool _setStaticFlagsOption;
 
         protected override bool CanRunTool(GameObject selectedGameObject, ButtonWizardEditorSettings editorSettings)
         {
@@ -20,17 +20,17 @@ namespace DaftAppleGames.Editor
 
         protected override void RunTool(GameObject selectedGameObject, ButtonWizardEditorSettings editorSettings)
         {
-            Log.Log(LogLevel.Info, $"Running ConfigureMeshesEditorTool. Configure Layers is {configureMeshLayersOption}, Set Static Flags is {setStaticFlagsOption}");
+            Log.Log(LogLevel.Info, $"Running ConfigureMeshesEditorTool. Configure Layers is {_configureMeshLayersOption}, Set Static Flags is {_setStaticFlagsOption}");
             if (editorSettings is BuildingEditorSettings buildingEditorSettings)
             {
-                if (configureMeshLayersOption)
+                if (_configureMeshLayersOption)
                 {
                     Log.Log(LogLevel.Info, "Configuring layers...");
                     BuildingConfigTools.ConfigureLayers(selectedGameObject, buildingEditorSettings, Log);
                     Log.Log(LogLevel.Info, "Done!");
                 }
 
-                if (setStaticFlagsOption)
+                if (_setStaticFlagsOption)
                 {
                     Log.Log(LogLevel.Info, "Configuring static flags...");
                     BuildingConfigTools.ConfigureStaticFlags(selectedGameObject, buildingEditorSettings, Log);
@@ -75,20 +75,23 @@ namespace DaftAppleGames.Editor
             return false;
         }
 
+        /// <summary>
+        /// Add bindings for custom tool options
+        /// </summary>
         protected override void AddCustomBindings()
         {
-            configureMeshLayersOption = BindToToggleOption("ConfigureMeshLayersToggle", SetConfigureMeshLayersOption);
-            setStaticFlagsOption = BindToToggleOption("SetStaticFlagsToggle", SetStaticFlagOption);
+            _configureMeshLayersOption = BindToToggleOption("ConfigureMeshLayersToggle", SetConfigureMeshLayersOption);
+            _setStaticFlagsOption = BindToToggleOption("SetStaticFlagsToggle", SetStaticFlagOption);
         }
 
         private void SetConfigureMeshLayersOption(ChangeEvent<bool> changeEvent)
         {
-            configureMeshLayersOption = changeEvent.newValue;
+            _configureMeshLayersOption = changeEvent.newValue;
         }
 
         private void SetStaticFlagOption(ChangeEvent<bool> changeEvent)
         {
-            setStaticFlagsOption = changeEvent.newValue;
+            _setStaticFlagsOption = changeEvent.newValue;
         }
     }
 }

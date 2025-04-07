@@ -1,22 +1,61 @@
 using DaftAppleGames.BuildingTools.Editor;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace DaftAppleGames.Editor
 {
     [CreateAssetMenu(fileName = "ConfigurePropsEditorTool", menuName = "Daft Apple Games/Editor Tools/Configure Props Tool")]
     internal class ConfigurePropsEditorTool : EditorTool
     {
+        private bool _addMissingCollidersOption;
+        private bool _alignExteriorPropsToTerrainOption;
+
         protected override bool CanRunTool(GameObject selectedGameObject, ButtonWizardEditorSettings editorSettings)
         {
-            return RequireSettingsAndGameObjectValidation();
+            return RequireSettingsAndGameObjectValidation() && RequiredBuildingValidation() && RequiredBuildingMeshValidation();
         }
 
         protected override void RunTool(GameObject selectedGameObject, ButtonWizardEditorSettings editorSettings)
         {
-            if (editorSettings is BuildingEditorSettings buildingEditorSettings)
+            Log.Log(LogLevel.Info, $"Running ConfigurePropsEditorTool. Add Colliders is {_addMissingCollidersOption}, Align To Terrain is {_alignExteriorPropsToTerrainOption}");
+
+            if (editorSettings is not BuildingEditorSettings buildingEditorSettings)
             {
-                BuildingConfigTools.ConfigureProps(selectedGameObject, buildingEditorSettings, Log);
+                return;
             }
+
+            if (_addMissingCollidersOption)
+            {
+                Log.Log(LogLevel.Info, "Adding missing colliders to props...");
+                BuildingConfigTools.ConfigureColliders(selectedGameObject, buildingEditorSettings, Log);
+                Log.Log(LogLevel.Info, "Done");
+            }
+
+            if (_alignExteriorPropsToTerrainOption)
+            {
+                Log.Log(LogLevel.Info, "Aligning exterior props to terrain...");
+                BuildingConfigTools.AlignExteriorPropsToTerrain(selectedGameObject, buildingEditorSettings, Log);
+                Log.Log(LogLevel.Info, "Done");
+            }
+        }
+
+        /// <summary>
+        /// Add bindings for custom tool options
+        /// </summary>
+        protected override void AddCustomBindings()
+        {
+            _addMissingCollidersOption = BindToToggleOption("CreateMissingCollidersToggle", SetConfigureCollidersOption);
+            _alignExteriorPropsToTerrainOption = BindToToggleOption("AlignExteriorPropsToTerrainToggle", SetAlignToTerrainOption);
+        }
+
+        private void SetConfigureCollidersOption(ChangeEvent<bool> changeEvent)
+        {
+            _addMissingCollidersOption = changeEvent.newValue;
+        }
+
+        private void SetAlignToTerrainOption(ChangeEvent<bool> changeEvent)
+        {
+            _alignExteriorPropsToTerrainOption = changeEvent.newValue;
         }
     }
 }

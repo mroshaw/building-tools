@@ -181,7 +181,7 @@ namespace DaftAppleGames.BuildingTools.Editor
         /// <summary>
         /// Look for GameObjects with the names given and add appropriate colliders
         /// </summary>
-        private static void ConfigureColliders(GameObject parentGameObject, BuildingEditorSettings buildingSettings, EditorLog log)
+        internal static void ConfigureColliders(GameObject parentGameObject, BuildingEditorSettings buildingSettings, EditorLog log)
         {
             Renderer[] allRenderers = parentGameObject.GetComponentsInChildren<Renderer>(true);
             foreach (Renderer renderer in allRenderers)
@@ -224,7 +224,7 @@ namespace DaftAppleGames.BuildingTools.Editor
         /// <summary>
         /// Aligns each External Prop mesh renderer to the terrain, if there is one
         /// </summary>
-        private static void AlignExteriorPropsToTerrain(GameObject parentGameObject, BuildingEditorSettings buildingSettings, EditorLog log)
+        internal static void AlignExteriorPropsToTerrain(GameObject parentGameObject, BuildingEditorSettings buildingSettings, EditorLog log)
         {
             Building building = parentGameObject.GetComponent<Building>();
 
