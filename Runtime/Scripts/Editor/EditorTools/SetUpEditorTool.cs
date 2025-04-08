@@ -9,6 +9,11 @@ namespace DaftAppleGames.BuildingTools.Editor
     [CreateAssetMenu(fileName = "SetUpEditorTool", menuName = "Daft Apple Games/Building Tools/Set Up Tool")]
     internal class SetUpEditorTool : BuildingEditorTool
     {
+        protected override string GetToolName()
+        {
+            return "Set Up Building Tools";
+        }
+
         protected override bool IsSupported(out string notSupportedReason)
         {
             notSupportedReason = string.Empty;
@@ -23,7 +28,7 @@ namespace DaftAppleGames.BuildingTools.Editor
         /// <summary>
         /// Implementation of the "Set Up" tool
         /// </summary>
-        protected override void RunTool(GameObject selectedGameObject, ButtonWizardEditorSettings editorSettings)
+        protected override void RunTool(GameObject selectedGameObject, ButtonWizardEditorSettings editorSettings, string undoGroupName)
         {
             Log.Log(LogLevel.Info, "Running setup...");
             Log.Log(LogLevel.Info, "Creating tags...");

@@ -10,6 +10,11 @@ namespace DaftAppleGames.BuildingTools.Editor
         private bool _addMissingCollidersOption;
         private bool _alignExteriorPropsToTerrainOption;
 
+        protected override string GetToolName()
+        {
+            return "Configure Props";
+        }
+
         protected override bool IsSupported(out string notSupportedReason)
         {
             notSupportedReason = string.Empty;
@@ -21,7 +26,7 @@ namespace DaftAppleGames.BuildingTools.Editor
             return RequireSettingsAndGameObjectValidation() && RequiredBuildingValidation() && RequiredBuildingMeshValidation();
         }
 
-        protected override void RunTool(GameObject selectedGameObject, ButtonWizardEditorSettings editorSettings)
+        protected override void RunTool(GameObject selectedGameObject, ButtonWizardEditorSettings editorSettings, string undoGroupName)
         {
             Log.Log(LogLevel.Info, $"Running ConfigurePropsEditorTool. Add Colliders is {_addMissingCollidersOption}, Align To Terrain is {_alignExteriorPropsToTerrainOption}");
 

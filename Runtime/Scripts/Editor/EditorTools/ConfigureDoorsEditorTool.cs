@@ -6,6 +6,11 @@ namespace DaftAppleGames.BuildingTools.Editor
     [CreateAssetMenu(fileName = "ConfigureDoorsEditorTool", menuName = "Daft Apple Games/Building Tools/Configure Doors Tool")]
     internal class ConfigureDoorsEditorTool : BuildingEditorTool
     {
+        protected override string GetToolName()
+        {
+            return "Configure Doors";
+        }
+
         protected override bool IsSupported(out string notSupportedReason)
         {
             notSupportedReason = string.Empty;
@@ -17,7 +22,7 @@ namespace DaftAppleGames.BuildingTools.Editor
             return RequireSettingsAndGameObjectValidation() && RequiredBuildingValidation();
         }
 
-        protected override void RunTool(GameObject selectedGameObject, ButtonWizardEditorSettings editorSettings)
+        protected override void RunTool(GameObject selectedGameObject, ButtonWizardEditorSettings editorSettings, string undoGroupName)
         {
             if (editorSettings is BuildingWizardEditorSettings buildingEditorSettings)
             {

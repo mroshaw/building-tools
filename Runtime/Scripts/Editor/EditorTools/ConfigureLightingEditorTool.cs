@@ -6,6 +6,11 @@ namespace DaftAppleGames.BuildingTools.Editor
     [CreateAssetMenu(fileName = "ConfigureLightingEditorTool", menuName = "Daft Apple Games/Building Tools/Configure Lighting Tool")]
     internal class ConfigureLightingEditorTool : BuildingEditorTool
     {
+        protected override string GetToolName()
+        {
+            return "Configure Lighting";
+        }
+
         protected override bool IsSupported(out string notSupportedReason)
         {
 #if !DAG_HDRP
@@ -21,7 +26,7 @@ namespace DaftAppleGames.BuildingTools.Editor
             return RequireSettingsAndGameObjectValidation() && RequiredBuildingValidation();
         }
 
-        protected override void RunTool(GameObject selectedGameObject, ButtonWizardEditorSettings editorSettings)
+        protected override void RunTool(GameObject selectedGameObject, ButtonWizardEditorSettings editorSettings, string undoGroupName)
         {
             if (editorSettings is BuildingWizardEditorSettings buildingEditorSettings)
             {

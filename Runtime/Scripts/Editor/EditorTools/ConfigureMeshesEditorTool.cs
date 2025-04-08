@@ -12,6 +12,11 @@ namespace DaftAppleGames.BuildingTools.Editor
         private bool _configureMeshLayersOption;
         private bool _setStaticFlagsOption;
 
+        protected override string GetToolName()
+        {
+            return "Configure Meshes";
+        }
+
         protected override bool IsSupported(out string notSupportedReason)
         {
             notSupportedReason = string.Empty;
@@ -24,7 +29,7 @@ namespace DaftAppleGames.BuildingTools.Editor
                    ValidateLayerSetup(selectedGameObject) && ValidateBuildingSetup(selectedGameObject);
         }
 
-        protected override void RunTool(GameObject selectedGameObject, ButtonWizardEditorSettings editorSettings)
+        protected override void RunTool(GameObject selectedGameObject, ButtonWizardEditorSettings editorSettings, string undoGroupName)
         {
             Log.Log(LogLevel.Info, $"Running ConfigureMeshesEditorTool. Configure Layers is {_configureMeshLayersOption}, Set Static Flags is {_setStaticFlagsOption}");
             if (editorSettings is BuildingWizardEditorSettings buildingEditorSettings)
