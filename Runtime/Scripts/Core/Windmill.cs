@@ -5,7 +5,7 @@ using DaftAppleGames.Attributes;
 #endif
 using UnityEngine;
 
-namespace DaftAppleGames.Darskerry.Core.Buildings
+namespace DaftAppleGames.Buildings
 {
     /// <summary>
     /// Simple Windmill blade spinner Monobehaviour

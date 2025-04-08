@@ -7,7 +7,7 @@ using DaftAppleGames.Attributes;
 #endif
 using UnityEngine;
 
-namespace DaftAppleGames.Darskerry.Core.Buildings
+namespace DaftAppleGames.Buildings
 {
     public class DoorController : MonoBehaviour
     {
@@ -21,7 +21,6 @@ namespace DaftAppleGames.Darskerry.Core.Buildings
             doors = allDoors.ToList();
         }
 
-        [Button("Close All Doors")]
         public void CloseAllDoors(bool immediate = true)
         {
             foreach (Door door in doors)
@@ -30,13 +29,11 @@ namespace DaftAppleGames.Darskerry.Core.Buildings
             }
         }
 
-        [Button("Open All Doors (Inwards")]
         public void OpenAllDoorsInwards(bool immediate = true)
         {
             OpenAllDoors(DoorOpenDirection.Inwards, immediate);
         }
 
-        [Button("Open All Doors (Outwards")]
         public void OpenAllDoorsOutwards(bool immediate = true)
         {
             OpenAllDoors(DoorOpenDirection.Outwards, immediate);
@@ -58,5 +55,25 @@ namespace DaftAppleGames.Darskerry.Core.Buildings
                 doors.Add(newDoor);
             }
         }
+
+#if UNITY_EDITOR
+        [Button("Open Doors (Inward)")]
+        private void OpenDoorsInwardEditor()
+        {
+            OpenAllDoorsInwards(true);
+        }
+
+        [Button("Open Doors (Outwards)")]
+        private void OpenDoorsOutwardEditor()
+        {
+            OpenAllDoorsOutwards(true);
+        }
+
+        [Button("Close Doors")]
+        private void CloseDoorsEditor()
+        {
+            CloseAllDoors(true);
+        }
+#endif
     }
 }

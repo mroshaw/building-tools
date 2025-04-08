@@ -10,7 +10,7 @@ using UnityEngine.Audio;
 using UnityEngine.Events;
 using DaftAppleGames.Extensions;
 
-namespace DaftAppleGames.Darskerry.Core.Buildings
+namespace DaftAppleGames.Buildings
 {
     public enum DoorOpenDirection
     {
@@ -95,14 +95,15 @@ namespace DaftAppleGames.Darskerry.Core.Buildings
                 return;
             }
 
-            if (!immediate)
+            if (immediate)
             {
-                StartCoroutine(OpenDoorAsync(direction));
+                transform.localRotation = gameObject.transform.localRotation *
+                                          Quaternion.Euler(gameObject.transform.up * (direction == DoorOpenDirection.Inwards ? -openAngle : openAngle));
+                _doorState = DoorState.Open;
+                return;
             }
 
-            transform.localRotation = gameObject.transform.localRotation *
-                                      Quaternion.Euler(gameObject.transform.up * (direction == DoorOpenDirection.Inwards ? -openAngle : openAngle));
-            _doorState = DoorState.Open;
+            StartCoroutine(OpenDoorAsync(direction));
         }
 
         private IEnumerator OpenDoorAsync(DoorOpenDirection direction)
@@ -136,8 +137,6 @@ namespace DaftAppleGames.Darskerry.Core.Buildings
             openingEndEvent.Invoke();
         }
 
-
-        [Button("Close Door")]
         public void CloseDoor(bool immediate = false)
         {
             if (IsMoving || !IsOpen)
@@ -145,13 +144,14 @@ namespace DaftAppleGames.Darskerry.Core.Buildings
                 return;
             }
 
-            if (!immediate)
+            if (immediate)
             {
-                StartCoroutine(CloseDoorAsync());
+                transform.localRotation = _doorClosedRotation;
+                _doorState = DoorState.Closed;
+                return;
             }
 
-            transform.localRotation = _doorClosedRotation;
-            _doorState = DoorState.Closed;
+            StartCoroutine(CloseDoorAsync());
         }
 
         private IEnumerator CloseDoorAsync()
@@ -216,22 +216,40 @@ namespace DaftAppleGames.Darskerry.Core.Buildings
             closedClips = newClosedClips;
         }
 
-        [Button("Open Door (Inward)")]
-        internal void OpenDoorInwardEditor()
+        [Button("Open Door (Inward Immediate)")]
+        private void OpenDoorInwardImmediateEditor()
         {
             OpenDoor(DoorOpenDirection.Inwards, true);
         }
 
-        [Button("Open Door (Outward)")]
-        internal void OpenDoorOutwardEditor()
+        [Button("Open Door (Outward Immediate)")]
+        private void OpenDoorOutwardImmediateEditor()
         {
             OpenDoor(DoorOpenDirection.Outwards, true);
         }
 
-        [Button("Close Door")]
-        internal void CloseDoorEditor()
+        [Button("Close Door (Immediate)")]
+        private void CloseDoorImmediateEditor()
         {
             CloseDoor(true);
+        }
+
+        [Button("Open Door (Inward)")]
+        private void OpenDoorInwardEditor()
+        {
+            OpenDoor(DoorOpenDirection.Inwards, false);
+        }
+
+        [Button("Open Door (Outward)")]
+        private void OpenDoorOutwardEditor()
+        {
+            OpenDoor(DoorOpenDirection.Outwards, false);
+        }
+
+        [Button("Close Door")]
+        private void CloseDoorEditor()
+        {
+            CloseDoor(false);
         }
 #endif
 

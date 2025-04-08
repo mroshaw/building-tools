@@ -1,4 +1,6 @@
+using DaftAppleGames.Buildings;
 using DaftAppleGames.Editor;
+using DaftAppleGames.Extensions;
 using UnityEngine;
 
 namespace DaftAppleGames.BuildingTools.Editor
@@ -26,8 +28,14 @@ namespace DaftAppleGames.BuildingTools.Editor
         {
             if (editorSettings is BuildingWizardEditorSettings buildingEditorSettings)
             {
-                BuildingConfigTools.AddBuildingComponent(selectedGameObject, Log);
+                AddBuildingComponent(selectedGameObject, Log);
             }
+        }
+
+        private static void AddBuildingComponent(GameObject parentGameObject, EditorLog log)
+        {
+            _ = parentGameObject.EnsureComponent<Building>();
+            log.Log(LogLevel.Info, $"Added Building component to {parentGameObject.name}.");
         }
     }
 }

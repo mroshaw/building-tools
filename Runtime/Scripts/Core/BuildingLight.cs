@@ -5,13 +5,12 @@ using DaftAppleGames.Attributes;
 #endif
 using UnityEngine;
 
-namespace DaftAppleGames.Darskerry.Core.Buildings
+namespace DaftAppleGames.Buildings
 {
     public enum BuildingLightType
     {
         IndoorCandle,
         IndoorFire,
-        IndoorCooking,
         OutdoorCandle,
         OutdoorFire
     }
@@ -84,6 +83,8 @@ namespace DaftAppleGames.Darskerry.Core.Buildings
             lightComponent = newLight;
             particles = newParticles;
         }
+
+        public Light LightComponent => lightComponent;
 #endif
 
         #endregion

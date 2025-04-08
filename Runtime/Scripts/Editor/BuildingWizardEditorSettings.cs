@@ -1,6 +1,6 @@
 using UnityEditor;
 using System;
-using DaftAppleGames.Darskerry.Core.Buildings;
+using DaftAppleGames.Buildings;
 using DaftAppleGames.Editor;
 using UnityEngine;
 using UnityEngine.Audio;
@@ -23,6 +23,13 @@ namespace DaftAppleGames.BuildingTools.Editor
         public float intensity;
         public float radius;
         public LightLayerMode layerMode;
+        public bool useLensFlare;
+        public float lensFlareIntensity;
+        public LensFlareDataSRP lensFlareData;
+        public Color filterColor;
+        public float temperature;
+        public LightmapBakeType lightmapBakeType;
+        public float shadowRefreshRate;
     }
 
     [CreateAssetMenu(fileName = "BuildingEditorSettings", menuName = "Daft Apple Games/Building Tools/BuildingEditorSettings")]
@@ -66,6 +73,11 @@ namespace DaftAppleGames.BuildingTools.Editor
         [BoxGroup("Volumes")] [SerializeField] internal LayerMask meshSizeIncludeLayers;
         [BoxGroup("Volumes")] [SerializeField] internal string interiorVolumeGameObjectName;
         [BoxGroup("Volumes")] [SerializeField] internal VolumeProfile interiorVolumeProfile;
+        [BoxGroup("Volumes")] [SerializeField] internal AudioMixerSnapshot indoorSnapshot;
+        [BoxGroup("Volumes")] [SerializeField] internal AudioMixerSnapshot outdoorSnapshot;
+        [BoxGroup("Volumes")] [SerializeField] internal string[] volumeTriggerTags;
+        [BoxGroup("Volumes")] [SerializeField] internal LayerMask volumeTriggerLayerMask;
+
         [BoxGroup("CombineMeshes")] [SerializeField] internal string meshAssetOutputPath;
     }
 }

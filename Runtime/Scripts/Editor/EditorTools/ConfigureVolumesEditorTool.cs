@@ -1,11 +1,17 @@
 using DaftAppleGames.Editor;
+using DaftAppleGames.Extensions;
 using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.UIElements;
 
 namespace DaftAppleGames.BuildingTools.Editor
 {
     [CreateAssetMenu(fileName = "ConfigureVolumesEditorTool", menuName = "Daft Apple Games/Building Tools/Configure Volumes Tool")]
     internal class ConfigureVolumesEditorTool : BuildingEditorTool
     {
+        private bool _configureLightingVolumeOption;
+        private bool _configureAudioVolumeOption;
+
         protected override string GetToolName()
         {
             return "Configure Volumes";
@@ -26,8 +32,92 @@ namespace DaftAppleGames.BuildingTools.Editor
         {
             if (editorSettings is BuildingWizardEditorSettings buildingEditorSettings)
             {
-                BuildingConfigTools.ConfigureVolumes(selectedGameObject, buildingEditorSettings, Log);
+                if (_configureLightingVolumeOption)
+                {
+                    Log.Log(LogLevel.Info, "Configuring Lighting Volume...");
+                    AddInteriorLightingVolume(selectedGameObject, buildingEditorSettings, Log);
+                    Log.Log(LogLevel.Info, "Configuring Lighting Volume... DONE!");
+                }
+
+                if (_configureAudioVolumeOption)
+                {
+                    Log.Log(LogLevel.Info, "Configuring Audio Volume...");
+                    AddInteriorAudioVolume(selectedGameObject, buildingEditorSettings, Log);
+                    Log.Log(LogLevel.Info, "Configuring Audio Volume... DONE!");
+                }
             }
         }
+
+        /// <summary>
+        /// Add bindings for custom tool options
+        /// </summary>
+        protected override void AddCustomBindings()
+        {
+            _configureLightingVolumeOption = BindToToggleOption("ConfigureLightingVolumeToggle", SetConfigureLightingVolumeOption);
+            _configureAudioVolumeOption = BindToToggleOption("ConfigureAudioVolumeToggle", SetConfigureAudioVolumeOption);
+        }
+
+        private void SetConfigureLightingVolumeOption(ChangeEvent<bool> changeEvent)
+        {
+            _configureLightingVolumeOption = changeEvent.newValue;
+        }
+
+        private void SetConfigureAudioVolumeOption(ChangeEvent<bool> changeEvent)
+        {
+            _configureAudioVolumeOption = changeEvent.newValue;
+        }
+
+        #region Static tool methods
+
+        private static void AddInteriorLightingVolume(GameObject parentGameObject, BuildingWizardEditorSettings buildingWizardSettings, EditorLog log)
+        {
+            MeshTools.GetMeshSize(parentGameObject, buildingWizardSettings.meshSizeIncludeLayers, buildingWizardSettings.meshSizeIgnoreNames, out Vector3 buildingSize,
+                out Vector3 buildingCenter);
+
+            log.Log(LogLevel.Debug, $"Adding Interior Lighting Volume to {parentGameObject.name}...");
+            GameObject volumeGameObject = ConfigureVolumeGameObject(parentGameObject, buildingWizardSettings, log);
+            Volume interiorVolume = volumeGameObject.EnsureComponent<Volume>();
+            interiorVolume.sharedProfile = buildingWizardSettings.interiorVolumeProfile;
+            interiorVolume.isGlobal = false;
+        }
+
+        private static void AddInteriorAudioVolume(GameObject parentGameObject, BuildingWizardEditorSettings buildingWizardSettings, EditorLog log)
+        {
+            log.Log(LogLevel.Debug, $"Adding Interior Audio Volume to {parentGameObject.name}...");
+            GameObject volumeGameObject = ConfigureVolumeGameObject(parentGameObject, buildingWizardSettings, log);
+            InteriorAudioFilter audioFilter = volumeGameObject.EnsureComponent<InteriorAudioFilter>();
+            audioFilter.ConfigureInEditor(buildingWizardSettings.volumeTriggerLayerMask, buildingWizardSettings.volumeTriggerTags);
+            log.Log(LogLevel.Debug, $"Adding Interior Audio Volume to {parentGameObject.name}... DONE!");
+        }
+
+        private static GameObject ConfigureVolumeGameObject(GameObject parentGameObject, BuildingWizardEditorSettings buildingWizardSettings, EditorLog log)
+        {
+            MeshTools.GetMeshSize(parentGameObject, buildingWizardSettings.meshSizeIncludeLayers, buildingWizardSettings.meshSizeIgnoreNames, out Vector3 buildingSize,
+                out Vector3 buildingCenter);
+
+            GameObject volumeGameObject = parentGameObject.FindChildGameObject(buildingWizardSettings.interiorVolumeGameObjectName);
+            if (!volumeGameObject)
+            {
+                volumeGameObject = new GameObject(buildingWizardSettings.interiorVolumeGameObjectName)
+                {
+                    transform =
+                    {
+                        parent = parentGameObject.transform,
+                        localPosition = Vector3.zero,
+                        localScale = Vector3.one,
+                        localRotation = Quaternion.identity
+                    }
+                };
+            }
+
+            BoxCollider volumeCollider = volumeGameObject.gameObject.EnsureComponent<BoxCollider>();
+            volumeCollider.isTrigger = true;
+            volumeCollider.center = buildingCenter;
+            volumeCollider.size = buildingSize;
+
+            return volumeGameObject;
+        }
+
+        #endregion
     }
 }

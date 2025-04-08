@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace DaftAppleGames.Darskerry.Core.Buildings
+namespace DaftAppleGames.Buildings
 {
     public class MeshCombineExcluder : MonoBehaviour
     {

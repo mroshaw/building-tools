@@ -6,7 +6,7 @@ using DaftAppleGames.Attributes;
 #endif
 using UnityEngine;
 
-namespace DaftAppleGames.Darskerry.Core.Buildings
+namespace DaftAppleGames.Buildings
 {
     public class LightingController : MonoBehaviour
     {
@@ -45,7 +45,7 @@ namespace DaftAppleGames.Darskerry.Core.Buildings
                     case BuildingLightType.IndoorCandle:
                         candleLights.Add(currLight);
                         break;
-                    case BuildingLightType.IndoorCooking:
+                    case BuildingLightType.IndoorFire:
                         cookingLights.Add(currLight);
                         break;
                     case BuildingLightType.OutdoorCandle:

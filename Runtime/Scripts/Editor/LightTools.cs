@@ -1,6 +1,10 @@
 using System.Collections.Generic;
-using DaftAppleGames.Darskerry.Core.Buildings;
+using DaftAppleGames.Buildings;
+using DaftAppleGames.Editor;
+using DaftAppleGames.Extensions;
+using DaftAppleGames.Lighting;
 using UnityEngine;
+using UnityEngine.Rendering;
 using RenderingLayerMask = UnityEngine.RenderingLayerMask;
 
 #if DAG_HDRP
@@ -31,16 +35,33 @@ namespace DaftAppleGames.BuildingTools.Editor
     /// </summary>
     internal static class LightTools
     {
-        private static readonly Dictionary<LightLayerMode, uint> LightLayerMasks;
+        private static readonly Dictionary<LightLayerMode, uint> MeshLightLayerMasks;
+#if DAG_HDRP
+        private static readonly Dictionary<LightLayerMode, UnityEngine.Rendering.HighDefinition.RenderingLayerMask> HDRPLightLayerMasks;
+#endif
 
         static LightTools()
         {
-            LightLayerMasks = new Dictionary<LightLayerMode, uint>
+            MeshLightLayerMasks = new Dictionary<LightLayerMode, uint>
             {
-                { LightLayerMode.Interior, RenderingLayerMask.GetMask("Exterior") },
+                { LightLayerMode.Interior, RenderingLayerMask.GetMask("Interior") },
                 { LightLayerMode.Exterior, RenderingLayerMask.GetMask("Exterior") },
                 { LightLayerMode.Both, RenderingLayerMask.GetMask("Interior", "Exterior") }
             };
+
+#if DAG_HDRP
+            HDRPLightLayerMasks = new Dictionary<LightLayerMode, UnityEngine.Rendering.HighDefinition.RenderingLayerMask>
+            {
+                { LightLayerMode.Interior, UnityEngine.Rendering.HighDefinition.RenderingLayerMask.RenderingLayer3 },
+                { LightLayerMode.Exterior, UnityEngine.Rendering.HighDefinition.RenderingLayerMask.RenderingLayer4 },
+                {
+                    LightLayerMode.Both,
+                    UnityEngine.Rendering.HighDefinition.RenderingLayerMask.RenderingLayer3 | UnityEngine.Rendering.HighDefinition.RenderingLayerMask.RenderingLayer4
+                }
+            };
+
+
+#endif
         }
 
         /// <summary>
@@ -48,8 +69,17 @@ namespace DaftAppleGames.BuildingTools.Editor
         /// </summary>
         internal static RenderingLayerMask GetMaskByMode(LightLayerMode layerMode)
         {
-            return LightLayerMasks[layerMode];
+            return MeshLightLayerMasks[layerMode];
         }
+
+#if DAG_HDRP
+
+        private static UnityEngine.Rendering.HighDefinition.RenderingLayerMask GetHDRPMaskByMode(LightLayerMode layerMode)
+        {
+            return HDRPLightLayerMasks[layerMode];
+        }
+
+#endif
 
         #region Tool prarameter structs
 
@@ -72,28 +102,74 @@ namespace DaftAppleGames.BuildingTools.Editor
         #region Configure Lights methoods
 
         /// <summary>
-        /// Validate the CombineMeshParameters
+        /// Sets the LightLayer on all child meshes
         /// </summary>
-        internal static bool ValidateConfigureLightParameters(LightConfigParameters lightingParameters)
+        public static void SetLightLayers(GameObject[] parentGameObjects, LightLayerMode lightLayerMode, EditorLog log)
         {
-            return true;
+            foreach (GameObject parentGameObject in parentGameObjects)
+            {
+                foreach (MeshRenderer renderer in parentGameObject.GetComponentsInChildren<MeshRenderer>())
+                {
+                    renderer.renderingLayerMask = GetMaskByMode(lightLayerMode);
+                }
+            }
         }
 
-        internal static void ConfigureLight(Light light, LightConfigParameters lightingParameters)
+        public static void ConfigureLight(GameObject lightGameObject, Light light, LightingSettings lightingSettings, EditorLog log)
+        {
+            // Look for old Lens Flare and destroy it - not supported in URP or HDRP
+#if DAG_HDRP || DAG_URP
+            if (lightGameObject.TryGetComponentInChildren(out LensFlare oldLensFlare, true))
+            {
+                Object.DestroyImmediate(oldLensFlare);
+
+                log.Log(LogLevel.Debug, $"Destroyed old Lens Flare component on: {lightGameObject.name}.");
+            }
+
+            // Set up Lens Flare, if it's selected
+            if (lightingSettings.useLensFlare)
+            {
+                LensFlareComponentSRP newLensFlare = light.gameObject.EnsureComponent<LensFlareComponentSRP>();
+                newLensFlare.lensFlareData = lightingSettings.lensFlareData;
+                newLensFlare.intensity = lightingSettings.lensFlareIntensity;
+                newLensFlare.environmentOcclusion = true;
+                newLensFlare.useOcclusion = true;
+                newLensFlare.allowOffScreen = false;
+
+                log.Log(LogLevel.Debug, $"Configured an SRP Lens Flare component to: {lightGameObject.name}.");
+            }
+#endif
+
+            log.Log(LogLevel.Debug, $"Setting light properties on: {lightGameObject.name}.");
+            UpdateLightProperties(light, lightingSettings, log);
+        }
+
+        private static void UpdateLightProperties(Light light, LightingSettings lightingSettings, EditorLog log)
         {
 #if DAG_HDRP
             HDAdditionalLightData hdLightData = light.GetComponent<HDAdditionalLightData>();
-
-            hdLightData.range = lightingParameters.Range;
-            light.intensity = lightingParameters.Intensity;
-            // hdLightData.lightlayersMask = GetMaskByMode(lightingParameters.LayerMode);
+            hdLightData.shapeRadius = lightingSettings.radius;
+            hdLightData.range = lightingSettings.range;
+#else
+            light.range = lightingSettings.range;
 #endif
+            light.color = lightingSettings.filterColor;
+            light.intensity = lightingSettings.intensity;
+            light.useColorTemperature = true;
+            light.colorTemperature = lightingSettings.temperature;
+            hdLightData.lightlayersMask = GetHDRPMaskByMode(lightingSettings.layerMode);
 
-#if DAG_URP
-#endif
+            float convertedIntensity = LightUnitUtils.ConvertIntensity(light, lightingSettings.intensity, LightUnit.Lumen, light.lightUnit);
+            light.intensity = convertedIntensity;
 
-#if DAG_BIRP
-#endif
+            light.lightmapBakeType = lightingSettings.lightmapBakeType;
+
+            // Add a ShadowMap manager
+            hdLightData.shadowUpdateMode = ShadowUpdateMode.OnDemand;
+            OnDemandShadowMapUpdate shadowMapUpdate = light.EnsureComponent<OnDemandShadowMapUpdate>();
+            shadowMapUpdate.counterMode = CounterMode.Frames;
+            shadowMapUpdate.shadowMapToRefresh = ShadowMapToRefresh.EntireShadowMap;
+            shadowMapUpdate.fullShadowMapRefreshWaitSeconds = lightingSettings.shadowRefreshRate;
         }
 
         #endregion
