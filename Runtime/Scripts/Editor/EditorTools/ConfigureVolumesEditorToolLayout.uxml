@@ -4,5 +4,5 @@
         <engine:Toggle label="Configure Meshes:" name="ConfigureMeshesToggle" value="true" />
         <engine:Toggle label="Set Static Flags:" name="SetStaticFlagsToggle" value="true" />
     </engine:Foldout>
-    <engine:Button text="Configure Volumes" name="ConfigureVoolumesButton" double-click-selects-word="false" class="Button" />
+    <engine:Button text="Configure Volumes" name="ConfigureVoolumesButton" double-click-selects-word="false" tooltip="Adds an Interior Volume to the selected Game Object, providing lighting settings for an interior setting. Also adds an Interior Audio component which &quot;muffles&quot; ambient sound effects." class="Button" />
 </engine:UXML>

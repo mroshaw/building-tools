@@ -1,11 +1,17 @@
-using DaftAppleGames.BuildingTools.Editor;
+using DaftAppleGames.Editor;
 using UnityEngine;
 
-namespace DaftAppleGames.Editor
+namespace DaftAppleGames.BuildingTools.Editor
 {
-    [CreateAssetMenu(fileName = "AddBuildingComponentEditorTool", menuName = "Daft Apple Games/Editor Tools/Add Building Component Tool")]
-    internal class AddBuildingComponentEditorTool : EditorTool
+    [CreateAssetMenu(fileName = "AddBuildingComponentEditorTool", menuName = "Daft Apple Games/Building Tools/Add Building Component Tool")]
+    internal class AddBuildingComponentEditorTool : BuildingEditorTool
     {
+        protected override bool IsSupported(out string notSupportedReason)
+        {
+            notSupportedReason = string.Empty;
+            return true;
+        }
+
         protected override bool CanRunTool(GameObject selectedGameObject, ButtonWizardEditorSettings editorSettings)
         {
             return RequireSettingsAndGameObjectValidation();

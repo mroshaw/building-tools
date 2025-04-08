@@ -4,5 +4,5 @@
         <engine:Toggle label="Create Missing Colliders:" name="CreateMissingCollidersToggle" value="true" />
         <engine:Toggle label="Align Exterior Props to Terrain:" name="AlignExteriorPropsToTerrainToggle" value="true" />
     </engine:Foldout>
-    <engine:Button text="Configure Props" name="ConfigurePropsButton" class="Button" />
+    <engine:Button text="Configure Props" name="ConfigurePropsButton" tooltip="Adds missing Collider components to props within the selected Game Object. Aligns any Exterior Props to the terrain, if they are not sitting on an existing Mesh." class="Button" />
 </engine:UXML>

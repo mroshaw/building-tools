@@ -4,5 +4,5 @@
         <engine:Toggle label="Create Layers" name="CreateLayersToggle" value="true" />
         <engine:Toggle label="Rename Render Layers:" name="RenameRenderLayersToggle" value="true" />
     </engine:Foldout>
-    <engine:Button text="Set Up" name="SetUpButton" class="Button" />
+    <engine:Button text="Set Up" name="SetUpButton" tooltip="Configures Layers and Rendering Layers in your project, as required by the other configuration tools." class="Button" />
 </engine:UXML>

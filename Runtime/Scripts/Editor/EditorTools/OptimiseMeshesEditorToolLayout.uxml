@@ -4,5 +4,5 @@
         <engine:Toggle label="Configure Meshes:" name="ConfigureMeshesToggle" value="true" />
         <engine:Toggle label="Set Static Flags:" name="SetStaticFlagsToggle" value="true" />
     </engine:Foldout>
-    <engine:Button text="Optimise Meshes" name="OptimiseMeshesButton" class="Button" />
+    <engine:Button text="Optimise Meshes" name="OptimiseMeshesButton" tooltip="Combined Interior, Exterior, Interior Prop and Exterior Prop Meshes within the selected Game Object. This greatly reduces the number of draw calls and shadow renderers for a modular building." class="Button" />
 </engine:UXML>

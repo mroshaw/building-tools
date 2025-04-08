@@ -1,16 +1,22 @@
-using DaftAppleGames.BuildingTools.Editor;
 using DaftAppleGames.Darskerry.Core.Buildings;
+using DaftAppleGames.Editor;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace DaftAppleGames.Editor
+namespace DaftAppleGames.BuildingTools.Editor
 {
-    [CreateAssetMenu(fileName = "ConfigureMeshesEditorTool", menuName = "Daft Apple Games/Editor Tools/Configure Meshes Tool")]
-    internal class ConfigureMeshesEditorTool : EditorTool
+    [CreateAssetMenu(fileName = "ConfigureMeshesEditorTool", menuName = "Daft Apple Games/Building Tools/Configure Meshes Tool")]
+    internal class ConfigureMeshesEditorTool : BuildingEditorTool
     {
         private bool _configureMeshLayersOption;
         private bool _setStaticFlagsOption;
+
+        protected override bool IsSupported(out string notSupportedReason)
+        {
+            notSupportedReason = string.Empty;
+            return true;
+        }
 
         protected override bool CanRunTool(GameObject selectedGameObject, ButtonWizardEditorSettings editorSettings)
         {

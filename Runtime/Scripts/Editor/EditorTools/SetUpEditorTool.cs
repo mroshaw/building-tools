@@ -1,13 +1,20 @@
+using DaftAppleGames.Editor;
 using UnityEngine;
 
-namespace DaftAppleGames.Editor
+namespace DaftAppleGames.BuildingTools.Editor
 {
     /// <summary>
     /// Implementation of the initial setup tool, to create and amend layers, tags and render layer config
     /// </summary>
-    [CreateAssetMenu(fileName = "SetUpEditorTool", menuName = "Daft Apple Games/Editor Tools/Set Up Tool")]
-    internal class SetUpEditorTool : EditorTool
+    [CreateAssetMenu(fileName = "SetUpEditorTool", menuName = "Daft Apple Games/Building Tools/Set Up Tool")]
+    internal class SetUpEditorTool : BuildingEditorTool
     {
+        protected override bool IsSupported(out string notSupportedReason)
+        {
+            notSupportedReason = string.Empty;
+            return true;
+        }
+
         protected override bool CanRunTool(GameObject selectedGameObject, ButtonWizardEditorSettings editorSettings)
         {
             return true;

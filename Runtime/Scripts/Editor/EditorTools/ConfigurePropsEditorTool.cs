@@ -1,14 +1,20 @@
-using DaftAppleGames.BuildingTools.Editor;
+using DaftAppleGames.Editor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace DaftAppleGames.Editor
+namespace DaftAppleGames.BuildingTools.Editor
 {
-    [CreateAssetMenu(fileName = "ConfigurePropsEditorTool", menuName = "Daft Apple Games/Editor Tools/Configure Props Tool")]
-    internal class ConfigurePropsEditorTool : EditorTool
+    [CreateAssetMenu(fileName = "ConfigurePropsEditorTool", menuName = "Daft Apple Games/Building Tools/Configure Props Tool")]
+    internal class ConfigurePropsEditorTool : BuildingEditorTool
     {
         private bool _addMissingCollidersOption;
         private bool _alignExteriorPropsToTerrainOption;
+
+        protected override bool IsSupported(out string notSupportedReason)
+        {
+            notSupportedReason = string.Empty;
+            return true;
+        }
 
         protected override bool CanRunTool(GameObject selectedGameObject, ButtonWizardEditorSettings editorSettings)
         {

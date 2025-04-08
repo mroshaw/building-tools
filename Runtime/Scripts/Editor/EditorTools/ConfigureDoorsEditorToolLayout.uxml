@@ -4,5 +4,5 @@
         <engine:Toggle label="Configure Meshes:" name="ConfigureMeshesToggle" value="true" />
         <engine:Toggle label="Set Static Flags:" name="SetStaticFlagsToggle" value="true" />
     </engine:Foldout>
-    <engine:Button text="Configure Doors" name="ConfigureDoorsButton" class="Button" />
+    <engine:Button text="Configure Doors" name="ConfigureDoorsButton" tooltip="Adds a Door Controller component to the selected Game Object, if one does not already exist. Looks for specifically named Mesh components in the selected Game Object and adds and configures Door components to matching child Game Objects." class="Button" />
 </engine:UXML>

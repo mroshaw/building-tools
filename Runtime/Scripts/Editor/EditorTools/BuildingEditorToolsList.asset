@@ -9,8 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: da9e0842b8bb0ea4d8d063c33e2f5517, type: 3}
-  m_Name: BuildingEditorTools
+  m_Script: {fileID: 11500000, guid: fd9d96ed70945fb4c84dc4e28c3e22d8, type: 3}
+  m_Name: BuildingEditorToolsList
   m_EditorClassIdentifier: 
   editorToolsList:
   - {fileID: 11400000, guid: 6ee9b0d05982c1f4f86a69d7b2890ddc, type: 2}
@@ -18,6 +18,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 2500fc8c015060a46a7dc7c25e9c42e3, type: 2}
   - {fileID: 11400000, guid: 27e7271b497c5a44f9517db953bbdcec, type: 2}
   - {fileID: 11400000, guid: 65e5ba2e5cc80634ea66809658163475, type: 2}
-  - {fileID: 11400000, guid: b1778e9ab9e641744b0bd65889547ce7, type: 2}
   - {fileID: 11400000, guid: 9a4b7cd4c648d5045af3732741577bdc, type: 2}
+  - {fileID: 11400000, guid: b1778e9ab9e641744b0bd65889547ce7, type: 2}
   - {fileID: 11400000, guid: 89437058bd181de47b2098ea9e36f5e6, type: 2}
