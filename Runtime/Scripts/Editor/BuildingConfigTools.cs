@@ -39,37 +39,37 @@ namespace DaftAppleGames.BuildingTools.Editor
         /// <summary>
         /// Applies layers, static and lighting properties to meshes
         /// </summary>
-        internal static void ConfigureMeshes(GameObject parentGameObject, BuildingEditorSettings buildingSettings, EditorLog log)
+        internal static void ConfigureMeshes(GameObject parentGameObject, BuildingWizardEditorSettings buildingWizardSettings, EditorLog log)
         {
             log.Log(LogLevel.Info, "Configuring layers...");
-            ConfigureLayers(parentGameObject, buildingSettings, log);
+            ConfigureLayers(parentGameObject, buildingWizardSettings, log);
             log.Log(LogLevel.Info, "Configuring static flags...");
-            ConfigureStaticFlags(parentGameObject, buildingSettings, log);
+            ConfigureStaticFlags(parentGameObject, buildingWizardSettings, log);
         }
 
         /// <summary>
         /// Sets the static flags on all child mesh renderers
         /// </summary>
-        internal static void ConfigureStaticFlags(GameObject parentGameObject, BuildingEditorSettings buildingSettings, EditorLog log)
+        internal static void ConfigureStaticFlags(GameObject parentGameObject, BuildingWizardEditorSettings buildingWizardSettings, EditorLog log)
         {
             foreach (MeshRenderer meshRenderer in parentGameObject.GetComponentsInChildren<MeshRenderer>(true))
             {
-                log.Log(LogLevel.Debug, $"Setting static flags on {meshRenderer.gameObject.name} to {buildingSettings.staticMeshFlags}");
-                GameObjectUtility.SetStaticEditorFlags(meshRenderer.gameObject, buildingSettings.staticMeshFlags);
+                log.Log(LogLevel.Debug, $"Setting static flags on {meshRenderer.gameObject.name} to {buildingWizardSettings.staticMeshFlags}");
+                GameObjectUtility.SetStaticEditorFlags(meshRenderer.gameObject, buildingWizardSettings.staticMeshFlags);
             }
         }
 
         /// <summary>
         /// Configure the Building layers
         /// </summary>
-        internal static void ConfigureLayers(GameObject parentGameObject, BuildingEditorSettings buildingSettings, EditorLog log)
+        internal static void ConfigureLayers(GameObject parentGameObject, BuildingWizardEditorSettings buildingWizardSettings, EditorLog log)
         {
             Building building = parentGameObject.GetComponent<Building>();
 
-            ConfigureLayersOnGameObjects(building.exteriors, buildingSettings.buildingExteriorLayer, log);
-            ConfigureLayersOnGameObjects(building.interiors, buildingSettings.buildingInteriorLayer, log);
-            ConfigureLayersOnGameObjects(building.interiorProps, buildingSettings.interiorPropsLayer, log);
-            ConfigureLayersOnGameObjects(building.exteriorProps, buildingSettings.exteriorPropsLayer, log);
+            ConfigureLayersOnGameObjects(building.exteriors, buildingWizardSettings.buildingExteriorLayer, log);
+            ConfigureLayersOnGameObjects(building.interiors, buildingWizardSettings.buildingInteriorLayer, log);
+            ConfigureLayersOnGameObjects(building.interiorProps, buildingWizardSettings.interiorPropsLayer, log);
+            ConfigureLayersOnGameObjects(building.exteriorProps, buildingWizardSettings.exteriorPropsLayer, log);
 
             // If props are within the building interior/exterior, move them up a level
             MovePropsToParent(parentGameObject, log);
@@ -170,38 +170,38 @@ namespace DaftAppleGames.BuildingTools.Editor
 
         #region Props methods
 
-        internal static void ConfigureProps(GameObject parentGameObject, BuildingEditorSettings buildingSettings, EditorLog log)
+        internal static void ConfigureProps(GameObject parentGameObject, BuildingWizardEditorSettings buildingWizardSettings, EditorLog log)
         {
             log.Log(LogLevel.Info, "Configuring colliders...");
-            ConfigureColliders(parentGameObject, buildingSettings, log);
+            ConfigureColliders(parentGameObject, buildingWizardSettings, log);
             log.Log(LogLevel.Info, "Aligning props to terrain...");
-            AlignExteriorPropsToTerrain(parentGameObject, buildingSettings, log);
+            AlignExteriorPropsToTerrain(parentGameObject, buildingWizardSettings, log);
         }
 
         /// <summary>
         /// Look for GameObjects with the names given and add appropriate colliders
         /// </summary>
-        internal static void ConfigureColliders(GameObject parentGameObject, BuildingEditorSettings buildingSettings, EditorLog log)
+        internal static void ConfigureColliders(GameObject parentGameObject, BuildingWizardEditorSettings buildingWizardSettings, EditorLog log)
         {
             Renderer[] allRenderers = parentGameObject.GetComponentsInChildren<Renderer>(true);
             foreach (Renderer renderer in allRenderers)
             {
-                if (buildingSettings.boxColliderNames.ItemInString(renderer.gameObject.name))
+                if (buildingWizardSettings.boxColliderNames.ItemInString(renderer.gameObject.name))
                 {
                     ConfigureCollider<BoxCollider>(renderer.gameObject, log);
                 }
 
-                if (buildingSettings.sphereColliderNames.ItemInString(renderer.gameObject.name))
+                if (buildingWizardSettings.sphereColliderNames.ItemInString(renderer.gameObject.name))
                 {
                     ConfigureCollider<SphereCollider>(renderer.gameObject, log);
                 }
 
-                if (buildingSettings.capsuleColliderNames.ItemInString(renderer.gameObject.name))
+                if (buildingWizardSettings.capsuleColliderNames.ItemInString(renderer.gameObject.name))
                 {
                     ConfigureCollider<CapsuleCollider>(renderer.gameObject, log);
                 }
 
-                if (buildingSettings.meshColliderNames.ItemInString(renderer.gameObject.name))
+                if (buildingWizardSettings.meshColliderNames.ItemInString(renderer.gameObject.name))
                 {
                     ConfigureCollider<MeshCollider>(renderer.gameObject, log);
                 }
@@ -224,7 +224,7 @@ namespace DaftAppleGames.BuildingTools.Editor
         /// <summary>
         /// Aligns each External Prop mesh renderer to the terrain, if there is one
         /// </summary>
-        internal static void AlignExteriorPropsToTerrain(GameObject parentGameObject, BuildingEditorSettings buildingSettings, EditorLog log)
+        internal static void AlignExteriorPropsToTerrain(GameObject parentGameObject, BuildingWizardEditorSettings buildingWizardSettings, EditorLog log)
         {
             Building building = parentGameObject.GetComponent<Building>();
 
@@ -247,8 +247,8 @@ namespace DaftAppleGames.BuildingTools.Editor
                     // If not, align to terrain
 
                     log.Log(LogLevel.Debug, $"Aligning prop to terrain: {propRenderer.gameObject.name}.");
-                    Terrain.activeTerrain.AlignObject(propRenderer.gameObject, buildingSettings.terrainAlignPosition, buildingSettings.terrainAlignRotation,
-                        buildingSettings.terrainAlignX, buildingSettings.terrainAlignY, buildingSettings.terrainAlignZ);
+                    Terrain.activeTerrain.AlignObject(propRenderer.gameObject, buildingWizardSettings.terrainAlignPosition, buildingWizardSettings.terrainAlignRotation,
+                        buildingWizardSettings.terrainAlignX, buildingWizardSettings.terrainAlignY, buildingWizardSettings.terrainAlignZ);
                 }
             }
         }
@@ -272,9 +272,9 @@ namespace DaftAppleGames.BuildingTools.Editor
 
         #region Volume methods
 
-        internal static void ConfigureVolumes(GameObject parentGameObject, BuildingEditorSettings buildingSettings, EditorLog log)
+        internal static void ConfigureVolumes(GameObject parentGameObject, BuildingWizardEditorSettings buildingWizardSettings, EditorLog log)
         {
-            MeshTools.GetMeshSize(parentGameObject, buildingSettings.meshSizeIncludeLayers, buildingSettings.meshSizeIgnoreNames, out Vector3 buildingSize,
+            MeshTools.GetMeshSize(parentGameObject, buildingWizardSettings.meshSizeIncludeLayers, buildingWizardSettings.meshSizeIgnoreNames, out Vector3 buildingSize,
                 out Vector3 buildingCenter);
             log.Log(LogLevel.Info, $"Building size is: {buildingSize}, local center is at: {buildingCenter}");
         }
@@ -283,7 +283,7 @@ namespace DaftAppleGames.BuildingTools.Editor
 
         #region Lighting methods
 
-        internal static void ConfigureLighting(GameObject parentGameObject, BuildingEditorSettings buildingSettings, EditorLog log)
+        internal static void ConfigureLighting(GameObject parentGameObject, BuildingWizardEditorSettings buildingWizardSettings, EditorLog log)
         {
             LightingController lightingController = parentGameObject.EnsureComponent<LightingController>();
             log.Log(LogLevel.Info, $"Added Lighting Controller component to {parentGameObject.name}.");
@@ -293,9 +293,9 @@ namespace DaftAppleGames.BuildingTools.Editor
             // Configure interior candles
             foreach (MeshRenderer renderer in allMeshRenderers)
             {
-                if (buildingSettings.indoorCandleSettings.meshNames.ItemInString(renderer.gameObject.name))
+                if (buildingWizardSettings.indoorCandleSettings.meshNames.ItemInString(renderer.gameObject.name))
                 {
-                    ConfigureBuildingLight(renderer.gameObject, buildingSettings.indoorCandleSettings, buildingSettings, log);
+                    ConfigureBuildingLight(renderer.gameObject, buildingWizardSettings.indoorCandleSettings, buildingWizardSettings, log);
                 }
             }
             // Configure interior fires
@@ -305,7 +305,8 @@ namespace DaftAppleGames.BuildingTools.Editor
             lightingController.UpdateLights();
         }
 
-        private static void ConfigureBuildingLight(GameObject lightGameObject, LightingSettings lightingSettings, BuildingEditorSettings buildingSettings, EditorLog log)
+        private static void ConfigureBuildingLight(GameObject lightGameObject, LightingSettings lightingSettings, BuildingWizardEditorSettings buildingWizardSettings,
+            EditorLog log)
         {
             if (!lightGameObject.TryGetComponentInChildren(out Light light, true))
             {
@@ -326,7 +327,7 @@ namespace DaftAppleGames.BuildingTools.Editor
 
         #region Door methods
 
-        internal static void ConfigureDoors(GameObject parentGameObject, BuildingEditorSettings buildingSettings, EditorLog log)
+        internal static void ConfigureDoors(GameObject parentGameObject, BuildingWizardEditorSettings buildingWizardSettings, EditorLog log)
         {
             DoorController doorController = parentGameObject.EnsureComponent<DoorController>();
             log.Log(LogLevel.Info, $"Added Door Controller component to {parentGameObject.name}.");
@@ -334,52 +335,53 @@ namespace DaftAppleGames.BuildingTools.Editor
             MeshRenderer[] allMeshRenderers = parentGameObject.GetComponentsInChildren<MeshRenderer>(true);
             foreach (MeshRenderer renderer in allMeshRenderers)
             {
-                if (!buildingSettings.doorNames.ItemInString(renderer.gameObject.name))
+                if (!buildingWizardSettings.doorNames.ItemInString(renderer.gameObject.name))
                 {
                     continue;
                 }
 
-                Door newDoor = ConfigureDoor(renderer.gameObject, buildingSettings, log);
+                Door newDoor = ConfigureDoor(renderer.gameObject, buildingWizardSettings, log);
                 doorController.AddDoor(newDoor);
             }
         }
 
-        private static Door ConfigureDoor(GameObject doorGameObject, BuildingEditorSettings buildingSettings, EditorLog log)
+        private static Door ConfigureDoor(GameObject doorGameObject, BuildingWizardEditorSettings buildingWizardSettings, EditorLog log)
         {
             log.Log(LogLevel.Info, $"Configuring door on {doorGameObject.name}.");
             Door door = doorGameObject.EnsureComponent<Door>();
             // We don't want to combine this mesh, as it needs to move
             doorGameObject.EnsureComponent<MeshCombineExcluder>();
             // Set the static flags, as the door will move
-            GameObjectUtility.SetStaticEditorFlags(door.gameObject, buildingSettings.moveableMeshFlags);
-            door.ConfigureInEditor(buildingSettings.doorSfxGroup, buildingSettings.doorOpeningClips, buildingSettings.doorOpenClips, buildingSettings.doorClosingClips,
-                buildingSettings.doorClosedClips);
-            CreateOrUpdateDoorTriggers(door, buildingSettings, log);
+            GameObjectUtility.SetStaticEditorFlags(door.gameObject, buildingWizardSettings.moveableMeshFlags);
+            door.ConfigureInEditor(buildingWizardSettings.doorSfxGroup, buildingWizardSettings.doorOpeningClips, buildingWizardSettings.doorOpenClips,
+                buildingWizardSettings.doorClosingClips,
+                buildingWizardSettings.doorClosedClips);
+            CreateOrUpdateDoorTriggers(door, buildingWizardSettings, log);
             return door;
         }
 
 
-        private static void CreateOrUpdateDoorTriggers(Door door, BuildingEditorSettings buildingSettings, EditorLog log)
+        private static void CreateOrUpdateDoorTriggers(Door door, BuildingWizardEditorSettings buildingWizardSettings, EditorLog log)
         {
             DoorTrigger[] doorTriggers = door.GetComponentsInChildren<DoorTrigger>(true);
 
             if (doorTriggers.Length == 0)
             {
                 // We need to create new door triggers
-                CreateDoorTrigger(door, buildingSettings, DoorOpenDirection.Inwards, log);
-                CreateDoorTrigger(door, buildingSettings, DoorOpenDirection.Outwards, log);
+                CreateDoorTrigger(door, buildingWizardSettings, DoorOpenDirection.Inwards, log);
+                CreateDoorTrigger(door, buildingWizardSettings, DoorOpenDirection.Outwards, log);
             }
             else
             {
                 // We want to reconfigure existing triggers
                 foreach (DoorTrigger existingDoorTrigger in doorTriggers)
                 {
-                    ConfigureDoorTrigger(door, existingDoorTrigger, buildingSettings, existingDoorTrigger.DoorOpenDirection, log);
+                    ConfigureDoorTrigger(door, existingDoorTrigger, buildingWizardSettings, existingDoorTrigger.DoorOpenDirection, log);
                 }
             }
         }
 
-        private static void CreateDoorTrigger(Door door, BuildingEditorSettings buildingSettings, DoorOpenDirection openDirection, EditorLog log)
+        private static void CreateDoorTrigger(Door door, BuildingWizardEditorSettings buildingWizardSettings, DoorOpenDirection openDirection, EditorLog log)
         {
             string gameObjectName = openDirection == DoorOpenDirection.Outwards ? "Inside Trigger" : "Outside Trigger";
             GameObject triggerGameObject = new(gameObjectName);
@@ -388,12 +390,13 @@ namespace DaftAppleGames.BuildingTools.Editor
             triggerGameObject.transform.localRotation = Quaternion.identity;
             triggerGameObject.EnsureComponent<BoxCollider>();
             DoorTrigger trigger = triggerGameObject.EnsureComponent<DoorTrigger>();
-            ConfigureDoorTrigger(door, trigger, buildingSettings, openDirection, log);
+            ConfigureDoorTrigger(door, trigger, buildingWizardSettings, openDirection, log);
         }
 
-        private static void ConfigureDoorTrigger(Door door, DoorTrigger doorTrigger, BuildingEditorSettings buildingSettings, DoorOpenDirection openDirection, EditorLog log)
+        private static void ConfigureDoorTrigger(Door door, DoorTrigger doorTrigger, BuildingWizardEditorSettings buildingWizardSettings, DoorOpenDirection openDirection,
+            EditorLog log)
         {
-            doorTrigger.ConfigureInEditor(door, buildingSettings.doorTriggerLayerMask, buildingSettings.doorTriggerTags, openDirection);
+            doorTrigger.ConfigureInEditor(door, buildingWizardSettings.doorTriggerLayerMask, buildingWizardSettings.doorTriggerTags, openDirection);
             MeshTools.GetMeshSize(doorTrigger.transform.parent.gameObject, ~0, new string[] { }, out Vector3 meshSize, out Vector3 center);
             float distanceFromDoor = openDirection == DoorOpenDirection.Inwards ? 0.3f : -(0.3f + meshSize.x);
             float triggerWidth = meshSize.z;
@@ -410,14 +413,14 @@ namespace DaftAppleGames.BuildingTools.Editor
 
         #region Optimisation methods
 
-        internal static void OptimiseMeshes(GameObject parentGameObject, BuildingEditorSettings buildingSettings, EditorLog log)
+        internal static void OptimiseMeshes(GameObject parentGameObject, BuildingWizardEditorSettings buildingWizardSettings, EditorLog log)
         {
             Building building = parentGameObject.GetComponent<Building>();
 
             // Combine the exterior Prop meshes
             MeshTools.CombineMeshParameters combineMeshParameters = new()
             {
-                BaseAssetOutputPath = buildingSettings.meshAssetOutputPath,
+                BaseAssetOutputPath = buildingWizardSettings.meshAssetOutputPath,
                 AssetOutputFolder = parentGameObject.name,
                 CreateOutputFolder = true
             };
@@ -425,16 +428,16 @@ namespace DaftAppleGames.BuildingTools.Editor
             MeshTools.ConfigureMeshParameters newMeshParameters = new()
             {
                 // Set properties and merge exterior meshes
-                LightLayerMode = buildingSettings.buildingExteriorLightLayerMode,
-                LayerName = buildingSettings.buildingExteriorLayer
+                LightLayerMode = buildingWizardSettings.buildingExteriorLightLayerMode,
+                LayerName = buildingWizardSettings.buildingExteriorLayer
             };
 
             OptimiseMeshGroup(building.exteriorProps, "exteriorProps", combineMeshParameters, newMeshParameters, log);
             OptimiseMeshGroup(building.exteriors, "exteriors", combineMeshParameters, newMeshParameters, log);
 
             // Set properties and merge interior meshes
-            newMeshParameters.LightLayerMode = buildingSettings.buildingInteriorLightLayerMode;
-            newMeshParameters.LayerName = buildingSettings.buildingInteriorLayer;
+            newMeshParameters.LightLayerMode = buildingWizardSettings.buildingInteriorLightLayerMode;
+            newMeshParameters.LayerName = buildingWizardSettings.buildingInteriorLayer;
             OptimiseMeshGroup(building.interiors, "interiors", combineMeshParameters, newMeshParameters, log);
             OptimiseMeshGroup(building.interiorProps, "interiorProps", combineMeshParameters, newMeshParameters, log);
         }

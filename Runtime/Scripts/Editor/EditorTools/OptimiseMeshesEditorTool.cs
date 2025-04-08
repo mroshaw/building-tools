@@ -19,7 +19,7 @@ namespace DaftAppleGames.BuildingTools.Editor
 
         protected override void RunTool(GameObject selectedGameObject, ButtonWizardEditorSettings editorSettings)
         {
-            if (editorSettings is BuildingEditorSettings buildingEditorSettings)
+            if (editorSettings is BuildingWizardEditorSettings buildingEditorSettings)
             {
                 BuildingConfigTools.OptimiseMeshes(selectedGameObject, buildingEditorSettings, Log);
             }
