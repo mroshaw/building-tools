@@ -32,25 +32,25 @@ namespace DaftAppleGames.BuildingTools.Editor
 
         protected override void RunTool(GameObject selectedGameObject, ButtonWizardEditorSettings editorSettings, string undoGroupName)
         {
-            Log.Log(LogLevel.Info, $"Running ConfigureMeshesEditorTool. Configure Layers is {_configureMeshLayersOption}, Set Static Flags is {_setStaticFlagsOption}");
+            log.Log(LogLevel.Info, $"Running ConfigureMeshesEditorTool. Configure Layers is {_configureMeshLayersOption}, Set Static Flags is {_setStaticFlagsOption}");
             if (editorSettings is BuildingWizardEditorSettings buildingEditorSettings)
             {
                 if (_configureMeshLayersOption)
                 {
-                    Log.Log(LogLevel.Info, "Configuring layers...");
-                    ConfigureLayers(selectedGameObject, buildingEditorSettings, Log);
-                    Log.Log(LogLevel.Info, "Done!");
+                    log.Log(LogLevel.Info, "Configuring layers...");
+                    ConfigureLayers(selectedGameObject, buildingEditorSettings);
+                    log.Log(LogLevel.Info, "Done!");
                 }
 
                 if (_setStaticFlagsOption)
                 {
-                    Log.Log(LogLevel.Info, "Configuring static flags...");
-                    ConfigureStaticFlags(selectedGameObject, buildingEditorSettings, Log);
-                    Log.Log(LogLevel.Info, "Done!");
+                    log.Log(LogLevel.Info, "Configuring static flags...");
+                    ConfigureStaticFlags(selectedGameObject, buildingEditorSettings);
+                    log.Log(LogLevel.Info, "Done!");
                 }
             }
 
-            Log.Log(LogLevel.Info, "Done");
+            log.Log(LogLevel.Info, "Done");
         }
 
         private bool ValidateBuildingSetup(GameObject selectedGameObject)
@@ -62,7 +62,7 @@ namespace DaftAppleGames.BuildingTools.Editor
                 return true;
             }
 
-            Log.Log(LogLevel.Error, "Please set the Interiors and Exteriors references in the Building component. These are required by the Mesh config process.");
+            log.Log(LogLevel.Error, "Please set the Interiors and Exteriors references in the Building component. These are required by the Mesh config process.");
             return false;
         }
 
@@ -82,7 +82,7 @@ namespace DaftAppleGames.BuildingTools.Editor
                 return true;
             }
 
-            Log.Log(LogLevel.Error,
+            log.Log(LogLevel.Error,
                 "The selected GameObject is a prefab or prefab instance, and it's props GameObjects are children of the main building structure. Please amend the prefab and re-parent the props outside of the building structure.");
             return false;
         }
@@ -109,20 +109,9 @@ namespace DaftAppleGames.BuildingTools.Editor
         #region Static Mesh config methods
 
         /// <summary>
-        /// Applies layers, static and lighting properties to meshes
-        /// </summary>
-        private static void ConfigureMeshes(GameObject parentGameObject, BuildingWizardEditorSettings buildingWizardSettings, EditorLog log)
-        {
-            log.Log(LogLevel.Info, "Configuring layers...");
-            ConfigureLayers(parentGameObject, buildingWizardSettings, log);
-            log.Log(LogLevel.Info, "Configuring static flags...");
-            ConfigureStaticFlags(parentGameObject, buildingWizardSettings, log);
-        }
-
-        /// <summary>
         /// Sets the static flags on all child mesh renderers
         /// </summary>
-        private static void ConfigureStaticFlags(GameObject parentGameObject, BuildingWizardEditorSettings buildingWizardSettings, EditorLog log)
+        private static void ConfigureStaticFlags(GameObject parentGameObject, BuildingWizardEditorSettings buildingWizardSettings)
         {
             foreach (MeshRenderer meshRenderer in parentGameObject.GetComponentsInChildren<MeshRenderer>(true))
             {
@@ -134,36 +123,36 @@ namespace DaftAppleGames.BuildingTools.Editor
         /// <summary>
         /// Configure the Building layers
         /// </summary>
-        private static void ConfigureLayers(GameObject parentGameObject, BuildingWizardEditorSettings buildingWizardSettings, EditorLog log)
+        private static void ConfigureLayers(GameObject parentGameObject, BuildingWizardEditorSettings buildingWizardSettings)
         {
             Building building = parentGameObject.GetComponent<Building>();
 
-            ConfigureLayersOnGameObjects(building.exteriors, buildingWizardSettings.buildingExteriorLayer, log);
-            ConfigureLayersOnGameObjects(building.interiors, buildingWizardSettings.buildingInteriorLayer, log);
-            ConfigureLayersOnGameObjects(building.interiorProps, buildingWizardSettings.interiorPropsLayer, log);
-            ConfigureLayersOnGameObjects(building.exteriorProps, buildingWizardSettings.exteriorPropsLayer, log);
+            ConfigureLayersOnGameObjects(building.exteriors, buildingWizardSettings.buildingExteriorLayer);
+            ConfigureLayersOnGameObjects(building.interiors, buildingWizardSettings.buildingInteriorLayer);
+            ConfigureLayersOnGameObjects(building.interiorProps, buildingWizardSettings.interiorPropsLayer);
+            ConfigureLayersOnGameObjects(building.exteriorProps, buildingWizardSettings.exteriorPropsLayer);
 
             // If props are within the building interior/exterior, move them up a level
-            MovePropsToParent(parentGameObject, log);
+            MovePropsToParent(parentGameObject);
         }
 
 
-        private static void ConfigureLayersOnGameObjects(GameObject[] gameObjects, string layerName, EditorLog log)
+        private static void ConfigureLayersOnGameObjects(GameObject[] gameObjects, string layerName)
         {
             foreach (GameObject gameObject in gameObjects)
             {
-                SetLayerInChildren(gameObject, layerName, log);
+                SetLayerInChildren(gameObject, layerName);
             }
         }
 
-        private static void MovePropsToParent(GameObject buildingGameObject, EditorLog log)
+        private static void MovePropsToParent(GameObject buildingGameObject)
         {
             Building building = buildingGameObject.GetComponent<Building>();
-            MoveAndRenameProps(building.interiorProps, building.interiors, "InteriorProps", log);
-            MoveAndRenameProps(building.exteriorProps, building.exteriors, "ExteriorProps", log);
+            MoveAndRenameProps(building.interiorProps, building.interiors, "InteriorProps");
+            MoveAndRenameProps(building.exteriorProps, building.exteriors, "ExteriorProps");
         }
 
-        private static void MoveAndRenameProps(GameObject[] props, GameObject[] buildingMeshes, string newName, EditorLog log)
+        private static void MoveAndRenameProps(GameObject[] props, GameObject[] buildingMeshes, string newName)
         {
             foreach (GameObject prop in props)
             {
@@ -177,16 +166,17 @@ namespace DaftAppleGames.BuildingTools.Editor
                     continue;
                 }
 
-                log.Log(LogLevel.Debug, $"Moving Props GameObject {prop.name} out of {parentGameObject.name} into {parentGameObject.transform.parent.gameObject.name}...");
+                Transform parent = parentGameObject.transform.parent;
+                log.Log(LogLevel.Debug, $"Moving Props GameObject {prop.name} out of {parentGameObject.name} into {parent.gameObject.name}...");
                 prop.name = newName;
-                prop.transform.SetParent(parentGameObject.transform.parent);
+                prop.transform.SetParent(parent);
             }
         }
 
         /// <summary>
         /// Checks to see if the Props are inside main structure GameObjects
         /// </summary>
-        internal static bool ArePropsInMainBuildingStructure(GameObject buildingGameObject)
+        private static bool ArePropsInMainBuildingStructure(GameObject buildingGameObject)
         {
             Building building = buildingGameObject.GetComponent<Building>();
 
@@ -222,12 +212,13 @@ namespace DaftAppleGames.BuildingTools.Editor
         /// <summary>
         /// Sets the Layer of all children of the given Game Object
         /// </summary>
-        private static void SetLayerInChildren(GameObject parentGameObject, string layerName, EditorLog log, bool includeParent = true)
+        private static void SetLayerInChildren(GameObject parentGameObject, string layerName, bool includeParent = true)
         {
             foreach (MeshRenderer child in parentGameObject.GetComponentsInChildren<MeshRenderer>(true))
             {
-                child.gameObject.layer = LayerMask.NameToLayer(layerName);
-                log.Log(LogLevel.Debug, $"Layer set to {layerName} in {child.gameObject}.");
+                GameObject gameObject;
+                (gameObject = child.gameObject).layer = LayerMask.NameToLayer(layerName);
+                log.Log(LogLevel.Debug, $"Layer set to {layerName} in {gameObject}.");
             }
 
             if (!includeParent)

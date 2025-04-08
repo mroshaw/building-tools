@@ -1,13 +1,7 @@
 using DaftAppleGames.Buildings;
 using DaftAppleGames.Editor;
 using DaftAppleGames.Extensions;
-using UnityEngine;
 using UnityEngine.UIElements;
-#if ODIN_INSPECTOR
-using Sirenix.OdinInspector;
-#else
-using DaftAppleGames.Attributes;
-#endif
 
 namespace DaftAppleGames.BuildingTools.Editor
 {

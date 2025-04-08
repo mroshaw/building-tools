@@ -27,13 +27,13 @@ namespace DaftAppleGames.BuildingTools.Editor
         {
             if (editorSettings is BuildingWizardEditorSettings buildingEditorSettings)
             {
-                OptimiseMeshes(selectedGameObject, buildingEditorSettings, Log);
+                OptimiseMeshes(selectedGameObject, buildingEditorSettings);
             }
         }
 
         #region Static Mesh Optimisation methods
 
-        private static void OptimiseMeshes(GameObject parentGameObject, BuildingWizardEditorSettings buildingWizardSettings, EditorLog log)
+        private static void OptimiseMeshes(GameObject parentGameObject, BuildingWizardEditorSettings buildingWizardSettings)
         {
             Building building = parentGameObject.GetComponent<Building>();
 
@@ -52,18 +52,18 @@ namespace DaftAppleGames.BuildingTools.Editor
                 LayerName = buildingWizardSettings.buildingExteriorLayer
             };
 
-            OptimiseMeshGroup(building.exteriorProps, "exteriorProps", combineMeshParameters, newMeshParameters, log);
-            OptimiseMeshGroup(building.exteriors, "exteriors", combineMeshParameters, newMeshParameters, log);
+            OptimiseMeshGroup(building.exteriorProps, "exteriorProps", combineMeshParameters, newMeshParameters);
+            OptimiseMeshGroup(building.exteriors, "exteriors", combineMeshParameters, newMeshParameters);
 
             // Set properties and merge interior meshes
             newMeshParameters.LightLayerMode = buildingWizardSettings.buildingInteriorLightLayerMode;
             newMeshParameters.LayerName = buildingWizardSettings.buildingInteriorLayer;
-            OptimiseMeshGroup(building.interiors, "interiors", combineMeshParameters, newMeshParameters, log);
-            OptimiseMeshGroup(building.interiorProps, "interiorProps", combineMeshParameters, newMeshParameters, log);
+            OptimiseMeshGroup(building.interiors, "interiors", combineMeshParameters, newMeshParameters);
+            OptimiseMeshGroup(building.interiorProps, "interiorProps", combineMeshParameters, newMeshParameters);
         }
 
         private static void OptimiseMeshGroup(GameObject[] allGameObjects, string namePrefix, MeshTools.CombineMeshParameters combineMeshParameters,
-            MeshTools.ConfigureMeshParameters newMeshParameters, EditorLog log)
+            MeshTools.ConfigureMeshParameters newMeshParameters)
         {
             foreach (GameObject gameObjectParent in allGameObjects)
             {

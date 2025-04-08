@@ -34,16 +34,16 @@ namespace DaftAppleGames.BuildingTools.Editor
             {
                 if (_configureLightingVolumeOption)
                 {
-                    Log.Log(LogLevel.Info, "Configuring Lighting Volume...");
-                    AddInteriorLightingVolume(selectedGameObject, buildingEditorSettings, Log);
-                    Log.Log(LogLevel.Info, "Configuring Lighting Volume... DONE!");
+                    log.Log(LogLevel.Info, "Configuring Lighting Volume...");
+                    AddInteriorLightingVolume(selectedGameObject, buildingEditorSettings);
+                    log.Log(LogLevel.Info, "Configuring Lighting Volume... DONE!");
                 }
 
                 if (_configureAudioVolumeOption)
                 {
-                    Log.Log(LogLevel.Info, "Configuring Audio Volume...");
-                    AddInteriorAudioVolume(selectedGameObject, buildingEditorSettings, Log);
-                    Log.Log(LogLevel.Info, "Configuring Audio Volume... DONE!");
+                    log.Log(LogLevel.Info, "Configuring Audio Volume...");
+                    AddInteriorAudioVolume(selectedGameObject, buildingEditorSettings);
+                    log.Log(LogLevel.Info, "Configuring Audio Volume... DONE!");
                 }
             }
         }
@@ -69,28 +69,25 @@ namespace DaftAppleGames.BuildingTools.Editor
 
         #region Static tool methods
 
-        private static void AddInteriorLightingVolume(GameObject parentGameObject, BuildingWizardEditorSettings buildingWizardSettings, EditorLog log)
+        private static void AddInteriorLightingVolume(GameObject parentGameObject, BuildingWizardEditorSettings buildingWizardSettings)
         {
-            MeshTools.GetMeshSize(parentGameObject, buildingWizardSettings.meshSizeIncludeLayers, buildingWizardSettings.meshSizeIgnoreNames, out Vector3 buildingSize,
-                out Vector3 buildingCenter);
-
             log.Log(LogLevel.Debug, $"Adding Interior Lighting Volume to {parentGameObject.name}...");
-            GameObject volumeGameObject = ConfigureVolumeGameObject(parentGameObject, buildingWizardSettings, log);
+            GameObject volumeGameObject = ConfigureVolumeGameObject(parentGameObject, buildingWizardSettings);
             Volume interiorVolume = volumeGameObject.EnsureComponent<Volume>();
             interiorVolume.sharedProfile = buildingWizardSettings.interiorVolumeProfile;
             interiorVolume.isGlobal = false;
         }
 
-        private static void AddInteriorAudioVolume(GameObject parentGameObject, BuildingWizardEditorSettings buildingWizardSettings, EditorLog log)
+        private static void AddInteriorAudioVolume(GameObject parentGameObject, BuildingWizardEditorSettings buildingWizardSettings)
         {
             log.Log(LogLevel.Debug, $"Adding Interior Audio Volume to {parentGameObject.name}...");
-            GameObject volumeGameObject = ConfigureVolumeGameObject(parentGameObject, buildingWizardSettings, log);
+            GameObject volumeGameObject = ConfigureVolumeGameObject(parentGameObject, buildingWizardSettings);
             InteriorAudioFilter audioFilter = volumeGameObject.EnsureComponent<InteriorAudioFilter>();
             audioFilter.ConfigureInEditor(buildingWizardSettings.volumeTriggerLayerMask, buildingWizardSettings.volumeTriggerTags);
             log.Log(LogLevel.Debug, $"Adding Interior Audio Volume to {parentGameObject.name}... DONE!");
         }
 
-        private static GameObject ConfigureVolumeGameObject(GameObject parentGameObject, BuildingWizardEditorSettings buildingWizardSettings, EditorLog log)
+        private static GameObject ConfigureVolumeGameObject(GameObject parentGameObject, BuildingWizardEditorSettings buildingWizardSettings)
         {
             MeshTools.GetMeshSize(parentGameObject, buildingWizardSettings.meshSizeIncludeLayers, buildingWizardSettings.meshSizeIgnoreNames, out Vector3 buildingSize,
                 out Vector3 buildingCenter);

@@ -28,7 +28,7 @@ namespace DaftAppleGames.BuildingTools.Editor
         {
             if (editorSettings is BuildingWizardEditorSettings buildingEditorSettings)
             {
-                AddBuildingComponent(selectedGameObject, Log);
+                AddBuildingComponent(selectedGameObject, log);
             }
         }
 

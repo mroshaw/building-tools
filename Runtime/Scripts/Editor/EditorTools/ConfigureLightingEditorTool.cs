@@ -1,7 +1,10 @@
 using DaftAppleGames.Buildings;
 using DaftAppleGames.Editor;
 using DaftAppleGames.Extensions;
+using DaftAppleGames.Lighting;
 using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.HighDefinition;
 
 namespace DaftAppleGames.BuildingTools.Editor
 {
@@ -32,13 +35,13 @@ namespace DaftAppleGames.BuildingTools.Editor
         {
             if (editorSettings is BuildingWizardEditorSettings buildingEditorSettings)
             {
-                ConfigureLighting(selectedGameObject, buildingEditorSettings, Log);
+                ConfigureLighting(selectedGameObject, buildingEditorSettings);
             }
         }
 
         #region Static Lighting methods
 
-        private static void ConfigureLighting(GameObject parentGameObject, BuildingWizardEditorSettings buildingWizardSettings, EditorLog log)
+        private static void ConfigureLighting(GameObject parentGameObject, BuildingWizardEditorSettings buildingWizardSettings)
         {
             LightingController lightingController = parentGameObject.EnsureComponent<LightingController>();
             log.Log(LogLevel.Info, $"Added Lighting Controller component to {parentGameObject.name}.");
@@ -50,7 +53,7 @@ namespace DaftAppleGames.BuildingTools.Editor
             {
                 if (buildingWizardSettings.indoorCandleSettings.meshNames.ItemInString(childTransform.gameObject.name))
                 {
-                    ConfigureBuildingLight(childTransform.gameObject, buildingWizardSettings.indoorCandleSettings, buildingWizardSettings, log);
+                    ConfigureBuildingLight(childTransform.gameObject, buildingWizardSettings.indoorCandleSettings);
                 }
             }
 
@@ -59,7 +62,7 @@ namespace DaftAppleGames.BuildingTools.Editor
             {
                 if (buildingWizardSettings.indoorFireSettings.meshNames.ItemInString(childTransform.gameObject.name))
                 {
-                    ConfigureBuildingLight(childTransform.gameObject, buildingWizardSettings.indoorFireSettings, buildingWizardSettings, log);
+                    ConfigureBuildingLight(childTransform.gameObject, buildingWizardSettings.indoorFireSettings);
                 }
             }
 
@@ -68,16 +71,15 @@ namespace DaftAppleGames.BuildingTools.Editor
             {
                 if (buildingWizardSettings.outdoorLightSettings.meshNames.ItemInString(childTransform.gameObject.name))
                 {
-                    ConfigureBuildingLight(childTransform.gameObject, buildingWizardSettings.outdoorLightSettings, buildingWizardSettings, log);
+                    ConfigureBuildingLight(childTransform.gameObject, buildingWizardSettings.outdoorLightSettings);
                 }
             }
 
             lightingController.UpdateLights();
-            ConfigureLightLayers(parentGameObject, buildingWizardSettings, log);
+            ConfigureLightLayers(parentGameObject, buildingWizardSettings);
         }
 
-        private static void ConfigureBuildingLight(GameObject lightGameObject, LightingSettings lightingSettings, BuildingWizardEditorSettings buildingWizardSettings,
-            EditorLog log)
+        private static void ConfigureBuildingLight(GameObject lightGameObject, LightingSettings lightingSettings)
         {
             if (!lightGameObject.TryGetComponentInChildren(out Light light, true))
             {
@@ -94,22 +96,97 @@ namespace DaftAppleGames.BuildingTools.Editor
             buildingLight.ConfigureInEditor(lightingSettings.buildingLightType, light, flameParticleSystem);
 
             log.Log(LogLevel.Debug, $"Configuring light on : {lightGameObject.name}...");
-            LightTools.ConfigureLight(lightGameObject, light, lightingSettings, log);
+            ConfigureLight(lightGameObject, light, lightingSettings);
             log.Log(LogLevel.Debug, $"Configuring light on : {lightGameObject.name}... DONE!");
         }
 
         /// <summary>
         /// Set the LightLayer/RenderLayer of meshes in the building
         /// </summary>
-        private static void ConfigureLightLayers(GameObject parentGameObject, BuildingWizardEditorSettings buildingWizardSettings, EditorLog log)
+        private static void ConfigureLightLayers(GameObject parentGameObject, BuildingWizardEditorSettings buildingWizardSettings)
         {
             Building building = parentGameObject.GetComponent<Building>();
 
-            LightTools.SetLightLayers(building.exteriors, buildingWizardSettings.buildingExteriorLightLayerMode, log);
-            LightTools.SetLightLayers(building.interiors, buildingWizardSettings.buildingInteriorLightLayerMode, log);
-            LightTools.SetLightLayers(building.interiorProps, buildingWizardSettings.interiorPropsLightLayerMode, log);
-            LightTools.SetLightLayers(building.exteriorProps, buildingWizardSettings.exteriorPropsLightLayerMode, log);
+            SetLightLayers(building.exteriors, buildingWizardSettings.buildingExteriorLightLayerMode);
+            SetLightLayers(building.interiors, buildingWizardSettings.buildingInteriorLightLayerMode);
+            SetLightLayers(building.interiorProps, buildingWizardSettings.interiorPropsLightLayerMode);
+            SetLightLayers(building.exteriorProps, buildingWizardSettings.exteriorPropsLightLayerMode);
         }
+
+        #region Configure Lights methoods
+
+        /// <summary>
+        /// Sets the LightLayer on all child meshes
+        /// </summary>
+        private static void SetLightLayers(GameObject[] parentGameObjects, LightLayerMode lightLayerMode)
+        {
+            foreach (GameObject parentGameObject in parentGameObjects)
+            {
+                foreach (MeshRenderer renderer in parentGameObject.GetComponentsInChildren<MeshRenderer>())
+                {
+                    renderer.renderingLayerMask = LightTools.GetMaskByMode(lightLayerMode);
+                }
+            }
+        }
+
+        private static void ConfigureLight(GameObject lightGameObject, Light light, LightingSettings lightingSettings)
+        {
+            // Look for old Lens Flare and destroy it - not supported in URP or HDRP
+#if DAG_HDRP || DAG_URP
+            if (lightGameObject.TryGetComponentInChildren(out LensFlare oldLensFlare, true))
+            {
+                DestroyImmediate(oldLensFlare);
+
+                log.Log(LogLevel.Debug, $"Destroyed old Lens Flare component on: {lightGameObject.name}.");
+            }
+
+            // Set up Lens Flare, if it's selected
+            if (lightingSettings.useLensFlare)
+            {
+                LensFlareComponentSRP newLensFlare = light.gameObject.EnsureComponent<LensFlareComponentSRP>();
+                newLensFlare.lensFlareData = lightingSettings.lensFlareData;
+                newLensFlare.intensity = lightingSettings.lensFlareIntensity;
+                newLensFlare.environmentOcclusion = true;
+                newLensFlare.useOcclusion = true;
+                newLensFlare.allowOffScreen = false;
+
+                log.Log(LogLevel.Debug, $"Configured an SRP Lens Flare component to: {lightGameObject.name}.");
+            }
+#endif
+
+            log.Log(LogLevel.Debug, $"Setting light properties on: {lightGameObject.name}.");
+            UpdateLightProperties(light, lightingSettings);
+        }
+
+        private static void UpdateLightProperties(Light light, LightingSettings lightingSettings)
+        {
+#if DAG_HDRP
+            HDAdditionalLightData hdLightData = light.GetComponent<HDAdditionalLightData>();
+            hdLightData.shapeRadius = lightingSettings.radius;
+            hdLightData.range = lightingSettings.range;
+#else
+            light.range = lightingSettings.range;
+#endif
+            light.color = lightingSettings.filterColor;
+            light.intensity = lightingSettings.intensity;
+            light.useColorTemperature = true;
+            light.colorTemperature = lightingSettings.temperature;
+            hdLightData.lightlayersMask = LightTools.GetHDRPMaskByMode(lightingSettings.layerMode);
+
+            float convertedIntensity = LightUnitUtils.ConvertIntensity(light, lightingSettings.intensity, LightUnit.Lumen, light.lightUnit);
+            light.intensity = convertedIntensity;
+
+            light.lightmapBakeType = lightingSettings.lightmapBakeType;
+
+            // Add a ShadowMap manager
+            hdLightData.shadowUpdateMode = ShadowUpdateMode.OnDemand;
+            OnDemandShadowMapUpdate shadowMapUpdate = light.EnsureComponent<OnDemandShadowMapUpdate>();
+            shadowMapUpdate.counterMode = CounterMode.Frames;
+            shadowMapUpdate.shadowMapToRefresh = ShadowMapToRefresh.EntireShadowMap;
+            shadowMapUpdate.fullShadowMapRefreshWaitSeconds = lightingSettings.shadowRefreshRate;
+        }
+
+        #endregion
 
         #endregion
     }
