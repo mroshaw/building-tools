@@ -27,7 +27,7 @@ namespace DaftAppleGames.BuildingTools.Editor
         protected override void RunTool(GameObject selectedGameObject, ButtonWizardEditorSettings editorSettings)
         {
             Log.Log(LogLevel.Info, $"Running ConfigureMeshesEditorTool. Configure Layers is {_configureMeshLayersOption}, Set Static Flags is {_setStaticFlagsOption}");
-            if (editorSettings is BuildingEditorSettings buildingEditorSettings)
+            if (editorSettings is BuildingWizardEditorSettings buildingEditorSettings)
             {
                 if (_configureMeshLayersOption)
                 {

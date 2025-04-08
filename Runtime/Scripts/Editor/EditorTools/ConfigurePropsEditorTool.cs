@@ -25,7 +25,7 @@ namespace DaftAppleGames.BuildingTools.Editor
         {
             Log.Log(LogLevel.Info, $"Running ConfigurePropsEditorTool. Add Colliders is {_addMissingCollidersOption}, Align To Terrain is {_alignExteriorPropsToTerrainOption}");
 
-            if (editorSettings is not BuildingEditorSettings buildingEditorSettings)
+            if (editorSettings is not BuildingWizardEditorSettings buildingEditorSettings)
             {
                 return;
             }
