@@ -14,7 +14,7 @@
     {
       "displayName": "3DForgeSample",
       "description": "Contains sample settings and files to use with 3D Forge building assets",
-      "path": "Samples~/BuildingTools"
+      "path": "Samples~/3DForgeSample"
     }
   ],
   "keywords": [
