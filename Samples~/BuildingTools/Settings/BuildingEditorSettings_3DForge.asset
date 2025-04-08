@@ -20,6 +20,8 @@ MonoBehaviour:
   exteriorPropsLightLayerMode: 1
   interiorPropsLayer: InteriorProps
   interiorPropsLightLayerMode: 0
+  staticMeshFlags: -1
+  moveableMeshFlags: 1
   boxColliderNames:
   - crate
   - chair
@@ -30,6 +32,11 @@ MonoBehaviour:
   - barrel
   meshColliderNames:
   - woven
+  terrainAlignPosition: 1
+  terrainAlignRotation: 1
+  terrainAlignX: 1
+  terrainAlignY: 1
+  terrainAlignZ: 1
   doorNames:
   - vil_door
   doorOpeningClips: []
