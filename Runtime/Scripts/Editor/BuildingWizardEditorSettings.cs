@@ -13,6 +13,10 @@ using DaftAppleGames.Attributes;
 
 namespace DaftAppleGames.BuildingTools.Editor
 {
+    /// <summary>
+    /// This struct gives us an easy way of passing Lighting configuration around
+    /// our various classes and methods
+    /// </summary>
     [Serializable]
     public struct LightingSettings
     {
@@ -32,6 +36,10 @@ namespace DaftAppleGames.BuildingTools.Editor
         public float shadowRefreshRate;
     }
 
+    /// <summary>
+    /// This Scriptable Object allows different configurations for the tools for different assets and use cases
+    /// At some point, I may consider splitting this into Tool specific configuration. For now, it's nice kept in one place.
+    /// </summary>
     [CreateAssetMenu(fileName = "BuildingEditorSettings", menuName = "Daft Apple Games/Building Tools/BuildingEditorSettings")]
     public class BuildingWizardEditorSettings : ButtonWizardEditorSettings
     {

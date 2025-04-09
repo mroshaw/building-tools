@@ -4,7 +4,7 @@
   "displayName": "Daft Apple Building Tools",
   "description": "Components and Editor Tools designed to help configure and optimise buildings in Unity projects",
   "unity": "6000.0",
-  "documentationUrl": "https://github.com/mroshaw/3dforge-tools/blob/main/README.md",
+  "documentationUrl": "https://mroshaw.github.io/unity-framework-docs/buildingtools/",
   "changelogUrl": "https://github.com/mroshaw/3dforge-tools/blob/main/README.md",
   "licensesUrl": "https://github.com/mroshaw/3dforge-tools/blob/main/LICENSE",
   "dependencies": {
@@ -12,9 +12,24 @@
   },
   "samples": [
     {
-      "displayName": "3DForgeSample",
-      "description": "Contains sample settings and files to use with 3D Forge building assets",
-      "path": "Samples~/3DForgeSample"
+      "displayName": "Sample Assets",
+      "description": "Contains simple sample assets used by the various sample scenes.",
+      "path": "Samples~/SampleAssets"
+    },
+    {
+      "displayName": "3D Forge Sample (HDRP)",
+      "description": "A sample scene and example settings showing how to use Building Tools in an HDRP project, with 3D Forge building assets. Requires the Sample Assets sample to be installed.",
+      "path": "Samples~/3DForgeSampleHDRP"
+    },
+    {
+      "displayName": "3D Forge Sample (URP)",
+      "description": "A sample scene and example settings showing how to use Building Tools in a URP project, with 3D Forge building assets. Requires the Sample Assets sample to be installed.",
+      "path": "Samples~/3DForgeSampleURP"
+    },
+    {
+      "displayName": "3D Forge Sample (BIRP)",
+      "description": "A sample scene and example settings showing how to use Building Tools in a BIRP project, with 3D Forge building assets. Requires the Sample Assets sample to be installed.",
+      "path": "Samples~/3DForgeSampleBIRP"
     }
   ],
   "keywords": [

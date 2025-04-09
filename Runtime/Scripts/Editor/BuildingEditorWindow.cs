@@ -1,8 +1,6 @@
 using DaftAppleGames.Editor;
-using DaftAppleGames.Extensions;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace DaftAppleGames.BuildingTools.Editor
 {
