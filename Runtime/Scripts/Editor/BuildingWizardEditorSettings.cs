@@ -28,7 +28,7 @@ namespace DaftAppleGames.BuildingTools.Editor
         public float radius;
         public LightLayerMode layerMode;
         public bool useLensFlare;
-#if DAG_HDRP || DAG_UURP
+#if DAG_HDRP || DAG_URP
         public float lensFlareIntensity;
         public LensFlareDataSRP lensFlareData;
 #endif
