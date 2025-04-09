@@ -3,10 +3,11 @@ using DaftAppleGames.Editor;
 using DaftAppleGames.Extensions;
 #if DAG_HDRP || DAG_UURP
 using DaftAppleGames.Lighting;
+using UnityEngine.Rendering.HighDefinition;
 #endif
 using UnityEngine;
 using UnityEngine.Rendering;
-using UnityEngine.Rendering.HighDefinition;
+
 
 namespace DaftAppleGames.BuildingTools.Editor
 {
