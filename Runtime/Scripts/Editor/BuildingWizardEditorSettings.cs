@@ -81,11 +81,9 @@ namespace DaftAppleGames.BuildingTools.Editor
 
         [BoxGroup("Volumes")] [SerializeField] internal string[] meshSizeIgnoreNames;
         [BoxGroup("Volumes")] [SerializeField] internal LayerMask meshSizeIncludeLayers;
-#if DAG_HDRP || DAG_UURP
-
         [BoxGroup("Volumes")] [SerializeField] internal string interiorVolumeGameObjectName;
+#if DAG_HDRP || DAG_UURP
         [BoxGroup("Volumes")] [SerializeField] internal VolumeProfile interiorVolumeProfile;
-
 #endif
         [BoxGroup("Volumes")] [SerializeField] internal AudioMixerSnapshot indoorSnapshot;
         [BoxGroup("Volumes")] [SerializeField] internal AudioMixerSnapshot outdoorSnapshot;
