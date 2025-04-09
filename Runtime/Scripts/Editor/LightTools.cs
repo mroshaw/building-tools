@@ -1,22 +1,5 @@
 using System.Collections.Generic;
-using DaftAppleGames.Buildings;
-using DaftAppleGames.Editor;
-using DaftAppleGames.Extensions;
-using DaftAppleGames.Lighting;
-using UnityEngine;
-using UnityEngine.Rendering;
 using RenderingLayerMask = UnityEngine.RenderingLayerMask;
-
-#if DAG_HDRP
-using UnityEngine.Rendering.HighDefinition;
-#endif
-
-#if DAG_URP
-#endif
-
-#if DAG_BIRP
-#endif
-
 
 namespace DaftAppleGames.BuildingTools.Editor
 {
