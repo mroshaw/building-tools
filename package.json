@@ -7,9 +7,6 @@
   "documentationUrl": "https://mroshaw.github.io/unity-framework-docs/buildingtools/",
   "changelogUrl": "https://github.com/mroshaw/3dforge-tools/blob/main/README.md",
   "licensesUrl": "https://github.com/mroshaw/3dforge-tools/blob/main/LICENSE",
-  "dependencies": {
-    "com.unity.splines": "2.7.2"
-  },
   "samples": [
     {
       "displayName": "Sample Assets",

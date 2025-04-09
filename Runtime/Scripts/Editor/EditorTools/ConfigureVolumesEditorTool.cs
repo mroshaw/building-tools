@@ -32,13 +32,14 @@ namespace DaftAppleGames.BuildingTools.Editor
         {
             if (editorSettings is BuildingWizardEditorSettings buildingEditorSettings)
             {
+#if DAG_HDRP || DAG_UURP
                 if (_configureLightingVolumeOption)
                 {
                     log.Log(LogLevel.Info, "Configuring Lighting Volume...");
                     AddInteriorLightingVolume(selectedGameObject, buildingEditorSettings);
                     log.Log(LogLevel.Info, "Configuring Lighting Volume... DONE!");
                 }
-
+#endif
                 if (_configureAudioVolumeOption)
                 {
                     log.Log(LogLevel.Info, "Configuring Audio Volume...");
@@ -69,6 +70,7 @@ namespace DaftAppleGames.BuildingTools.Editor
 
         #region Static tool methods
 
+#if DAG_HDRP || DAG_UURP
         private static void AddInteriorLightingVolume(GameObject parentGameObject, BuildingWizardEditorSettings buildingWizardSettings)
         {
             log.Log(LogLevel.Debug, $"Adding Interior Lighting Volume to {parentGameObject.name}...");
@@ -77,7 +79,7 @@ namespace DaftAppleGames.BuildingTools.Editor
             interiorVolume.sharedProfile = buildingWizardSettings.interiorVolumeProfile;
             interiorVolume.isGlobal = false;
         }
-
+#endif
         private static void AddInteriorAudioVolume(GameObject parentGameObject, BuildingWizardEditorSettings buildingWizardSettings)
         {
             log.Log(LogLevel.Debug, $"Adding Interior Audio Volume to {parentGameObject.name}...");

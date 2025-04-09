@@ -1,7 +1,9 @@
 using DaftAppleGames.Buildings;
 using DaftAppleGames.Editor;
 using DaftAppleGames.Extensions;
+#if DAG_HDRP || DAG_UURP
 using DaftAppleGames.Lighting;
+#endif
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.HighDefinition;
@@ -164,19 +166,6 @@ namespace DaftAppleGames.BuildingTools.Editor
             HDAdditionalLightData hdLightData = light.GetComponent<HDAdditionalLightData>();
             hdLightData.shapeRadius = lightingSettings.radius;
             hdLightData.range = lightingSettings.range;
-#else
-            light.range = lightingSettings.range;
-#endif
-            light.color = lightingSettings.filterColor;
-            light.intensity = lightingSettings.intensity;
-            light.useColorTemperature = true;
-            light.colorTemperature = lightingSettings.temperature;
-            hdLightData.lightlayersMask = LightTools.GetHDRPMaskByMode(lightingSettings.layerMode);
-
-            float convertedIntensity = LightUnitUtils.ConvertIntensity(light, lightingSettings.intensity, LightUnit.Lumen, light.lightUnit);
-            light.intensity = convertedIntensity;
-
-            light.lightmapBakeType = lightingSettings.lightmapBakeType;
 
             // Add a ShadowMap manager
             hdLightData.shadowUpdateMode = ShadowUpdateMode.OnDemand;
@@ -184,6 +173,19 @@ namespace DaftAppleGames.BuildingTools.Editor
             shadowMapUpdate.counterMode = CounterMode.Frames;
             shadowMapUpdate.shadowMapToRefresh = ShadowMapToRefresh.EntireShadowMap;
             shadowMapUpdate.fullShadowMapRefreshWaitSeconds = lightingSettings.shadowRefreshRate;
+            hdLightData.lightlayersMask = LightTools.GetHDRPMaskByMode(lightingSettings.layerMode);
+
+            float convertedIntensity = LightUnitUtils.ConvertIntensity(light, lightingSettings.intensity, LightUnit.Lumen, light.lightUnit);
+            light.intensity = convertedIntensity;
+
+#else
+            light.range = lightingSettings.range;
+#endif
+            light.color = lightingSettings.filterColor;
+            light.intensity = lightingSettings.intensity;
+            light.useColorTemperature = true;
+            light.colorTemperature = lightingSettings.temperature;
+            light.lightmapBakeType = lightingSettings.lightmapBakeType;
         }
 
         #endregion

@@ -28,8 +28,10 @@ namespace DaftAppleGames.BuildingTools.Editor
         public float radius;
         public LightLayerMode layerMode;
         public bool useLensFlare;
+#if DAG_HDRP || DAG_UURP
         public float lensFlareIntensity;
         public LensFlareDataSRP lensFlareData;
+#endif
         public Color filterColor;
         public float temperature;
         public LightmapBakeType lightmapBakeType;
@@ -79,8 +81,12 @@ namespace DaftAppleGames.BuildingTools.Editor
 
         [BoxGroup("Volumes")] [SerializeField] internal string[] meshSizeIgnoreNames;
         [BoxGroup("Volumes")] [SerializeField] internal LayerMask meshSizeIncludeLayers;
+#if DAG_HDRP || DAG_UURP
+
         [BoxGroup("Volumes")] [SerializeField] internal string interiorVolumeGameObjectName;
         [BoxGroup("Volumes")] [SerializeField] internal VolumeProfile interiorVolumeProfile;
+
+#endif
         [BoxGroup("Volumes")] [SerializeField] internal AudioMixerSnapshot indoorSnapshot;
         [BoxGroup("Volumes")] [SerializeField] internal AudioMixerSnapshot outdoorSnapshot;
         [BoxGroup("Volumes")] [SerializeField] internal string[] volumeTriggerTags;
