@@ -22,12 +22,18 @@ namespace DaftAppleGames.BuildingTools.Editor
 
         protected bool RequiredBuildingMeshValidation()
         {
-            if (ParentToolsList.SelectedGameObject && ParentToolsList.SelectedGameObject.HasComponent<Building>())
+            if (!ParentToolsList.SelectedGameObject.TryGetComponent(out Building building))
             {
                 return true;
             }
 
-            ParentToolsList.EditorLog.Log(LogLevel.Error, "The selected game object must contain a Building component to run this tool!");
+            if (building.interiors != null && building.interiors.Length != 0 &&
+                building.exteriors != null && building.exteriors.Length != 0)
+            {
+                return true;
+            }
+
+            ParentToolsList.EditorLog.Log(LogLevel.Error, "You must configure the Mesh properties on the Building Component before running this tool!");
             return false;
         }
     }

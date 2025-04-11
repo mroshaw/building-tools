@@ -54,5 +54,21 @@ namespace DaftAppleGames.BuildingTools
         }
 
         #endregion
+
+        #region Editor methods
+
+#if UNITY_EDITOR
+        public void ConfigureInEditor(LayerMask newTriggerLayerMask, string[] newTriggerTags, AudioMixerSnapshot newIndoorSnapshot, AudioMixerSnapshot newOutdoorSnapshot)
+        {
+            // Configure the ActionTrigger
+            base.ConfigureInEditor(newTriggerLayerMask, newTriggerTags);
+
+            // Configure the AudioMixer
+            indoorSnapshot = newIndoorSnapshot;
+            outdoorSnapshot = newOutdoorSnapshot;
+        }
+#endif
+
+        #endregion
     }
 }

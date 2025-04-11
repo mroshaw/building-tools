@@ -1,5 +1,5 @@
 <engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
     <Style src="project://database/Assets/daftapple-core/Runtime/Scripts/Editor/EditorWindowStyles.uss?fileID=7433441132597879392&amp;guid=b92b529d400a4f84db355c6f295a3efa&amp;type=3#EditorWindowStyles" />
     <engine:Foldout text="Configure Doors Options" name="ToolOptionsFoldout" value="false" class="Foldout" />
-    <engine:Button text="Configure Doors" name="ConfigureDoorsButton" tooltip="Adds a Door Controller component to the selected Game Object, if one does not already exist. Looks for specifically named Mesh components in the selected Game Object and adds and configures Door components to matching child Game Objects." class="Button" />
+    <engine:Button text="Add Doors" name="ConfigureDoorsButton" tooltip="Adds a Door Controller component to the selected Game Object, if one does not already exist. Looks for specifically named Mesh components in the selected Game Object and adds and configures Door components to matching child Game Objects." class="Button" />
 </engine:UXML>

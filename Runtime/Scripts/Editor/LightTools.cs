@@ -1,65 +1,62 @@
-using System.Collections.Generic;
+using System;
+using DaftAppleGames.Buildings;
+using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.HighDefinition;
 using RenderingLayerMask = UnityEngine.RenderingLayerMask;
+using HDRenderingLayerMask = UnityEngine.Rendering.HighDefinition.RenderingLayerMask;
 
 namespace DaftAppleGames.BuildingTools.Editor
 {
-    /// <summary>
-    /// Used to assign specific Light Layers to lights and meshes
-    /// </summary>
-    public enum LightLayerMode
-    {
-        Interior,
-        Exterior,
-        Both
-    }
-
     /// <summary>
     /// Static methods for working with Lighting
     /// </summary>
     internal static class LightTools
     {
-        private static readonly Dictionary<LightLayerMode, uint> MeshLightLayerMasks;
-#if DAG_HDRP
-        private static readonly Dictionary<LightLayerMode, UnityEngine.Rendering.HighDefinition.RenderingLayerMask> HDRPLightLayerMasks;
-#endif
-
-        static LightTools()
-        {
-            MeshLightLayerMasks = new Dictionary<LightLayerMode, uint>
-            {
-                { LightLayerMode.Interior, RenderingLayerMask.GetMask("Interior") },
-                { LightLayerMode.Exterior, RenderingLayerMask.GetMask("Exterior") },
-                { LightLayerMode.Both, RenderingLayerMask.GetMask("Interior", "Exterior") }
-            };
-
-#if DAG_HDRP
-            HDRPLightLayerMasks = new Dictionary<LightLayerMode, UnityEngine.Rendering.HighDefinition.RenderingLayerMask>
-            {
-                { LightLayerMode.Interior, UnityEngine.Rendering.HighDefinition.RenderingLayerMask.RenderingLayer3 },
-                { LightLayerMode.Exterior, UnityEngine.Rendering.HighDefinition.RenderingLayerMask.RenderingLayer4 },
-                {
-                    LightLayerMode.Both,
-                    UnityEngine.Rendering.HighDefinition.RenderingLayerMask.RenderingLayer3 | UnityEngine.Rendering.HighDefinition.RenderingLayerMask.RenderingLayer4
-                }
-            };
-#endif
-        }
-
         /// <summary>
-        /// Gets the LayerMask defined by the mode
+        /// This struct gives us an easy way of passing Lighting configuration around
+        /// our various classes and methods
         /// </summary>
-        internal static RenderingLayerMask GetMaskByMode(LightLayerMode layerMode)
+        [Serializable]
+        public struct LightingSettings
         {
-            return MeshLightLayerMasks[layerMode];
-        }
-
+            public BuildingLightType buildingLightType;
+            public string[] meshNames;
+            public string[] flameNames;
+            public float range;
+            public float intensity;
+            public float radius;
+            public bool useLensFlare;
 #if DAG_HDRP
-
-        internal static UnityEngine.Rendering.HighDefinition.RenderingLayerMask GetHDRPMaskByMode(LightLayerMode layerMode)
-        {
-            return HDRPLightLayerMasks[layerMode];
+            public HDRenderingLayerMask renderingLayerMask;
+#endif
+#if DAG_HDRP || DAG_URP
+            public float lensFlareIntensity;
+            public LensFlareDataSRP lensFlareData;
+#endif
+            public Color filterColor;
+            public float temperature;
+            public LightmapBakeType lightmapBakeType;
+            public float shadowRefreshRate;
         }
 
+        internal static void ConfigureLight(Light light, LightingSettings lightingSettings)
+        {
+#if DAG_HDRP
+            HDAdditionalLightData hdLightData = light.GetComponent<HDAdditionalLightData>();
+            hdLightData.shapeRadius = lightingSettings.radius;
+            hdLightData.range = lightingSettings.range;
+            hdLightData.lightlayersMask = lightingSettings.renderingLayerMask;
+            float convertedIntensity = LightUnitUtils.ConvertIntensity(light, lightingSettings.intensity, LightUnit.Lumen, light.lightUnit);
+            light.intensity = convertedIntensity;
+#else
+            light.range = lightingSettings.range;
 #endif
+            light.color = lightingSettings.filterColor;
+            light.intensity = lightingSettings.intensity;
+            light.useColorTemperature = true;
+            light.colorTemperature = lightingSettings.temperature;
+            light.lightmapBakeType = lightingSettings.lightmapBakeType;
+        }
     }
 }

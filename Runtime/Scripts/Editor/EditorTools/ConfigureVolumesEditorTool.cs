@@ -14,7 +14,7 @@ namespace DaftAppleGames.BuildingTools.Editor
 
         protected override string GetToolName()
         {
-            return "Configure Volumes";
+            return "Add Volumes";
         }
 
         protected override bool IsSupported(out string notSupportedReason)
@@ -85,7 +85,8 @@ namespace DaftAppleGames.BuildingTools.Editor
             log.Log(LogLevel.Debug, $"Adding Interior Audio Volume to {parentGameObject.name}...");
             GameObject volumeGameObject = ConfigureVolumeGameObject(parentGameObject, buildingWizardSettings);
             InteriorAudioFilter audioFilter = volumeGameObject.EnsureComponent<InteriorAudioFilter>();
-            audioFilter.ConfigureInEditor(buildingWizardSettings.volumeTriggerLayerMask, buildingWizardSettings.volumeTriggerTags);
+            audioFilter.ConfigureInEditor(buildingWizardSettings.volumeTriggerLayerMask, buildingWizardSettings.volumeTriggerTags,
+                buildingWizardSettings.indoorSnapshot, buildingWizardSettings.outdoorSnapshot);
             log.Log(LogLevel.Debug, $"Adding Interior Audio Volume to {parentGameObject.name}... DONE!");
         }
 

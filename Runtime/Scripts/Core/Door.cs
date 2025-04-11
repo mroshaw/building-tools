@@ -209,6 +209,7 @@ namespace DaftAppleGames.Buildings
                 _audioSource = this.EnsureComponent<AudioSource>();
             }
 
+            _audioSource.playOnAwake = false;
             _audioSource.outputAudioMixerGroup = audioMixerGroup;
             openingClips = newOpeningClips;
             openingClips = newOpenClips;

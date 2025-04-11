@@ -16,7 +16,7 @@ namespace DaftAppleGames.BuildingTools.Editor
     {
         protected override string GetToolName()
         {
-            return "Configure Lighting";
+            return "Set Up Lights";
         }
 
         protected override bool IsSupported(out string notSupportedReason)
@@ -78,11 +78,10 @@ namespace DaftAppleGames.BuildingTools.Editor
                 }
             }
 
-            lightingController.UpdateLights();
-            ConfigureLightLayers(parentGameObject, buildingWizardSettings);
+            lightingController.ConfigureInEditor();
         }
 
-        private static void ConfigureBuildingLight(GameObject lightGameObject, LightingSettings lightingSettings)
+        private static void ConfigureBuildingLight(GameObject lightGameObject, LightTools.LightingSettings lightingSettings)
         {
             if (!lightGameObject.TryGetComponentInChildren(out Light light, true))
             {
@@ -103,36 +102,9 @@ namespace DaftAppleGames.BuildingTools.Editor
             log.Log(LogLevel.Debug, $"Configuring light on : {lightGameObject.name}... DONE!");
         }
 
-        /// <summary>
-        /// Set the LightLayer/RenderLayer of meshes in the building
-        /// </summary>
-        private static void ConfigureLightLayers(GameObject parentGameObject, BuildingWizardEditorSettings buildingWizardSettings)
-        {
-            Building building = parentGameObject.GetComponent<Building>();
+        #region Configure Lights methods
 
-            SetLightLayers(building.exteriors, buildingWizardSettings.buildingExteriorLightLayerMode);
-            SetLightLayers(building.interiors, buildingWizardSettings.buildingInteriorLightLayerMode);
-            SetLightLayers(building.interiorProps, buildingWizardSettings.interiorPropsLightLayerMode);
-            SetLightLayers(building.exteriorProps, buildingWizardSettings.exteriorPropsLightLayerMode);
-        }
-
-        #region Configure Lights methoods
-
-        /// <summary>
-        /// Sets the LightLayer on all child meshes
-        /// </summary>
-        private static void SetLightLayers(GameObject[] parentGameObjects, LightLayerMode lightLayerMode)
-        {
-            foreach (GameObject parentGameObject in parentGameObjects)
-            {
-                foreach (MeshRenderer renderer in parentGameObject.GetComponentsInChildren<MeshRenderer>())
-                {
-                    renderer.renderingLayerMask = LightTools.GetMaskByMode(lightLayerMode);
-                }
-            }
-        }
-
-        private static void ConfigureLight(GameObject lightGameObject, Light light, LightingSettings lightingSettings)
+        private static void ConfigureLight(GameObject lightGameObject, Light light, LightTools.LightingSettings lightingSettings)
         {
             // Look for old Lens Flare and destroy it - not supported in URP or HDRP
 #if DAG_HDRP || DAG_URP
@@ -158,35 +130,21 @@ namespace DaftAppleGames.BuildingTools.Editor
 #endif
 
             log.Log(LogLevel.Debug, $"Setting light properties on: {lightGameObject.name}.");
-            UpdateLightProperties(light, lightingSettings);
+            LightTools.ConfigureLight(light, lightingSettings);
         }
 
-        private static void UpdateLightProperties(Light light, LightingSettings lightingSettings)
+        private static void ConfigureOnDemandShadowMap(Light light, LightTools.LightingSettings lightingSettings)
         {
 #if DAG_HDRP
             HDAdditionalLightData hdLightData = light.GetComponent<HDAdditionalLightData>();
-            hdLightData.shapeRadius = lightingSettings.radius;
-            hdLightData.range = lightingSettings.range;
-
             // Add a ShadowMap manager
             hdLightData.shadowUpdateMode = ShadowUpdateMode.OnDemand;
             OnDemandShadowMapUpdate shadowMapUpdate = light.EnsureComponent<OnDemandShadowMapUpdate>();
             shadowMapUpdate.counterMode = CounterMode.Frames;
             shadowMapUpdate.shadowMapToRefresh = ShadowMapToRefresh.EntireShadowMap;
             shadowMapUpdate.fullShadowMapRefreshWaitSeconds = lightingSettings.shadowRefreshRate;
-            hdLightData.lightlayersMask = LightTools.GetHDRPMaskByMode(lightingSettings.layerMode);
 
-            float convertedIntensity = LightUnitUtils.ConvertIntensity(light, lightingSettings.intensity, LightUnit.Lumen, light.lightUnit);
-            light.intensity = convertedIntensity;
-
-#else
-            light.range = lightingSettings.range;
 #endif
-            light.color = lightingSettings.filterColor;
-            light.intensity = lightingSettings.intensity;
-            light.useColorTemperature = true;
-            light.colorTemperature = lightingSettings.temperature;
-            light.lightmapBakeType = lightingSettings.lightmapBakeType;
         }
 
         #endregion

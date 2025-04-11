@@ -4,5 +4,5 @@
         <engine:Toggle label="Configure Mesh Layers:" name="ConfigureMeshLayersToggle" value="true" binding-path="configureMeshLayers" />
         <engine:Toggle label="Set Static Flags:" name="SetStaticFlagsToggle" value="true" binding-path="setStaticFlags" />
     </engine:Foldout>
-    <engine:Button text="Configure Meshes" name="ConfigureMeshesButton" tooltip="Assigns an appropriate Layer to MeshRenderer Game Objects within the selected Game Object. Configures the Static flags according to the settings selected." class="Button" />
+    <engine:Button text="Apply Mesh Presets" name="ConfigureMeshesButton" tooltip="Assigns an appropriate Layer to MeshRenderer Game Objects within the selected Game Object. Configures the Static flags according to the settings selected." class="Button" />
 </engine:UXML>

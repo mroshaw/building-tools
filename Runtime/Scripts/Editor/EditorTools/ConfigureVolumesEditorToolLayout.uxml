@@ -4,5 +4,5 @@
         <engine:Toggle label="Configure Lighting Volume:" name="ConfigureLightingVolumeToggle" value="true" />
         <engine:Toggle label="Configure Audio Volume:" name="ConfigureAudioVolumeToggle" value="true" />
     </engine:Foldout>
-    <engine:Button text="Configure Volumes" name="ConfigureVoolumesButton" double-click-selects-word="false" tooltip="Adds an Interior Volume to the selected Game Object, providing lighting settings for an interior setting. Also adds an Interior Audio component which &quot;muffles&quot; ambient sound effects." class="Button" />
+    <engine:Button text="Add Volumes" name="ConfigureVoolumesButton" double-click-selects-word="false" tooltip="Adds an Interior Volume to the selected Game Object, providing lighting settings for an interior setting. Also adds an Interior Audio component which &quot;muffles&quot; ambient sound effects." class="Button" />
 </engine:UXML>

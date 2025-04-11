@@ -11,7 +11,7 @@ namespace DaftAppleGames.BuildingTools.Editor
     {
         protected override string GetToolName()
         {
-            return "Configure Doors";
+            return "Add Doors";
         }
 
         protected override bool IsSupported(out string notSupportedReason)

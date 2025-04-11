@@ -14,7 +14,7 @@ namespace DaftAppleGames.BuildingTools.Editor
 
         protected override string GetToolName()
         {
-            return "Configure Props";
+            return "Fix Props";
         }
 
         protected override bool IsSupported(out string notSupportedReason)

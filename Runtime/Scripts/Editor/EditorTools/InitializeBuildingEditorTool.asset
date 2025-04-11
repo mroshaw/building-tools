@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 754ecd0791b9fed47b32bac1de960c13, type: 3}
-  m_Name: AddBuildingComponentEditorTool
+  m_Name: InitializeBuildingEditorTool
   m_EditorClassIdentifier: 
   visualTreeAsset: {fileID: 9197481963319205126, guid: 8808701a13f9e3843bdf05aa382f9a94, type: 3}
-  runToolButtonName: AddBuildingComponentButton
+  runToolButtonName: InitializeBuildingButton

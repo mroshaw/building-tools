@@ -1,6 +1,4 @@
 using UnityEditor;
-using System;
-using DaftAppleGames.Buildings;
 using DaftAppleGames.Editor;
 using UnityEngine;
 using UnityEngine.Audio;
@@ -14,46 +12,18 @@ using DaftAppleGames.Attributes;
 namespace DaftAppleGames.BuildingTools.Editor
 {
     /// <summary>
-    /// This struct gives us an easy way of passing Lighting configuration around
-    /// our various classes and methods
-    /// </summary>
-    [Serializable]
-    public struct LightingSettings
-    {
-        public BuildingLightType buildingLightType;
-        public string[] meshNames;
-        public string[] flameNames;
-        public float range;
-        public float intensity;
-        public float radius;
-        public LightLayerMode layerMode;
-        public bool useLensFlare;
-#if DAG_HDRP || DAG_URP
-        public float lensFlareIntensity;
-        public LensFlareDataSRP lensFlareData;
-#endif
-        public Color filterColor;
-        public float temperature;
-        public LightmapBakeType lightmapBakeType;
-        public float shadowRefreshRate;
-    }
-
-    /// <summary>
     /// This Scriptable Object allows different configurations for the tools for different assets and use cases
     /// At some point, I may consider splitting this into Tool specific configuration. For now, it's nice kept in one place.
     /// </summary>
-    [CreateAssetMenu(fileName = "BuildingEditorSettings", menuName = "Daft Apple Games/Building Tools/BuildingEditorSettings")]
+    [CreateAssetMenu(fileName = "BuildingWizardEditorSettings", menuName = "Daft Apple Games/Building Tools/Building Wizard Editor Settings")]
     public class BuildingWizardEditorSettings : ButtonWizardEditorSettings
     {
-        [BoxGroup("Meshes")] [SerializeField] internal string buildingExteriorLayer = "BuildingExterior";
-        [BoxGroup("Meshes")] [SerializeField] internal LightLayerMode buildingExteriorLightLayerMode = LightLayerMode.Exterior;
-        [BoxGroup("Meshes")] [SerializeField] internal string buildingInteriorLayer = "BuildingInterior";
-        [BoxGroup("Meshes")] [SerializeField] internal LightLayerMode buildingInteriorLightLayerMode = LightLayerMode.Interior;
-        [BoxGroup("Meshes")] [SerializeField] internal string exteriorPropsLayer = "ExteriorProps";
-        [BoxGroup("Meshes")] [SerializeField] internal LightLayerMode exteriorPropsLightLayerMode = LightLayerMode.Exterior;
-        [BoxGroup("Meshes")] [SerializeField] internal string interiorPropsLayer = "InteriorProps";
-        [BoxGroup("Meshes")] [SerializeField] internal LightLayerMode interiorPropsLightLayerMode = LightLayerMode.Interior;
-        [BoxGroup("Meshes")] [SerializeField] internal StaticEditorFlags staticMeshFlags;
+        [BoxGroup("Building")] [SerializeField] internal float adjustAnchorHeight;
+
+        [BoxGroup("Meshes")] [SerializeField] internal MeshTools.MeshSettings interiorMeshSettings;
+        [BoxGroup("Meshes")] [SerializeField] internal MeshTools.MeshSettings exteriorMeshSettings;
+        [BoxGroup("Meshes")] [SerializeField] internal MeshTools.MeshSettings interiorPropMeshSettings;
+        [BoxGroup("Meshes")] [SerializeField] internal MeshTools.MeshSettings exteriorPropMeshSettings;
         [BoxGroup("Meshes")] [SerializeField] internal StaticEditorFlags moveableMeshFlags;
 
         [BoxGroup("Props")] [SerializeField] internal string[] boxColliderNames;
@@ -75,9 +45,9 @@ namespace DaftAppleGames.BuildingTools.Editor
         [BoxGroup("Doors")] [SerializeField] internal LayerMask doorTriggerLayerMask;
         [BoxGroup("Doors")] [SerializeField] internal string[] doorTriggerTags;
 
-        [BoxGroup("Lighting")] [SerializeField] internal LightingSettings indoorCandleSettings;
-        [BoxGroup("Lighting")] [SerializeField] internal LightingSettings indoorFireSettings;
-        [BoxGroup("Lighting")] [SerializeField] internal LightingSettings outdoorLightSettings;
+        [BoxGroup("Lighting")] [SerializeField] internal LightTools.LightingSettings indoorCandleSettings;
+        [BoxGroup("Lighting")] [SerializeField] internal LightTools.LightingSettings indoorFireSettings;
+        [BoxGroup("Lighting")] [SerializeField] internal LightTools.LightingSettings outdoorLightSettings;
 
         [BoxGroup("Volumes")] [SerializeField] internal string[] meshSizeIgnoreNames;
         [BoxGroup("Volumes")] [SerializeField] internal LayerMask meshSizeIncludeLayers;
@@ -90,6 +60,6 @@ namespace DaftAppleGames.BuildingTools.Editor
         [BoxGroup("Volumes")] [SerializeField] internal string[] volumeTriggerTags;
         [BoxGroup("Volumes")] [SerializeField] internal LayerMask volumeTriggerLayerMask;
 
-        [BoxGroup("CombineMeshes")] [SerializeField] internal string meshAssetOutputPath;
+        [BoxGroup("Combine Meshes")] [SerializeField] internal string meshAssetOutputPath;
     }
 }

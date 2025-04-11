@@ -11,9 +11,16 @@ namespace DaftAppleGames.Buildings
     public class LightingController : MonoBehaviour
     {
         [BoxGroup("Settings")] [SerializeField] private bool findLightsOnAwake;
-        [BoxGroup("Building Lights")] [SerializeField] private List<BuildingLight> candleLights;
-        [BoxGroup("Building Lights")] [SerializeField] private List<BuildingLight> cookingLights;
-        [BoxGroup("Building Lights")] [SerializeField] private List<BuildingLight> outdoorLights;
+        [BoxGroup("Settings")] [SerializeField] private bool defaultState;
+        [BoxGroup("Indoor Candle Lights")] [SerializeField] private List<BuildingLight> candleLights;
+        [BoxGroup("Indoor Candle Lights")] [SerializeField] private bool candleDefaultState;
+        [BoxGroup("Indoor Candle Lights")] [SerializeField] private bool candleCurrentState;
+        [BoxGroup("Indoor Fire Lights")] [SerializeField] private List<BuildingLight> indoorFireLights;
+        [BoxGroup("Indoor Fire Lights")] [SerializeField] private bool indoorFireDefaultState = true;
+        [BoxGroup("Indoor Fire Lights")] [SerializeField] private bool indoorFireCurrentState;
+        [BoxGroup("Outdoor Lights")] [SerializeField] private List<BuildingLight> outdoorLights;
+        [BoxGroup("Outdoor Lights")] [SerializeField] private bool outdoorLightDefaultState;
+        [BoxGroup("Outdoor Lights")] [SerializeField] private bool outdoorLightCurrentState;
 
         #region Startup
 
@@ -21,19 +28,46 @@ namespace DaftAppleGames.Buildings
         {
             if (findLightsOnAwake)
             {
-                UpdateLights();
+                UpdateLightLists();
             }
+
+            SetDefaultState();
+        }
+
+        private void SetDefaultState()
+        {
+            SetCandleLightsState(candleDefaultState);
+            SetFireLightsState(indoorFireDefaultState);
+            SetOutdoorLightsState(outdoorLightDefaultState);
+        }
+
+        private void SetCandleLightsState(bool state)
+        {
+            candleCurrentState = state;
+            SetLightsState(candleLights, state);
+        }
+
+        private void SetFireLightsState(bool state)
+        {
+            indoorFireCurrentState = state;
+            SetLightsState(indoorFireLights, state);
+        }
+
+        private void SetOutdoorLightsState(bool state)
+        {
+            outdoorLightCurrentState = state;
+            SetLightsState(outdoorLights, state);
         }
 
         #endregion
 
         #region Class Methods
 
-        [Button("Update Lights")]
-        public void UpdateLights()
+        [Button("Update Light Lists")]
+        private void UpdateLightLists()
         {
             candleLights = new List<BuildingLight>();
-            cookingLights = new List<BuildingLight>();
+            indoorFireLights = new List<BuildingLight>();
             outdoorLights = new List<BuildingLight>();
             BuildingLight[] allLights = gameObject.GetComponentsInChildren<BuildingLight>(true);
             foreach (BuildingLight currLight in allLights)
@@ -46,7 +80,7 @@ namespace DaftAppleGames.Buildings
                         candleLights.Add(currLight);
                         break;
                     case BuildingLightType.IndoorFire:
-                        cookingLights.Add(currLight);
+                        indoorFireLights.Add(currLight);
                         break;
                     case BuildingLightType.OutdoorCandle:
                         outdoorLights.Add(currLight);
@@ -58,37 +92,37 @@ namespace DaftAppleGames.Buildings
         [Button("Turn On Candles")]
         public void TurnOnCandleLights()
         {
-            SetLightsState(candleLights, true);
+            SetCandleLightsState(true);
         }
 
         [Button("Turn Off Candles")]
         public void TurnOffCandleLights()
         {
-            SetLightsState(candleLights, false);
+            SetCandleLightsState(false);
         }
 
         [Button("Turn On Outdoor Lights")]
         public void TurnOnOutdoorLights()
         {
-            SetLightsState(outdoorLights, true);
+            SetOutdoorLightsState(true);
         }
 
         [Button("Turn Off Outdoor Lights")]
         public void TurnOffOutdoorLights()
         {
-            SetLightsState(outdoorLights, false);
+            SetOutdoorLightsState(false);
         }
 
-        [Button("Turn On Cooking")]
-        public void TurnOnCookingLights()
+        [Button("Turn On Fire Lights")]
+        public void TurnOnFireLights()
         {
-            SetLightsState(cookingLights, true);
+            SetFireLightsState(true);
         }
 
-        [Button("Turn Off Cooking")]
+        [Button("Turn Off Fire Lights")]
         public void TurnOffCookingLights()
         {
-            SetLightsState(cookingLights, false);
+            SetFireLightsState(false);
         }
 
 
@@ -99,6 +133,17 @@ namespace DaftAppleGames.Buildings
                 currLight.SetLightState(state);
             }
         }
+
+        #endregion
+
+        #region Unity Editor Methods
+
+#if UNITY_EDITOR
+        public void ConfigureInEditor()
+        {
+            UpdateLightLists();
+        }
+#endif
 
         #endregion
     }

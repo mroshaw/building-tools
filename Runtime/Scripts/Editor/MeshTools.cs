@@ -1,57 +1,45 @@
-using System.Collections.Generic;
-using System.IO;
-using DaftAppleGames.Buildings;
+using System;
+using DaftAppleGames.Editor;
 using DaftAppleGames.Extensions;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
+#if ODIN_INSPECTOR
+using Sirenix.OdinInspector;
+#else
+using DaftAppleGames.Attributes;
+#endif
 
 namespace DaftAppleGames.BuildingTools.Editor
 {
-    /// <summary>
-    /// Used by static methods to configure specific attributes of a Mesh, while being able to ignore others
-    /// </summary>
-    internal enum MeshProperties
-    {
-        CastShadows,
-        StaticShadowCaster,
-        ContributeGI,
-        ReceiveGI,
-        MotionVectors,
-        DynamicOcclusion,
-        RenderLayerMask,
-        Priority
-    }
-
-
     /// <summary>
     /// Static methods for working with Meshes
     /// </summary>
     internal static class MeshTools
     {
-        #region Tool prarameter structs
+        #region Mesh Settings
 
         /// <summary>
-        /// Struct to consolidate parameters for use with the 'CombineMesh' tool
+        /// Struct to give us flexibility it configuring Meshes for different use cases
         /// </summary>
-        internal struct CombineMeshParameters
+        [Serializable]
+        public struct MeshSettings
         {
-            internal string BaseAssetOutputPath;
-            internal string AssetOutputFolder;
-            internal string AssetFileNamePrefix;
-            internal bool CreateOutputFolder;
-            internal bool Is32BIT;
-            internal bool GenerateSecondaryUVs;
-        }
+            [BoxGroup("Game Object")] public string layerName;
+            [BoxGroup("Game Object")] public StaticEditorFlags staticEditorFlags;
 
-        internal struct ConfigureMeshParameters
-        {
-            internal ShadowCastingMode ShadowCastingMode;
-            internal bool StaticShadowCaster;
-            internal bool ContributeGI;
-            internal ReceiveGI ReceiveGlobalGI;
-            internal LightLayerMode LightLayerMode;
-            internal string LayerName;
+            [BoxGroup("Lighting")] public ShadowCastingMode shadowCastingMode;
+            [BoxGroup("Lighting")] public bool staticShadowCaster;
+            [BoxGroup("Lighting")] public ReceiveGI receiveGI;
+            [BoxGroup("Lighting")] public bool contributeGI;
+            [BoxGroup("Lighting")] public LightProbeUsage lightProbeUsage;
+
+            [BoxGroup("Light Mapping")] public float scaleInLightmap;
+
+            [BoxGroup("Additional")] public MotionVectorGenerationMode motionVectors;
+            [BoxGroup("Additional")] public bool dynamicOcclusion;
+            [BoxGroup("Additional")] public RenderingLayerMask renderingLayerMask;
+            [BoxGroup("Additional")] public int priority;
         }
 
         #endregion
@@ -59,214 +47,60 @@ namespace DaftAppleGames.BuildingTools.Editor
         #region Configure Mesh methoods
 
         /// <summary>
-        /// Validate the CombineMeshParameters
+        /// Applies the Mesh Settings to the given Mesh Renderer
         /// </summary>
-        private static bool ValidateCombineMeshParameters(CombineMeshParameters combineMeshParameters)
+        private static void ConfigureMeshRenderer(MeshRenderer meshRenderer, MeshSettings meshSettings)
         {
-            // Check the base asset folder exists
-            if (!Directory.Exists(combineMeshParameters.BaseAssetOutputPath))
-            {
-                Debug.LogError($"Combined Mesh base output folder does not exist: {combineMeshParameters.BaseAssetOutputPath}. Aborting!");
-                return false;
-            }
-
-            string fullOutputPath = Path.Combine(combineMeshParameters.BaseAssetOutputPath, combineMeshParameters.AssetOutputFolder);
-
-            if (combineMeshParameters.CreateOutputFolder || Directory.Exists(fullOutputPath))
-            {
-                return true;
-            }
-
-            Debug.LogError($"Combined Mesh output folder does not exist: {fullOutputPath}. Aborting!");
-            return false;
+            meshRenderer.shadowCastingMode = meshSettings.shadowCastingMode;
+            meshRenderer.staticShadowCaster = meshSettings.staticShadowCaster;
+            meshRenderer.receiveGI = meshSettings.receiveGI;
+            meshRenderer.renderingLayerMask = meshSettings.renderingLayerMask;
+            meshRenderer.lightProbeUsage = meshSettings.lightProbeUsage;
+            meshRenderer.scaleInLightmap = meshSettings.scaleInLightmap;
+            meshRenderer.motionVectorGenerationMode = meshSettings.motionVectors;
+            meshRenderer.allowOcclusionWhenDynamic = meshSettings.dynamicOcclusion;
+            meshRenderer.rendererPriority = meshSettings.priority;
         }
-
-        private static void ConfigureMeshOnGameObject(GameObject parentGameObject, ConfigureMeshParameters configureMeshParameters)
-        {
-            if (!parentGameObject.TryGetComponent(out MeshRenderer renderer))
-            {
-                Debug.LogWarning($"No MeshRenderer found on {parentGameObject.name}");
-                return;
-            }
-
-            renderer.shadowCastingMode = configureMeshParameters.ShadowCastingMode;
-            renderer.staticShadowCaster = configureMeshParameters.StaticShadowCaster;
-
-            // Apply ContributeGI only if renderer is a MeshRenderer
-            if (renderer != null)
-            {
-                renderer.receiveGI = configureMeshParameters.ReceiveGlobalGI;
-            }
-
-            // Apply the Light Layer Mask using the static dictionary
-            renderer.renderingLayerMask = LightTools.GetMaskByMode(configureMeshParameters.LightLayerMode);
-
-            // Set the layer
-            renderer.gameObject.layer = LayerMask.NameToLayer(configureMeshParameters.LayerName);
-
-            // Update the static flags, based on whether ConfigureGI is true or false
-            StaticEditorFlags flags = GameObjectUtility.GetStaticEditorFlags(renderer.gameObject);
-            GameObjectUtility.SetStaticEditorFlags(renderer.gameObject,
-                configureMeshParameters.ContributeGI ? flags | StaticEditorFlags.ContributeGI : flags & ~StaticEditorFlags.ContributeGI);
-        }
-
-        #endregion
-
-        #region Combine Mesh methods
 
         /// <summary>
-        /// Combines all meshes in the given GameObject, writing the resulting Mesh as an asset to the given path.
-        /// Any components with the 'MeshCombineExcluder' component will be ignored by the process
+        /// Applies the Mesh settings to all Meshes on the given Game Object
         /// </summary>
-        internal static void CombineGameObjectMeshes(GameObject parentGameObject, CombineMeshParameters combineMeshParameters, ConfigureMeshParameters newMeshParameters)
+        internal static void ConfigureMeshOnGameObject(GameObject parentGameObject, MeshSettings meshSettings, EditorLog log)
         {
-            if (!ValidateCombineMeshParameters(combineMeshParameters))
+            MeshRenderer[] meshRenderers = parentGameObject.GetComponentsInChildren<MeshRenderer>();
+            if (meshRenderers.Length == 0)
             {
                 return;
             }
 
-            string fullOutputPath = Path.Combine(combineMeshParameters.BaseAssetOutputPath, combineMeshParameters.AssetOutputFolder);
-
-            if (combineMeshParameters.CreateOutputFolder && !Directory.Exists(fullOutputPath))
+            foreach (MeshRenderer renderer in meshRenderers)
             {
-                Directory.CreateDirectory(fullOutputPath);
-                Debug.Log($"Created new folder for Mesh asset: {fullOutputPath}");
+                // Apply Mesh Renderer settings
+                log.Log(LogLevel.Debug, $"Configuring mesh on: {renderer.gameObject.name}.");
+                ConfigureMeshRenderer(renderer, meshSettings);
             }
 
-            MeshFilter[] meshFilters = parentGameObject.GetComponentsInChildren<MeshFilter>(true);
-            Vector3 originalPosition = parentGameObject.transform.position;
-            Quaternion originalRotation = parentGameObject.transform.rotation;
+            // Set the layer
+            parentGameObject.layer = LayerMask.NameToLayer(meshSettings.layerName);
 
-            parentGameObject.transform.position = Vector3.zero;
-            parentGameObject.transform.rotation = Quaternion.identity;
+            // Update the static flags, based on whether ConfigureGI is true or false
+            StaticEditorFlags flags = GameObjectUtility.GetStaticEditorFlags(parentGameObject);
+            GameObjectUtility.SetStaticEditorFlags(parentGameObject,
+                meshSettings.contributeGI ? flags | StaticEditorFlags.ContributeGI : flags & ~StaticEditorFlags.ContributeGI);
+        }
 
-            Dictionary<Material, List<MeshFilter>> materialToMeshFilterList = new();
-            List<GameObject> combinedObjects = new();
-
-            foreach (MeshFilter meshFilter in meshFilters)
+        /// <summary>
+        /// Apply Mesh Settings to all GameObjects in parent
+        /// </summary>
+        internal static void ConfigureMeshOnAllGameObjects(GameObject[] parentGameObjects, MeshSettings meshSettings, EditorLog log)
+        {
+            foreach (GameObject gameObject in parentGameObjects)
             {
-                MeshRenderer meshRenderer = meshFilter.GetComponent<MeshRenderer>();
-                if (meshRenderer == null)
+                foreach (Transform transform in gameObject.GetComponentsInChildren<Transform>(true))
                 {
-                    Debug.LogWarning("The Mesh Filter on object " + meshFilter.name + " has no Mesh Renderer component attached. Skipping.");
-                    continue;
-                }
-
-                Material[] materials = meshRenderer.sharedMaterials;
-                if (materials == null)
-                {
-                    Debug.LogWarning("The Mesh Renderer on object " + meshFilter.name + " has no material assigned. Skipping.");
-                    continue;
-                }
-
-                if (meshFilter.gameObject.HasComponent<MeshCombineExcluder>())
-                {
-                    Debug.LogWarning("The object " + meshFilter.name + " has a MeshCombineExcluder. Skipping.");
-                    continue;
-                }
-
-                if (materials.Length > 1)
-                {
-                    // Rollback: return the object to original position
-                    parentGameObject.transform.position = originalPosition;
-                    parentGameObject.transform.rotation = originalRotation;
-                    Debug.LogError(
-                        "Objects with multiple materials on the same mesh are not supported. Create multiple meshes from this object's sub-meshes in an external 3D tool and assign separate materials to each. Aborted!");
-                    return;
-                }
-
-                Material material = materials[0];
-
-                // Add material to mesh filter mapping to dictionary
-                if (materialToMeshFilterList.ContainsKey(material))
-                {
-                    materialToMeshFilterList[material].Add(meshFilter);
-                }
-                else
-                {
-                    materialToMeshFilterList.Add(material, new List<MeshFilter> { meshFilter });
-                }
-
-                // Disable the MeshRenderer
-                if (meshFilter.TryGetComponent(out Renderer renderer))
-                {
-                    renderer.enabled = false;
+                    ConfigureMeshOnGameObject(transform.gameObject, meshSettings, log);
                 }
             }
-
-            // For each material, create a new merged object, in the scene and in the assets.
-            foreach (KeyValuePair<Material, List<MeshFilter>> entry in materialToMeshFilterList)
-            {
-                List<MeshFilter> meshesWithSameMaterial = entry.Value;
-                // Create a convenient material name
-                string materialName = entry.Key.ToString().Split(' ')[0];
-
-                CombineInstance[] combine = new CombineInstance[meshesWithSameMaterial.Count];
-                for (int i = 0; i < meshesWithSameMaterial.Count; i++)
-                {
-                    combine[i].mesh = meshesWithSameMaterial[i].sharedMesh;
-                    combine[i].transform = meshesWithSameMaterial[i].transform.localToWorldMatrix;
-                }
-
-                // Create a new mesh using the combined properties
-                IndexFormat format = combineMeshParameters.Is32BIT ? IndexFormat.UInt32 : IndexFormat.UInt16;
-                Mesh combinedMesh = new() { indexFormat = format };
-                combinedMesh.CombineMeshes(combine);
-
-                if (combineMeshParameters.GenerateSecondaryUVs)
-                {
-                    bool secondaryUVsResult = Unwrapping.GenerateSecondaryUVSet(combinedMesh);
-                    if (!secondaryUVsResult)
-                    {
-                        Debug.LogWarning(
-                            "Could not generate secondary UVs.");
-                    }
-                }
-
-                // Create asset
-                materialName += "_" + combinedMesh.GetInstanceID();
-                AssetDatabase.CreateAsset(combinedMesh, Path.Combine(fullOutputPath, $"{combineMeshParameters.AssetFileNamePrefix}CombinedMeshes_{materialName}.asset"));
-
-                // Create game object
-                string combinedMeshGoName = materialToMeshFilterList.Count > 1 ? "CombinedMeshes_" + materialName : "CombinedMeshes_" + parentGameObject.name;
-                GameObject combinedMeshGameObject = new(combinedMeshGoName);
-                MeshFilter filter = combinedMeshGameObject.AddComponent<MeshFilter>();
-                filter.sharedMesh = combinedMesh;
-                MeshRenderer renderer = combinedMeshGameObject.AddComponent<MeshRenderer>();
-                renderer.sharedMaterial = entry.Key;
-                combinedObjects.Add(combinedMeshGameObject);
-
-                // Configure the new Mesh Renderer
-                ConfigureMeshOnGameObject(combinedMeshGameObject, newMeshParameters);
-            }
-
-            // If there was more than one material, and thus multiple GOs created, parent them and work with result
-            GameObject resultGameObject;
-            if (combinedObjects.Count > 1)
-            {
-                resultGameObject = new GameObject("CombinedMeshes_" + parentGameObject.name);
-                foreach (GameObject combinedObject in combinedObjects) combinedObject.transform.parent = resultGameObject.transform;
-            }
-            else
-            {
-                resultGameObject = combinedObjects[0];
-            }
-
-            // Create prefab
-            string prefabPath = Path.Combine(fullOutputPath, resultGameObject.name + ".prefab");
-            PrefabUtility.SaveAsPrefabAssetAndConnect(resultGameObject, prefabPath, InteractionMode.UserAction);
-
-            // Return both to original positions
-            parentGameObject.transform.position = originalPosition;
-            parentGameObject.transform.rotation = originalRotation;
-            if (parentGameObject.transform.parent == null)
-            {
-                return;
-            }
-
-            resultGameObject.transform.SetParent(parentGameObject.transform.parent, false);
-            resultGameObject.transform.position = originalPosition;
-            resultGameObject.transform.rotation = originalRotation;
         }
 
         #endregion

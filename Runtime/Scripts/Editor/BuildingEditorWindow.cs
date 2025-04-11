@@ -16,6 +16,10 @@ namespace DaftAppleGames.BuildingTools.Editor
         protected override string WelcomeLogText =>
             "Welcome to Building Tools! Select some building preset settings, then select a Game Object in the hierarchy or a prefab asset, then click the buttons to configure your building.";
 
+        protected override void CreateCustomGUI()
+        {
+        }
+
         [MenuItem("Daft Apple Games/Building Tools/Building Editor")]
         public static void ShowWindow()
         {
