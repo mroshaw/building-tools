@@ -1,13 +1,33 @@
+using System;
 using DaftAppleGames.Buildings;
 using DaftAppleGames.Editor;
 using DaftAppleGames.Extensions;
 using UnityEngine;
 using UnityEngine.UIElements;
+#if ODIN_INSPECTOR
+using Sirenix.OdinInspector;
+#else
+using DaftAppleGames.Attributes;
+#endif
 
 namespace DaftAppleGames.BuildingTools.Editor
 {
+    [Serializable]
+    public struct BuildingPropsSettings
+    {
+        [SerializeField] internal string[] boxColliderNames;
+        [SerializeField] internal string[] sphereColliderNames;
+        [SerializeField] internal string[] capsuleColliderNames;
+        [SerializeField] internal string[] meshColliderNames;
+        [SerializeField] internal bool terrainAlignPosition;
+        [SerializeField] internal bool terrainAlignRotation;
+        [SerializeField] internal bool terrainAlignX;
+        [SerializeField] internal bool terrainAlignY;
+        [SerializeField] internal bool terrainAlignZ;
+    }
+
     [CreateAssetMenu(fileName = "ConfigurePropsEditorTool", menuName = "Daft Apple Games/Building Tools/Configure Props Tool")]
-    internal class ConfigurePropsEditorTool : BuildingEditorTool
+    internal class FixPropsEditorTool : BuildingEditorTool
     {
         private bool _addMissingCollidersOption;
         private bool _alignExteriorPropsToTerrainOption;
@@ -40,14 +60,14 @@ namespace DaftAppleGames.BuildingTools.Editor
             if (_addMissingCollidersOption)
             {
                 log.Log(LogLevel.Info, "Adding missing colliders to props...");
-                ConfigureColliders(selectedGameObject, buildingEditorSettings);
+                ConfigureColliders(selectedGameObject, buildingEditorSettings.buildingPropsSettings);
                 log.Log(LogLevel.Info, "Done");
             }
 
             if (_alignExteriorPropsToTerrainOption)
             {
                 log.Log(LogLevel.Info, "Aligning exterior props to terrain...");
-                AlignExteriorPropsToTerrain(selectedGameObject, buildingEditorSettings);
+                AlignExteriorPropsToTerrain(selectedGameObject, buildingEditorSettings.buildingPropsSettings);
                 log.Log(LogLevel.Info, "Done");
             }
         }
@@ -77,27 +97,27 @@ namespace DaftAppleGames.BuildingTools.Editor
         /// <summary>
         /// Look for GameObjects with the names given and add appropriate colliders
         /// </summary>
-        private static void ConfigureColliders(GameObject parentGameObject, BuildingWizardEditorSettings buildingWizardSettings)
+        private static void ConfigureColliders(GameObject parentGameObject, BuildingPropsSettings buildingPropsSettings)
         {
             Renderer[] allRenderers = parentGameObject.GetComponentsInChildren<Renderer>(true);
             foreach (Renderer renderer in allRenderers)
             {
-                if (buildingWizardSettings.boxColliderNames.ItemInString(renderer.gameObject.name))
+                if (buildingPropsSettings.boxColliderNames.ItemInString(renderer.gameObject.name))
                 {
                     ConfigureCollider<BoxCollider>(renderer.gameObject);
                 }
 
-                if (buildingWizardSettings.sphereColliderNames.ItemInString(renderer.gameObject.name))
+                if (buildingPropsSettings.sphereColliderNames.ItemInString(renderer.gameObject.name))
                 {
                     ConfigureCollider<SphereCollider>(renderer.gameObject);
                 }
 
-                if (buildingWizardSettings.capsuleColliderNames.ItemInString(renderer.gameObject.name))
+                if (buildingPropsSettings.capsuleColliderNames.ItemInString(renderer.gameObject.name))
                 {
                     ConfigureCollider<CapsuleCollider>(renderer.gameObject);
                 }
 
-                if (buildingWizardSettings.meshColliderNames.ItemInString(renderer.gameObject.name))
+                if (buildingPropsSettings.meshColliderNames.ItemInString(renderer.gameObject.name))
                 {
                     ConfigureCollider<MeshCollider>(renderer.gameObject);
                 }
@@ -120,7 +140,7 @@ namespace DaftAppleGames.BuildingTools.Editor
         /// <summary>
         /// Aligns each External Prop mesh renderer to the terrain, if there is one
         /// </summary>
-        private static void AlignExteriorPropsToTerrain(GameObject parentGameObject, BuildingWizardEditorSettings buildingWizardSettings)
+        private static void AlignExteriorPropsToTerrain(GameObject parentGameObject, BuildingPropsSettings buildingPropsSettings)
         {
             Building building = parentGameObject.GetComponent<Building>();
 
@@ -143,8 +163,8 @@ namespace DaftAppleGames.BuildingTools.Editor
                     // If not, align to terrain
 
                     log.Log(LogLevel.Debug, $"Aligning prop to terrain: {propRenderer.gameObject.name}.");
-                    Terrain.activeTerrain.AlignObject(propRenderer.gameObject, buildingWizardSettings.terrainAlignPosition, buildingWizardSettings.terrainAlignRotation,
-                        buildingWizardSettings.terrainAlignX, buildingWizardSettings.terrainAlignY, buildingWizardSettings.terrainAlignZ);
+                    Terrain.activeTerrain.AlignObject(propRenderer.gameObject, buildingPropsSettings.terrainAlignPosition, buildingPropsSettings.terrainAlignRotation,
+                        buildingPropsSettings.terrainAlignX, buildingPropsSettings.terrainAlignY, buildingPropsSettings.terrainAlignZ);
                 }
             }
         }

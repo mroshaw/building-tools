@@ -3,6 +3,7 @@ using Sirenix.OdinInspector;
 #else
 using DaftAppleGames.Attributes;
 #endif
+using DaftAppleGames.Extensions;
 using UnityEngine;
 
 namespace DaftAppleGames.Buildings

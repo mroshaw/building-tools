@@ -1,3 +1,4 @@
+using System;
 using DaftAppleGames.Buildings;
 using DaftAppleGames.Editor;
 using DaftAppleGames.Extensions;
@@ -6,6 +7,12 @@ using UnityEngine.UIElements;
 
 namespace DaftAppleGames.BuildingTools.Editor
 {
+    [Serializable]
+    internal struct BuildingInitSettings
+    {
+        [SerializeField] internal float adjustAnchorHeight;
+    }
+
     /// <summary>
     /// This tool sets up the building, adding the Building component and re-jigging the anchor so that the building can be placed easier
     /// </summary>
@@ -45,7 +52,7 @@ namespace DaftAppleGames.BuildingTools.Editor
                 if (_setBuildingAnchorOption)
                 {
                     log.Log(LogLevel.Info, "Setting Building anchor...");
-                    SetBuildingAnchor(selectedGameObject, buildingEditorSettings);
+                    SetBuildingAnchor(selectedGameObject, buildingEditorSettings.buildingInitSetting);
                     log.Log(LogLevel.Info, "Setting Building anchor... DONE!");
                 }
             }
@@ -65,12 +72,12 @@ namespace DaftAppleGames.BuildingTools.Editor
         /// Adjusts the building anchor, by parenting the building, so that it is raised up over the anchor point
         /// This makes it easier to place on a non-flat surface or terrain
         /// </summary>
-        private static void SetBuildingAnchor(GameObject parentGameObject, BuildingWizardEditorSettings buildingEditorSettings)
+        private static void SetBuildingAnchor(GameObject parentGameObject, BuildingInitSettings buildingInitSettings)
         {
             // Move each child game object vertically by the settings amount
             foreach (Transform child in parentGameObject.transform)
             {
-                Vector3 newPosition = new(0, buildingEditorSettings.adjustAnchorHeight, 0);
+                Vector3 newPosition = new(0, buildingInitSettings.adjustAnchorHeight, 0);
                 // child.position += Vector3.up * buildingEditorSettings.adjustAnchorHeight;
                 child.localPosition = newPosition;
                 log.Log(LogLevel.Debug, $"Moved child {child.name} to position {newPosition}.");

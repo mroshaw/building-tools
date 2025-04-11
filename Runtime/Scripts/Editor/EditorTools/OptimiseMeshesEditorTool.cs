@@ -84,16 +84,16 @@ namespace DaftAppleGames.BuildingTools.Editor
             };
 
             // Merge exterior meshes
-            OptimiseMeshGroup(building.exteriorProps, "exteriorProps", combineMeshParameters, buildingWizardSettings.exteriorPropMeshSettings);
-            OptimiseMeshGroup(building.exteriors, "exteriors", combineMeshParameters, buildingWizardSettings.exteriorMeshSettings);
+            OptimiseMeshGroup(building.exteriorProps, "exteriorProps", combineMeshParameters, buildingWizardSettings.buildingMeshSettings.exteriorPropMeshSettings);
+            OptimiseMeshGroup(building.exteriors, "exteriors", combineMeshParameters, buildingWizardSettings.buildingMeshSettings.exteriorMeshSettings);
 
             // Merge interior meshes
-            OptimiseMeshGroup(building.interiorProps, "interiorProps", combineMeshParameters, buildingWizardSettings.interiorPropMeshSettings);
-            OptimiseMeshGroup(building.interiors, "interiors", combineMeshParameters, buildingWizardSettings.interiorMeshSettings);
+            OptimiseMeshGroup(building.interiorProps, "interiorProps", combineMeshParameters, buildingWizardSettings.buildingMeshSettings.interiorPropMeshSettings);
+            OptimiseMeshGroup(building.interiors, "interiors", combineMeshParameters, buildingWizardSettings.buildingMeshSettings.interiorMeshSettings);
         }
 
         private static void OptimiseMeshGroup(GameObject[] allGameObjects, string namePrefix, CombineMeshParameters combineMeshParameters,
-            MeshTools.MeshSettings newMeshParameters)
+            MeshEditorPresetSettings newMeshParameters)
         {
             foreach (GameObject gameObjectParent in allGameObjects)
             {
@@ -106,7 +106,7 @@ namespace DaftAppleGames.BuildingTools.Editor
         /// Combines all meshes in the given GameObject, writing the resulting Mesh as an asset to the given path.
         /// Any components with the 'MeshCombineExcluder' component will be ignored by the process
         /// </summary>
-        private static void CombineGameObjectMeshes(GameObject parentGameObject, CombineMeshParameters combineMeshParameters, MeshTools.MeshSettings newMeshParameters)
+        private static void CombineGameObjectMeshes(GameObject parentGameObject, CombineMeshParameters combineMeshParameters, MeshEditorPresetSettings newMeshParameters)
         {
             if (!ValidateCombineMeshParameters(combineMeshParameters))
             {
@@ -225,7 +225,7 @@ namespace DaftAppleGames.BuildingTools.Editor
                 combinedObjects.Add(combinedMeshGameObject);
 
                 // Configure the new Mesh Renderer
-                MeshTools.ConfigureMeshOnGameObject(combinedMeshGameObject, newMeshParameters, log);
+                newMeshParameters.ConfigureMeshOnGameObject(combinedMeshGameObject, log);
             }
 
             // If there was more than one material, and thus multiple GOs created, parent them and work with result

@@ -1,13 +1,28 @@
+using System;
 using DaftAppleGames.Buildings;
 using DaftAppleGames.Editor;
 using DaftAppleGames.Extensions;
 using UnityEditor;
 using UnityEngine;
+#if ODIN_INSPECTOR
+using Sirenix.OdinInspector;
+#else
+using DaftAppleGames.Attributes;
+#endif
 
 namespace DaftAppleGames.BuildingTools.Editor
 {
+    [Serializable]
+    public struct BuildingMeshSettings
+    {
+        [SerializeField] internal MeshEditorPresetSettings interiorMeshSettings;
+        [SerializeField] internal MeshEditorPresetSettings exteriorMeshSettings;
+        [SerializeField] internal MeshEditorPresetSettings interiorPropMeshSettings;
+        [SerializeField] internal MeshEditorPresetSettings exteriorPropMeshSettings;
+    }
+
     [CreateAssetMenu(fileName = "ConfigureMeshesEditorTool", menuName = "Daft Apple Games/Building Tools/Configure Meshes Tool")]
-    internal class ConfigureMeshesEditorTool : BuildingEditorTool
+    internal class ApplyMeshPresetsEditorTool : BuildingEditorTool
     {
         protected override string GetToolName()
         {
@@ -31,10 +46,10 @@ namespace DaftAppleGames.BuildingTools.Editor
             if (editorSettings is BuildingWizardEditorSettings buildingEditorSettings)
             {
                 Building building = selectedGameObject.GetComponent<Building>();
-                MeshTools.ConfigureMeshOnAllGameObjects(building.interiors, buildingEditorSettings.interiorMeshSettings, log);
-                MeshTools.ConfigureMeshOnAllGameObjects(building.exteriors, buildingEditorSettings.exteriorMeshSettings, log);
-                MeshTools.ConfigureMeshOnAllGameObjects(building.interiorProps, buildingEditorSettings.interiorPropMeshSettings, log);
-                MeshTools.ConfigureMeshOnAllGameObjects(building.exteriorProps, buildingEditorSettings.exteriorPropMeshSettings, log);
+                buildingEditorSettings.buildingMeshSettings.interiorMeshSettings.ConfigureMeshOnAllGameObjects(building.interiors, log);
+                buildingEditorSettings.buildingMeshSettings.exteriorMeshSettings.ConfigureMeshOnAllGameObjects(building.exteriors, log);
+                buildingEditorSettings.buildingMeshSettings.interiorPropMeshSettings.ConfigureMeshOnAllGameObjects(building.interiorProps, log);
+                buildingEditorSettings.buildingMeshSettings.exteriorPropMeshSettings.ConfigureMeshOnAllGameObjects(building.exteriorProps, log);
             }
         }
 

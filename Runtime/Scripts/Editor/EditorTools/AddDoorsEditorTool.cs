@@ -1,13 +1,29 @@
+using System;
 using DaftAppleGames.Buildings;
 using DaftAppleGames.Editor;
+using DaftAppleGames.Editor.Extensions;
 using DaftAppleGames.Extensions;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Audio;
 
 namespace DaftAppleGames.BuildingTools.Editor
 {
+    [Serializable] internal struct BuildingDoorSettings
+    {
+        [SerializeField] internal string[] doorNames;
+        [SerializeField] internal AudioClip[] doorOpeningClips;
+        [SerializeField] internal AudioClip[] doorOpenClips;
+        [SerializeField] internal AudioClip[] doorClosingClips;
+        [SerializeField] internal AudioClip[] doorClosedClips;
+        [SerializeField] internal AudioMixerGroup doorSfxGroup;
+        [SerializeField] internal LayerMask doorTriggerLayerMask;
+        [SerializeField] internal string[] doorTriggerTags;
+        [SerializeField] internal StaticEditorFlags moveableMeshStaticFlags;
+    }
+
     [CreateAssetMenu(fileName = "ConfigureDoorsEditorTool", menuName = "Daft Apple Games/Building Tools/Configure Doors Tool")]
-    internal class ConfigureDoorsEditorTool : BuildingEditorTool
+    internal class AddDoorsEditorTool : BuildingEditorTool
     {
         protected override string GetToolName()
         {
@@ -29,13 +45,13 @@ namespace DaftAppleGames.BuildingTools.Editor
         {
             if (editorSettings is BuildingWizardEditorSettings buildingEditorSettings)
             {
-                ConfigureDoors(selectedGameObject, buildingEditorSettings);
+                ConfigureDoors(selectedGameObject, buildingEditorSettings.buildingDoorSettings);
             }
         }
 
         #region Static Door methods
 
-        private static void ConfigureDoors(GameObject parentGameObject, BuildingWizardEditorSettings buildingWizardSettings)
+        private static void ConfigureDoors(GameObject parentGameObject, BuildingDoorSettings buildingDoorSettings)
         {
             DoorController doorController = parentGameObject.EnsureComponent<DoorController>();
             log.Log(LogLevel.Debug, $"Added Door Controller component to {parentGameObject.name}.");
@@ -43,53 +59,53 @@ namespace DaftAppleGames.BuildingTools.Editor
             MeshRenderer[] allMeshRenderers = parentGameObject.GetComponentsInChildren<MeshRenderer>(true);
             foreach (MeshRenderer renderer in allMeshRenderers)
             {
-                if (!buildingWizardSettings.doorNames.ItemInString(renderer.gameObject.name))
+                if (!buildingDoorSettings.doorNames.ItemInString(renderer.gameObject.name))
                 {
                     continue;
                 }
 
-                Door newDoor = ConfigureDoor(renderer.gameObject, buildingWizardSettings);
+                Door newDoor = ConfigureDoor(renderer.gameObject, buildingDoorSettings);
                 doorController.AddDoor(newDoor);
             }
         }
 
-        private static Door ConfigureDoor(GameObject doorGameObject, BuildingWizardEditorSettings buildingWizardSettings)
+        private static Door ConfigureDoor(GameObject doorGameObject, BuildingDoorSettings buildingDoorSettings)
         {
             log.Log(LogLevel.Info, $"Configuring door on {doorGameObject.name}.");
             Door door = doorGameObject.EnsureComponent<Door>();
             // We don't want to combine this mesh, as it needs to move
             doorGameObject.EnsureComponent<MeshCombineExcluder>();
             // Set the static flags, as the door will move
-            GameObjectUtility.SetStaticEditorFlags(door.gameObject, buildingWizardSettings.moveableMeshFlags);
-            door.ConfigureInEditor(buildingWizardSettings.doorSfxGroup, buildingWizardSettings.doorOpeningClips, buildingWizardSettings.doorOpenClips,
-                buildingWizardSettings.doorClosingClips,
-                buildingWizardSettings.doorClosedClips);
-            CreateOrUpdateDoorTriggers(door, buildingWizardSettings);
+            GameObjectUtility.SetStaticEditorFlags(door.gameObject, buildingDoorSettings.moveableMeshStaticFlags);
+            door.ConfigureInEditor(buildingDoorSettings.doorSfxGroup, buildingDoorSettings.doorOpeningClips, buildingDoorSettings.doorOpenClips,
+                buildingDoorSettings.doorClosingClips,
+                buildingDoorSettings.doorClosedClips);
+            CreateOrUpdateDoorTriggers(door, buildingDoorSettings);
             return door;
         }
 
 
-        private static void CreateOrUpdateDoorTriggers(Door door, BuildingWizardEditorSettings buildingWizardSettings)
+        private static void CreateOrUpdateDoorTriggers(Door door, BuildingDoorSettings buildingDoorSettings)
         {
             DoorTrigger[] doorTriggers = door.GetComponentsInChildren<DoorTrigger>(true);
 
             if (doorTriggers.Length == 0)
             {
                 // We need to create new door triggers
-                CreateDoorTrigger(door, buildingWizardSettings, DoorOpenDirection.Inwards);
-                CreateDoorTrigger(door, buildingWizardSettings, DoorOpenDirection.Outwards);
+                CreateDoorTrigger(door, buildingDoorSettings, DoorOpenDirection.Inwards);
+                CreateDoorTrigger(door, buildingDoorSettings, DoorOpenDirection.Outwards);
             }
             else
             {
                 // We want to reconfigure existing triggers
                 foreach (DoorTrigger existingDoorTrigger in doorTriggers)
                 {
-                    ConfigureDoorTrigger(door, existingDoorTrigger, buildingWizardSettings, existingDoorTrigger.DoorOpenDirection);
+                    ConfigureDoorTrigger(door, existingDoorTrigger, buildingDoorSettings, existingDoorTrigger.DoorOpenDirection);
                 }
             }
         }
 
-        private static void CreateDoorTrigger(Door door, BuildingWizardEditorSettings buildingWizardSettings, DoorOpenDirection openDirection)
+        private static void CreateDoorTrigger(Door door, BuildingDoorSettings buildingDoorSettings, DoorOpenDirection openDirection)
         {
             string gameObjectName = openDirection == DoorOpenDirection.Outwards ? "Inside Trigger" : "Outside Trigger";
             GameObject triggerGameObject = new(gameObjectName);
@@ -98,13 +114,13 @@ namespace DaftAppleGames.BuildingTools.Editor
             triggerGameObject.transform.localRotation = Quaternion.identity;
             triggerGameObject.EnsureComponent<BoxCollider>();
             DoorTrigger trigger = triggerGameObject.EnsureComponent<DoorTrigger>();
-            ConfigureDoorTrigger(door, trigger, buildingWizardSettings, openDirection);
+            ConfigureDoorTrigger(door, trigger, buildingDoorSettings, openDirection);
         }
 
-        private static void ConfigureDoorTrigger(Door door, DoorTrigger doorTrigger, BuildingWizardEditorSettings buildingWizardSettings, DoorOpenDirection openDirection)
+        private static void ConfigureDoorTrigger(Door door, DoorTrigger doorTrigger, BuildingDoorSettings buildingDoorSettings, DoorOpenDirection openDirection)
         {
-            doorTrigger.ConfigureInEditor(door, buildingWizardSettings.doorTriggerLayerMask, buildingWizardSettings.doorTriggerTags, openDirection);
-            MeshTools.GetMeshSize(doorTrigger.transform.parent.gameObject, ~0, new string[] { }, out Vector3 meshSize, out Vector3 _);
+            doorTrigger.ConfigureInEditor(door, buildingDoorSettings.doorTriggerLayerMask, buildingDoorSettings.doorTriggerTags, openDirection);
+            doorTrigger.transform.parent.gameObject.GetMeshSize(~0, new string[] { }, out Vector3 meshSize, out Vector3 _);
             float distanceFromDoor = openDirection == DoorOpenDirection.Inwards ? 0.3f : -(0.3f + meshSize.x);
             float triggerWidth = meshSize.z;
             float triggerLocalCenter = meshSize.z / 2;

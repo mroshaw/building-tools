@@ -1,3 +1,4 @@
+using System;
 using DaftAppleGames.Buildings;
 using DaftAppleGames.Editor;
 using DaftAppleGames.Extensions;
@@ -11,8 +12,35 @@ using UnityEngine.Rendering;
 
 namespace DaftAppleGames.BuildingTools.Editor
 {
+    [Serializable]
+    internal struct BuildingLightSettings
+    {
+        [SerializeField] internal BuildingLightTypeSettings indoorCandleTypeSettings;
+        [SerializeField] internal BuildingLightTypeSettings indoorFireTypeSettings;
+        [SerializeField] internal BuildingLightTypeSettings outdoorBuildingLightTypeSettings;
+    }
+
+    /// <summary>
+    /// This struct gives us an easy way of passing Lighting configuration around
+    /// our various classes and methods
+    /// </summary>
+    [Serializable]
+    public struct BuildingLightTypeSettings
+    {
+        public BuildingLightType buildingLightType;
+        public string[] meshNames;
+        public string[] flameNames;
+        public bool useLensFlare;
+#if DAG_HDRP || DAG_URP
+        public float shadowRefreshRate;
+        public float lensFlareIntensity;
+        public LensFlareDataSRP lensFlareData;
+#endif
+        public LightEditorPresetSettings presetSettings;
+    }
+
     [CreateAssetMenu(fileName = "ConfigureLightingEditorTool", menuName = "Daft Apple Games/Building Tools/Configure Lighting Tool")]
-    internal class ConfigureLightingEditorTool : BuildingEditorTool
+    internal class SetUpLightsEditorTool : BuildingEditorTool
     {
         protected override string GetToolName()
         {
@@ -38,13 +66,13 @@ namespace DaftAppleGames.BuildingTools.Editor
         {
             if (editorSettings is BuildingWizardEditorSettings buildingEditorSettings)
             {
-                ConfigureLighting(selectedGameObject, buildingEditorSettings);
+                ConfigureLighting(selectedGameObject, buildingEditorSettings.buildingLightSettings);
             }
         }
 
         #region Static Lighting methods
 
-        private static void ConfigureLighting(GameObject parentGameObject, BuildingWizardEditorSettings buildingWizardSettings)
+        private static void ConfigureLighting(GameObject parentGameObject, BuildingLightSettings buildingLightSettings)
         {
             LightingController lightingController = parentGameObject.EnsureComponent<LightingController>();
             log.Log(LogLevel.Info, $"Added Lighting Controller component to {parentGameObject.name}.");
@@ -54,34 +82,34 @@ namespace DaftAppleGames.BuildingTools.Editor
             // Configure interior candles
             foreach (Transform childTransform in allChildren)
             {
-                if (buildingWizardSettings.indoorCandleSettings.meshNames.ItemInString(childTransform.gameObject.name))
+                if (buildingLightSettings.indoorCandleTypeSettings.meshNames.ItemInString(childTransform.gameObject.name))
                 {
-                    ConfigureBuildingLight(childTransform.gameObject, buildingWizardSettings.indoorCandleSettings);
+                    ConfigureBuildingLight(childTransform.gameObject, buildingLightSettings.indoorCandleTypeSettings);
                 }
             }
 
             // Configure interior fires
             foreach (Transform childTransform in allChildren)
             {
-                if (buildingWizardSettings.indoorFireSettings.meshNames.ItemInString(childTransform.gameObject.name))
+                if (buildingLightSettings.indoorFireTypeSettings.meshNames.ItemInString(childTransform.gameObject.name))
                 {
-                    ConfigureBuildingLight(childTransform.gameObject, buildingWizardSettings.indoorFireSettings);
+                    ConfigureBuildingLight(childTransform.gameObject, buildingLightSettings.indoorFireTypeSettings);
                 }
             }
 
             // Configure exterior lights
             foreach (Transform childTransform in allChildren)
             {
-                if (buildingWizardSettings.outdoorLightSettings.meshNames.ItemInString(childTransform.gameObject.name))
+                if (buildingLightSettings.outdoorBuildingLightTypeSettings.meshNames.ItemInString(childTransform.gameObject.name))
                 {
-                    ConfigureBuildingLight(childTransform.gameObject, buildingWizardSettings.outdoorLightSettings);
+                    ConfigureBuildingLight(childTransform.gameObject, buildingLightSettings.outdoorBuildingLightTypeSettings);
                 }
             }
 
             lightingController.ConfigureInEditor();
         }
 
-        private static void ConfigureBuildingLight(GameObject lightGameObject, LightTools.LightingSettings lightingSettings)
+        private static void ConfigureBuildingLight(GameObject lightGameObject, BuildingLightTypeSettings lightingTypeSettings)
         {
             if (!lightGameObject.TryGetComponentInChildren(out Light light, true))
             {
@@ -95,16 +123,14 @@ namespace DaftAppleGames.BuildingTools.Editor
             }
 
             BuildingLight buildingLight = lightGameObject.EnsureComponent<BuildingLight>();
-            buildingLight.ConfigureInEditor(lightingSettings.buildingLightType, light, flameParticleSystem);
+            buildingLight.ConfigureInEditor(lightingTypeSettings.buildingLightType, light, flameParticleSystem);
 
             log.Log(LogLevel.Debug, $"Configuring light on : {lightGameObject.name}...");
-            ConfigureLight(lightGameObject, light, lightingSettings);
+            ConfigureLight(lightGameObject, light, lightingTypeSettings);
             log.Log(LogLevel.Debug, $"Configuring light on : {lightGameObject.name}... DONE!");
         }
 
-        #region Configure Lights methods
-
-        private static void ConfigureLight(GameObject lightGameObject, Light light, LightTools.LightingSettings lightingSettings)
+        private static void ConfigureLight(GameObject lightGameObject, Light light, BuildingLightTypeSettings lightingTypeSettings)
         {
             // Look for old Lens Flare and destroy it - not supported in URP or HDRP
 #if DAG_HDRP || DAG_URP
@@ -116,11 +142,11 @@ namespace DaftAppleGames.BuildingTools.Editor
             }
 
             // Set up Lens Flare, if it's selected
-            if (lightingSettings.useLensFlare)
+            if (lightingTypeSettings.useLensFlare)
             {
                 LensFlareComponentSRP newLensFlare = light.gameObject.EnsureComponent<LensFlareComponentSRP>();
-                newLensFlare.lensFlareData = lightingSettings.lensFlareData;
-                newLensFlare.intensity = lightingSettings.lensFlareIntensity;
+                newLensFlare.lensFlareData = lightingTypeSettings.lensFlareData;
+                newLensFlare.intensity = lightingTypeSettings.lensFlareIntensity;
                 newLensFlare.environmentOcclusion = true;
                 newLensFlare.useOcclusion = true;
                 newLensFlare.allowOffScreen = false;
@@ -130,10 +156,10 @@ namespace DaftAppleGames.BuildingTools.Editor
 #endif
 
             log.Log(LogLevel.Debug, $"Setting light properties on: {lightGameObject.name}.");
-            LightTools.ConfigureLight(light, lightingSettings);
+            lightingTypeSettings.presetSettings.ApplyPreset(light);
         }
 
-        private static void ConfigureOnDemandShadowMap(Light light, LightTools.LightingSettings lightingSettings)
+        private static void ConfigureOnDemandShadowMap(Light light, BuildingLightTypeSettings lightingSettings)
         {
 #if DAG_HDRP
             HDAdditionalLightData hdLightData = light.GetComponent<HDAdditionalLightData>();
@@ -146,8 +172,6 @@ namespace DaftAppleGames.BuildingTools.Editor
 
 #endif
         }
-
-        #endregion
 
         #endregion
     }

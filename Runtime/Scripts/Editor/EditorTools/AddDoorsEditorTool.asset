@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b5f5db9f93cabb44cb52ff3227a2e83f, type: 3}
-  m_Name: ConfigureDoorsEditorTool
+  m_Name: AddDoorsEditorTool
   m_EditorClassIdentifier: 
   visualTreeAsset: {fileID: 9197481963319205126, guid: eb918f141c38f7640bec2c1507d0da62, type: 3}
   runToolButtonName: ConfigureDoorsButton
