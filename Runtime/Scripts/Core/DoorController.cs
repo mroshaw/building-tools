@@ -11,8 +11,16 @@ namespace DaftAppleGames.Buildings
 {
     public class DoorController : MonoBehaviour
     {
-        [BoxGroup("Settings")] [SerializeField] private bool findLightsOnAwake;
+        [BoxGroup("Settings")] [SerializeField] private bool findDoorsOnAwake;
         [BoxGroup("Building Doors")] [SerializeField] private List<Door> doors = new();
+
+        private void Awake()
+        {
+            if (findDoorsOnAwake)
+            {
+                RefreshDoorList();
+            }
+        }
 
         [Button("Refresh Door List")]
         private void RefreshDoorList()

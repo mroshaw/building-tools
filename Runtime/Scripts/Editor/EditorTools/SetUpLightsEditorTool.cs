@@ -132,6 +132,13 @@ namespace DaftAppleGames.BuildingTools.Editor
 
         private static void ConfigureLight(GameObject lightGameObject, Light light, BuildingLightTypeSettings lightingTypeSettings)
         {
+            log.Log(LogLevel.Debug, $"Configuring light on : {lightGameObject.name}...");
+
+            if (!lightingTypeSettings.presetSettings)
+            {
+                log.Log(LogLevel.Error, $"No presets found on {lightingTypeSettings.buildingLightType}.");
+            }
+
             // Look for old Lens Flare and destroy it - not supported in URP or HDRP
 #if DAG_HDRP || DAG_URP
             if (lightGameObject.TryGetComponentInChildren(out LensFlare oldLensFlare, true))

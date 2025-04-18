@@ -45,7 +45,7 @@ namespace DaftAppleGames.Editor
         /// <summary>
         /// Given a Mesh Renderer object, applies the presets
         /// </summary>
-        public void ApplyPreset(MeshRenderer meshRenderer)
+        private void ApplyPreset(MeshRenderer meshRenderer)
         {
             meshRenderer.shadowCastingMode = shadowCastingMode;
             meshRenderer.staticShadowCaster = staticShadowCaster;
