@@ -1,3 +1,16 @@
 {
-	"name": "DaftAppleGames.Samples.BuildingTools.Core"
+    "name": "DaftAppleGames.Samples.BuildingTools.Core",
+    "rootNamespace": "",
+    "references": [
+        "GUID:388f132624f9dfc408864ea2764b7698"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }
