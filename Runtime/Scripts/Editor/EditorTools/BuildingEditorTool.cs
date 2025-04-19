@@ -9,6 +9,10 @@ namespace DaftAppleGames.BuildingTools.Editor
     /// </summary>
     public abstract class BuildingEditorTool : EditorTool
     {
+        // Standard return strings for validation functions
+        protected static string buildingComponentRequiredError = "The selected game object must contain a Building component to run this tool!";
+        protected static string buildingMeshNotSetError = "You must configure the Mesh properties on the Building Component before running this tool!";
+
         protected bool RequiredBuildingValidation()
         {
             if (ParentToolsList.SelectedGameObject && ParentToolsList.SelectedGameObject.HasComponent<Building>())
@@ -16,7 +20,6 @@ namespace DaftAppleGames.BuildingTools.Editor
                 return true;
             }
 
-            ParentToolsList.EditorLog.Log(LogLevel.Error, "The selected game object must contain a Building component to run this tool!");
             return false;
         }
 
@@ -33,7 +36,6 @@ namespace DaftAppleGames.BuildingTools.Editor
                 return true;
             }
 
-            ParentToolsList.EditorLog.Log(LogLevel.Error, "You must configure the Mesh properties on the Building Component before running this tool!");
             return false;
         }
     }

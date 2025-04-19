@@ -41,9 +41,16 @@ namespace DaftAppleGames.BuildingTools.Editor
             return true;
         }
 
-        protected override bool CanRunTool(GameObject selectedGameObject, ButtonWizardEditorSettings editorSettings)
+        protected override bool CanRunTool(GameObject selectedGameObject, ButtonWizardEditorSettings editorSettings, out string cannotRunReason)
         {
-            return RequireSettingsAndGameObjectValidation() && RequiredBuildingValidation();
+            if (RequireSettingsAndGameObjectValidation() && RequiredBuildingValidation())
+            {
+                cannotRunReason = string.Empty;
+                return true;
+            }
+
+            cannotRunReason = $"{selectEditorSettingsAndGameObjectError}\n{buildingComponentRequiredError}";
+            return false;
         }
 
         protected override void RunTool(GameObject selectedGameObject, ButtonWizardEditorSettings editorSettings, string undoGroupName)

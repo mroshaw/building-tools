@@ -33,9 +33,16 @@ namespace DaftAppleGames.BuildingTools.Editor
             return true;
         }
 
-        protected override bool CanRunTool(GameObject selectedGameObject, ButtonWizardEditorSettings editorSettings)
+        protected override bool CanRunTool(GameObject selectedGameObject, ButtonWizardEditorSettings editorSettings, out string cannotRunReason)
         {
-            return RequireSettingsAndGameObjectValidation();
+            if (RequireSettingsAndGameObjectValidation())
+            {
+                cannotRunReason = string.Empty;
+                return true;
+            }
+
+            cannotRunReason = $"{selectEditorSettingsAndGameObjectError}";
+            return false;
         }
 
         protected override void RunTool(GameObject selectedGameObject, ButtonWizardEditorSettings editorSettings, string undoGroupName)
@@ -46,6 +53,8 @@ namespace DaftAppleGames.BuildingTools.Editor
                 {
                     log.Log(LogLevel.Info, "Adding Building component (if not already there)...");
                     AddBuildingComponent(selectedGameObject);
+                    ShowPopupWindow("Daft Apple Building Tools", "IMPORTANT! ACTION REQUIRED!",
+                        "You must now expand the 'Meshes' foldout in the new 'Building' component, and drag 'Interior', 'Exterior', and 'Prop' parent game objects into the appropriate array. If prop Game Objects are children of building mesh game objects, please 'un-parent' them now.");
                     log.Log(LogLevel.Info, "Adding Building component (if not already there). DONE!");
                 }
 

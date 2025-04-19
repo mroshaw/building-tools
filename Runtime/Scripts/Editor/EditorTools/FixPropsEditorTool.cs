@@ -43,9 +43,16 @@ namespace DaftAppleGames.BuildingTools.Editor
             return true;
         }
 
-        protected override bool CanRunTool(GameObject selectedGameObject, ButtonWizardEditorSettings editorSettings)
+        protected override bool CanRunTool(GameObject selectedGameObject, ButtonWizardEditorSettings editorSettings, out string cannotRunReason)
         {
-            return RequireSettingsAndGameObjectValidation() && RequiredBuildingValidation() && RequiredBuildingMeshValidation();
+            if (RequireSettingsAndGameObjectValidation() && RequiredBuildingValidation() && RequiredBuildingMeshValidation())
+            {
+                cannotRunReason = string.Empty;
+                return true;
+            }
+
+            cannotRunReason = $"{selectEditorSettingsAndGameObjectError}\n{buildingComponentRequiredError}\n{buildingMeshNotSetError}";
+            return false;
         }
 
         protected override void RunTool(GameObject selectedGameObject, ButtonWizardEditorSettings editorSettings, string undoGroupName)
@@ -90,9 +97,6 @@ namespace DaftAppleGames.BuildingTools.Editor
         {
             _alignExteriorPropsToTerrainOption = changeEvent.newValue;
         }
-
-
-        #region Static Props methods
 
         /// <summary>
         /// Look for GameObjects with the names given and add appropriate colliders
@@ -157,11 +161,11 @@ namespace DaftAppleGames.BuildingTools.Editor
                     // Check to see if the renderer is already on top of another mesh renderer
                     if (IsGameObjectOnMeshRenderer(propRenderer.gameObject))
                     {
+                        log.Log(LogLevel.Debug, $"Prop {propRenderer.gameObject.name} is already on top of an existing mesh so won't be aligned.");
                         continue;
                     }
 
                     // If not, align to terrain
-
                     log.Log(LogLevel.Debug, $"Aligning prop to terrain: {propRenderer.gameObject.name}.");
                     Terrain.activeTerrain.AlignObject(propRenderer.gameObject, buildingPropsSettings.terrainAlignPosition, buildingPropsSettings.terrainAlignRotation,
                         buildingPropsSettings.terrainAlignX, buildingPropsSettings.terrainAlignY, buildingPropsSettings.terrainAlignZ);
@@ -184,7 +188,5 @@ namespace DaftAppleGames.BuildingTools.Editor
 
             return raycastHit.collider.gameObject.GetComponent<Terrain>() == null;
         }
-
-        #endregion
     }
 }

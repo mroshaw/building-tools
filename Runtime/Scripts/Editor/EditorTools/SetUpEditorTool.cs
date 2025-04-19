@@ -20,9 +20,17 @@ namespace DaftAppleGames.BuildingTools.Editor
             return true;
         }
 
-        protected override bool CanRunTool(GameObject selectedGameObject, ButtonWizardEditorSettings editorSettings)
+        protected override bool CanRunTool(GameObject selectedGameObject, ButtonWizardEditorSettings editorSettings, out string cannotRunReason)
         {
-            return true;
+            // Check to see if setup has already been run or settings added manually
+            if (!CustomEditorTools.DoLayersExist(new[] { "BuildingExterior", "BuildingInterior", "InteriorProps", "ExteriorProps" }))
+            {
+                cannotRunReason = string.Empty;
+                return true;
+            }
+
+            cannotRunReason = "Setup has already been run, or the required layers have been manually added";
+            return false;
         }
 
         /// <summary>

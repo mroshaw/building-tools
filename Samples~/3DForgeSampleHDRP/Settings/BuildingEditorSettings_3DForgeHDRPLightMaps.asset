@@ -24,11 +24,11 @@ MonoBehaviour:
     sphereColliderNames: []
     capsuleColliderNames: []
     meshColliderNames: []
-    terrainAlignPosition: 0
-    terrainAlignRotation: 0
-    terrainAlignX: 0
-    terrainAlignY: 0
-    terrainAlignZ: 0
+    terrainAlignPosition: 1
+    terrainAlignRotation: 1
+    terrainAlignX: 1
+    terrainAlignY: 1
+    terrainAlignZ: 1
   buildingDoorSettings:
     doorNames:
     - vil_door
