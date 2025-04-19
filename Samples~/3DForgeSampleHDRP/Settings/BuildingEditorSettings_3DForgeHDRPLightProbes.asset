@@ -20,10 +20,13 @@ MonoBehaviour:
     interiorPropMeshSettings: {fileID: 11400000, guid: 4ed8ad62526665b47a0f4d5af2d63861, type: 2}
     exteriorPropMeshSettings: {fileID: 11400000, guid: 90f48bb62ac832b4d92aa94d8dd6905e, type: 2}
   buildingPropsSettings:
-    boxColliderNames: []
+    boxColliderNames:
+    - crate
     sphereColliderNames: []
-    capsuleColliderNames: []
-    meshColliderNames: []
+    capsuleColliderNames:
+    - barrel
+    meshColliderNames:
+    - carpet
     terrainAlignPosition: 1
     terrainAlignRotation: 1
     terrainAlignX: 1
