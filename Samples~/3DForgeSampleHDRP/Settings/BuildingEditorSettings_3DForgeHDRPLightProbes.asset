@@ -57,7 +57,7 @@ MonoBehaviour:
       - candle_cluster01_lit
       flameNames:
       - Flare
-      useLensFlare: 0
+      useLensFlare: 1
       shadowRefreshRate: 0
       lensFlareIntensity: 0
       lensFlareData: {fileID: 11400000, guid: 76abfea03adae384ba994f035f0713c4, type: 2}
