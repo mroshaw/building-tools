@@ -128,11 +128,12 @@ namespace DaftAppleGames.BuildingTools.Editor
             }
         }
 
-        private static void ConfigureCollider<T>(GameObject colliderGameObject)
+        private static void ConfigureCollider<T>(GameObject colliderGameObject) where T : Component
         {
             T component = colliderGameObject.GetComponent<T>();
             if (component == null)
             {
+                colliderGameObject.AddComponent<T>();
                 log.Log(LogLevel.Debug, $"Added {typeof(T)} to {colliderGameObject.name}.");
             }
             else
