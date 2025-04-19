@@ -176,18 +176,36 @@ namespace DaftAppleGames.BuildingTools.Editor
 
         private static bool IsGameObjectOnMeshRenderer(GameObject gameObject)
         {
+            // Disable any Colliders already on the GameObject.
+            SetColliderState(gameObject, false);
+
             // Raycast down from the GameObject, see what's there
             LayerMask rayLayerMask = ~0;
             Vector3 up = gameObject.transform.up;
             bool isHit = Physics.Raycast(gameObject.transform.position + up * 0.1f, up * -1, out RaycastHit raycastHit, 0.5f,
                 rayLayerMask,
                 QueryTriggerInteraction.UseGlobal);
+
+            // Re-enable Colliders
+            SetColliderState(gameObject, true);
+
             if (!isHit)
             {
                 return false;
             }
 
             return raycastHit.collider.gameObject.GetComponent<Terrain>() == null;
+        }
+
+        /// <summary>
+        /// Enables or disables all colliders in a GameObject
+        /// </summary>
+        private static void SetColliderState(GameObject parentGameObject, bool state)
+        {
+            foreach (Collider collider in parentGameObject.GetComponentsInChildren<Collider>())
+            {
+                collider.enabled = state;
+            }
         }
     }
 }
