@@ -51,7 +51,7 @@ namespace DaftAppleGames.Editor
             light.intensity = convertedIntensity;
 #else
             light.intensity = intensity;
-            light.range = lightingSettings.range;
+            light.range = range;
 #endif
             light.color = filterColor;
             light.useColorTemperature = true;
