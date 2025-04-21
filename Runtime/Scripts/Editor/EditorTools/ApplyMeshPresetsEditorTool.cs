@@ -1,4 +1,4 @@
-using System;
+using System.Collections.Generic;
 using DaftAppleGames.Buildings;
 using DaftAppleGames.Editor;
 using DaftAppleGames.Extensions;
@@ -12,18 +12,14 @@ using DaftAppleGames.Attributes;
 
 namespace DaftAppleGames.BuildingTools.Editor
 {
-    [Serializable]
-    public struct BuildingMeshSettings
-    {
-        [SerializeField] internal MeshEditorPresetSettings interiorMeshSettings;
-        [SerializeField] internal MeshEditorPresetSettings exteriorMeshSettings;
-        [SerializeField] internal MeshEditorPresetSettings interiorPropMeshSettings;
-        [SerializeField] internal MeshEditorPresetSettings exteriorPropMeshSettings;
-    }
-
     [CreateAssetMenu(fileName = "ConfigureMeshesEditorTool", menuName = "Daft Apple Games/Building Tools/Configure Meshes Tool")]
     internal class ApplyMeshPresetsEditorTool : BuildingEditorTool
     {
+        [SerializeField] [BoxGroup("Settings")] internal MeshEditorPresetSettings interiorMeshSettings;
+        [SerializeField] [BoxGroup("Settings")] internal MeshEditorPresetSettings exteriorMeshSettings;
+        [SerializeField] [BoxGroup("Settings")] internal MeshEditorPresetSettings interiorPropMeshSettings;
+        [SerializeField] [BoxGroup("Settings")] internal MeshEditorPresetSettings exteriorPropMeshSettings;
+
         protected override string GetToolName()
         {
             return "Apply Mesh Presets";
@@ -35,56 +31,87 @@ namespace DaftAppleGames.BuildingTools.Editor
             return true;
         }
 
-        protected override bool CanRunTool(GameObject selectedGameObject, ButtonWizardEditorSettings editorSettings, out string cannotRunReason)
+        protected override bool CanRunTool(GameObject selectedGameObject, out List<string> cannotRunReasons)
         {
-            if (RequireSettingsAndGameObjectValidation() && RequiredBuildingValidation() && RequiredBuildingMeshValidation() &&
-                ValidateLayerSetup(selectedGameObject))
+            bool canRun = true;
+
+            cannotRunReasons = new List<string>();
+            if (!RequireGameObjectValidation(out string requireGameObjectReason))
             {
-                cannotRunReason = string.Empty;
+                cannotRunReasons.Add(requireGameObjectReason);
+                return false;
+            }
+
+            if (!RequiredBuildingValidation(out string requiredBuildingReason))
+            {
+                cannotRunReasons.Add(requiredBuildingReason);
+                return false;
+            }
+
+            if (!RequiredBuildingMeshValidation(out string requiredBuildingMeshReason))
+            {
+                cannotRunReasons.Add(requiredBuildingMeshReason);
+                return false;
+            }
+
+
+            if (!LayerSetupValidation(selectedGameObject, out string layerSetupReason))
+            {
+                cannotRunReasons.Add(layerSetupReason);
+                canRun = false;
+            }
+
+            if (!ValidateToolSettings(out string toolSettingsReason))
+            {
+                cannotRunReasons.Add(toolSettingsReason);
+                canRun = false;
+            }
+
+            return canRun;
+        }
+
+        private bool ValidateToolSettings(out string validationReason)
+        {
+            if (interiorMeshSettings && exteriorMeshSettings && interiorPropMeshSettings && exteriorPropMeshSettings)
+            {
+                validationReason = string.Empty;
                 return true;
             }
 
-            cannotRunReason = $"{selectEditorSettingsAndGameObjectError}\n{buildingComponentRequiredError}\n{buildingMeshNotSetError}";
+            validationReason = "Mesh presets are missing from the selected settings!";
             return false;
         }
 
-        protected override void RunTool(GameObject selectedGameObject, ButtonWizardEditorSettings editorSettings, string undoGroupName)
+        protected override void RunTool(GameObject selectedGameObject, string undoGroupName)
         {
-            if (editorSettings is BuildingWizardEditorSettings buildingEditorSettings)
-            {
-                Building building = selectedGameObject.GetComponent<Building>();
-                buildingEditorSettings.buildingMeshSettings.interiorMeshSettings.ConfigureMeshOnAllGameObjects(building.interiors, log);
-                buildingEditorSettings.buildingMeshSettings.exteriorMeshSettings.ConfigureMeshOnAllGameObjects(building.exteriors, log);
-                buildingEditorSettings.buildingMeshSettings.interiorPropMeshSettings.ConfigureMeshOnAllGameObjects(building.interiorProps, log);
-                buildingEditorSettings.buildingMeshSettings.exteriorPropMeshSettings.ConfigureMeshOnAllGameObjects(building.exteriorProps, log);
-            }
+            Building building = selectedGameObject.GetComponent<Building>();
+            interiorMeshSettings.ConfigureMeshOnAllGameObjects(building.interiors, log);
+            exteriorMeshSettings.ConfigureMeshOnAllGameObjects(building.exteriors, log);
+            interiorPropMeshSettings.ConfigureMeshOnAllGameObjects(building.interiorProps, log);
+            exteriorPropMeshSettings.ConfigureMeshOnAllGameObjects(building.exteriorProps, log);
         }
 
         /// <summary>
         /// Checks to see if it's possible to configure the layers as we want them
         /// </summary>
-        private bool ValidateLayerSetup(GameObject selectedGameObject)
+        private bool LayerSetupValidation(GameObject selectedGameObject, out string validationReason)
         {
             // If not a prefab or prefab instance, then we're good
-            if (!PrefabUtility.IsPartOfAnyPrefab(selectedGameObject))
+            if (!PrefabUtility.IsPartOfAnyPrefab(selectedGameObject) || !ArePropsInMainBuildingStructure(selectedGameObject))
             {
+                validationReason = string.Empty;
                 return true;
             }
 
-            if (!ArePropsInMainBuildingStructure(selectedGameObject))
-            {
-                return true;
-            }
-
-            log.Log(LogLevel.Error,
-                "The selected GameObject is a prefab or prefab instance, and it's props GameObjects are children of the main building structure. Please amend the prefab and re-parent the props outside of the building structure.");
+            validationReason =
+                "The selected GameObject is a prefab or prefab instance, and it's props GameObjects are children of the main building structure. Please amend the prefab and re-parent the props outside of the building structure.";
             return false;
         }
 
         /// <summary>
         /// Checks to see if the Props are inside main structure GameObjects
         /// </summary>
-        private static bool ArePropsInMainBuildingStructure(GameObject buildingGameObject)
+        private bool ArePropsInMainBuildingStructure(GameObject buildingGameObject)
         {
             Building building = buildingGameObject.GetComponent<Building>();
 

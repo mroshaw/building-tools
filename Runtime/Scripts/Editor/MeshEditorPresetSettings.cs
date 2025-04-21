@@ -72,7 +72,7 @@ namespace DaftAppleGames.Editor
             foreach (MeshRenderer renderer in meshRenderers)
             {
                 // Apply Mesh Renderer settings
-                log.Log(LogLevel.Debug, $"Configuring mesh on: {renderer.gameObject.name}.");
+                log.AddToLog(LogLevel.Debug, $"Configuring mesh on: {renderer.gameObject.name}.");
                 ApplyPreset(renderer);
             }
 

@@ -1,9 +1,8 @@
-using System;
+using System.Collections.Generic;
 using DaftAppleGames.Buildings;
 using DaftAppleGames.Editor;
 using DaftAppleGames.Extensions;
 using UnityEngine;
-using UnityEngine.UIElements;
 #if ODIN_INSPECTOR
 using Sirenix.OdinInspector;
 #else
@@ -12,25 +11,18 @@ using DaftAppleGames.Attributes;
 
 namespace DaftAppleGames.BuildingTools.Editor
 {
-    [Serializable]
-    public struct BuildingPropsSettings
-    {
-        [SerializeField] internal string[] boxColliderNames;
-        [SerializeField] internal string[] sphereColliderNames;
-        [SerializeField] internal string[] capsuleColliderNames;
-        [SerializeField] internal string[] meshColliderNames;
-        [SerializeField] internal bool terrainAlignPosition;
-        [SerializeField] internal bool terrainAlignRotation;
-        [SerializeField] internal bool terrainAlignX;
-        [SerializeField] internal bool terrainAlignY;
-        [SerializeField] internal bool terrainAlignZ;
-    }
-
     [CreateAssetMenu(fileName = "ConfigurePropsEditorTool", menuName = "Daft Apple Games/Building Tools/Configure Props Tool")]
     internal class FixPropsEditorTool : BuildingEditorTool
     {
-        private bool _addMissingCollidersOption;
-        private bool _alignExteriorPropsToTerrainOption;
+        [SerializeField] [BoxGroup("Collider Settings")] internal string[] boxColliderNames;
+        [SerializeField] [BoxGroup("Collider Settings")] internal string[] sphereColliderNames;
+        [SerializeField] [BoxGroup("Collider Settings")] internal string[] capsuleColliderNames;
+        [SerializeField] [BoxGroup("Collider Settings")] internal string[] meshColliderNames;
+        [SerializeField] [BoxGroup("Alignment Settings")] internal bool terrainAlignPosition;
+        [SerializeField] [BoxGroup("Alignment Settings")] internal bool terrainAlignRotation;
+        [SerializeField] [BoxGroup("Alignment Settings")] internal bool terrainAlignX;
+        [SerializeField] [BoxGroup("Alignment Settings")] internal bool terrainAlignY;
+        [SerializeField] [BoxGroup("Alignment Settings")] internal bool terrainAlignZ;
 
         protected override string GetToolName()
         {
@@ -43,138 +35,123 @@ namespace DaftAppleGames.BuildingTools.Editor
             return true;
         }
 
-        protected override bool CanRunTool(GameObject selectedGameObject, ButtonWizardEditorSettings editorSettings, out string cannotRunReason)
+        protected override bool CanRunTool(GameObject selectedGameObject, out List<string> cannotRunReasons)
         {
-            if (RequireSettingsAndGameObjectValidation() && RequiredBuildingValidation() && RequiredBuildingMeshValidation())
+            bool canRun = true;
+
+            cannotRunReasons = new List<string>();
+            if (!RequireGameObjectValidation(out string requireGameObjectReason))
             {
-                cannotRunReason = string.Empty;
-                return true;
+                cannotRunReasons.Add(requireGameObjectReason);
+                return false;
             }
 
-            cannotRunReason = $"{selectEditorSettingsAndGameObjectError}\n{buildingComponentRequiredError}\n{buildingMeshNotSetError}";
-            return false;
-        }
-
-        protected override void RunTool(GameObject selectedGameObject, ButtonWizardEditorSettings editorSettings, string undoGroupName)
-        {
-            log.Log(LogLevel.Info, $"Running ConfigurePropsEditorTool. Add Colliders is {_addMissingCollidersOption}, Align To Terrain is {_alignExteriorPropsToTerrainOption}");
-
-            if (editorSettings is not BuildingWizardEditorSettings buildingEditorSettings)
+            if (!RequiredBuildingValidation(out string requiredBuildingReason))
             {
-                return;
+                cannotRunReasons.Add(requiredBuildingReason);
+                canRun = false;
             }
 
-            if (_addMissingCollidersOption)
+            if (!RequiredBuildingMeshValidation(out string requiredBuildingMeshReason))
             {
-                log.Log(LogLevel.Info, "Adding missing colliders to props...");
-                ConfigureColliders(selectedGameObject, buildingEditorSettings.buildingPropsSettings);
-                log.Log(LogLevel.Info, "Done");
+                cannotRunReasons.Add(requiredBuildingMeshReason);
+                canRun = false;
             }
 
-            if (_alignExteriorPropsToTerrainOption)
-            {
-                log.Log(LogLevel.Info, "Aligning exterior props to terrain...");
-                AlignExteriorPropsToTerrain(selectedGameObject, buildingEditorSettings.buildingPropsSettings);
-                log.Log(LogLevel.Info, "Done");
-            }
+            return canRun;
         }
 
-        /// <summary>
-        /// Add bindings for custom tool options
-        /// </summary>
-        protected override void AddCustomBindings()
+        protected override void RunTool(GameObject selectedGameObject, string undoGroupName)
         {
-            _addMissingCollidersOption = BindToToggleOption("CreateMissingCollidersToggle", SetConfigureCollidersOption);
-            _alignExteriorPropsToTerrainOption = BindToToggleOption("AlignExteriorPropsToTerrainToggle", SetAlignToTerrainOption);
-        }
+            log.AddToLog(LogLevel.Info, "Adding missing colliders to props...");
+            ConfigureColliders(selectedGameObject);
+            log.AddToLog(LogLevel.Info, "Done");
 
-        private void SetConfigureCollidersOption(ChangeEvent<bool> changeEvent)
-        {
-            _addMissingCollidersOption = changeEvent.newValue;
-        }
-
-        private void SetAlignToTerrainOption(ChangeEvent<bool> changeEvent)
-        {
-            _alignExteriorPropsToTerrainOption = changeEvent.newValue;
+            log.AddToLog(LogLevel.Info, "Aligning exterior props to terrain...");
+            AlignExteriorPropsToTerrain(selectedGameObject);
+            log.AddToLog(LogLevel.Info, "Done");
         }
 
         /// <summary>
         /// Look for GameObjects with the names given and add appropriate colliders
         /// </summary>
-        private static void ConfigureColliders(GameObject parentGameObject, BuildingPropsSettings buildingPropsSettings)
+        private void ConfigureColliders(GameObject parentGameObject)
         {
             Renderer[] allRenderers = parentGameObject.GetComponentsInChildren<Renderer>(true);
             foreach (Renderer renderer in allRenderers)
             {
-                if (buildingPropsSettings.boxColliderNames.ItemInString(renderer.gameObject.name))
+                if (boxColliderNames.ItemInString(renderer.gameObject.name))
                 {
                     ConfigureCollider<BoxCollider>(renderer.gameObject);
                 }
 
-                if (buildingPropsSettings.sphereColliderNames.ItemInString(renderer.gameObject.name))
+                if (sphereColliderNames.ItemInString(renderer.gameObject.name))
                 {
                     ConfigureCollider<SphereCollider>(renderer.gameObject);
                 }
 
-                if (buildingPropsSettings.capsuleColliderNames.ItemInString(renderer.gameObject.name))
+                if (capsuleColliderNames.ItemInString(renderer.gameObject.name))
                 {
                     ConfigureCollider<CapsuleCollider>(renderer.gameObject);
                 }
 
-                if (buildingPropsSettings.meshColliderNames.ItemInString(renderer.gameObject.name))
+                if (meshColliderNames.ItemInString(renderer.gameObject.name))
                 {
                     ConfigureCollider<MeshCollider>(renderer.gameObject);
                 }
             }
         }
 
-        private static void ConfigureCollider<T>(GameObject colliderGameObject) where T : Component
+        private void ConfigureCollider<T>(GameObject colliderGameObject) where T : Component
         {
             T component = colliderGameObject.GetComponent<T>();
             if (component == null)
             {
                 colliderGameObject.AddComponent<T>();
-                log.Log(LogLevel.Debug, $"Added {typeof(T)} to {colliderGameObject.name}.");
+                log.AddToLog(LogLevel.Debug, $"Added {typeof(T)} to {colliderGameObject.name}.");
             }
             else
             {
-                log.Log(LogLevel.Warning, $"{colliderGameObject.name} already has a {typeof(T)} component.");
+                log.AddToLog(LogLevel.Warning, $"{colliderGameObject.name} already has a {typeof(T)} component.");
             }
         }
 
         /// <summary>
         /// Aligns each External Prop mesh renderer to the terrain, if there is one
         /// </summary>
-        private static void AlignExteriorPropsToTerrain(GameObject parentGameObject, BuildingPropsSettings buildingPropsSettings)
+        private void AlignExteriorPropsToTerrain(GameObject parentGameObject)
         {
             Building building = parentGameObject.GetComponent<Building>();
 
             if (Terrain.activeTerrain == null)
             {
-                log.Log(LogLevel.Warning, $"There is no active terrain in the scene, so exterior props will not be aligned.");
+                log.AddToLog(LogLevel.Warning, $"There is no active terrain in the scene, so exterior props will not be aligned.");
                 return;
             }
 
             foreach (GameObject externalPropParent in building.exteriorProps)
             {
+                log.AddToLog(LogLevel.Debug, $"Processing prop container: {externalPropParent.gameObject.name}...");
+
                 foreach (MeshRenderer propRenderer in externalPropParent.GetComponentsInChildren<MeshRenderer>(true))
                 {
+                    log.AddToLog(LogLevel.Debug, $"Processing prop {propRenderer.name}...");
                     // Check to see if the renderer is already on top of another mesh renderer
                     if (IsGameObjectOnMeshRenderer(propRenderer.gameObject))
                     {
-                        log.Log(LogLevel.Debug, $"Prop {propRenderer.gameObject.name} is already on top of an existing mesh so won't be aligned.");
+                        log.AddToLog(LogLevel.Debug, $"Prop {propRenderer.gameObject.name} is already on top of an existing mesh so won't be aligned.");
                         continue;
                     }
 
                     // If not, align to terrain
-                    log.Log(LogLevel.Debug, $"Aligning prop to terrain: {propRenderer.gameObject.name}.");
-                    Terrain.activeTerrain.AlignObject(propRenderer.gameObject, buildingPropsSettings.terrainAlignPosition, buildingPropsSettings.terrainAlignRotation,
-                        buildingPropsSettings.terrainAlignX, buildingPropsSettings.terrainAlignY, buildingPropsSettings.terrainAlignZ);
+                    log.AddToLog(LogLevel.Debug, $"Aligning prop to terrain: {propRenderer.gameObject.name}.");
+                    Terrain.activeTerrain.AlignObject(propRenderer.gameObject, terrainAlignPosition, terrainAlignRotation,
+                        terrainAlignX, terrainAlignY, terrainAlignZ);
                 }
             }
         }
 
-        private static bool IsGameObjectOnMeshRenderer(GameObject gameObject)
+        private bool IsGameObjectOnMeshRenderer(GameObject gameObject)
         {
             // Disable any Colliders already on the GameObject.
             SetColliderState(gameObject, false);
@@ -200,7 +177,7 @@ namespace DaftAppleGames.BuildingTools.Editor
         /// <summary>
         /// Enables or disables all colliders in a GameObject
         /// </summary>
-        private static void SetColliderState(GameObject parentGameObject, bool state)
+        private void SetColliderState(GameObject parentGameObject, bool state)
         {
             foreach (Collider collider in parentGameObject.GetComponentsInChildren<Collider>())
             {

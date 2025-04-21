@@ -6,12 +6,27 @@ using DaftAppleGames.Extensions;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
+#if ODIN_INSPECTOR
+using Sirenix.OdinInspector;
+#else
+using DaftAppleGames.Attributes;
+#endif
 
 namespace DaftAppleGames.BuildingTools.Editor
 {
     [CreateAssetMenu(fileName = "OptimiseMeshesEditorTool", menuName = "Daft Apple Games/Building Tools/Optimise Meshes Tool")]
     internal class OptimiseMeshesEditorTool : BuildingEditorTool
     {
+        [BoxGroup("Settings")] [SerializeField] internal string assetOutputFolder;
+        [BoxGroup("Settings")] [SerializeField] internal string assetFileNamePrefix;
+        [BoxGroup("Settings")] [SerializeField] internal bool createOutputFolder;
+        [BoxGroup("Settings")] [SerializeField] internal bool is32BIT;
+        [BoxGroup("Settings")] [SerializeField] internal bool generateSecondaryUVs;
+        [BoxGroup("Settings")] [SerializeField] internal ApplyMeshPresetsEditorTool combinedMeshPresets;
+
+        private string OutputAbsolutePath => Path.Combine(Application.dataPath, assetOutputFolder);
+        private string OutputRelativePath => Path.Combine("Assets", assetOutputFolder);
+
         protected override string GetToolName()
         {
             return "Optimise Meshes";
@@ -23,89 +38,83 @@ namespace DaftAppleGames.BuildingTools.Editor
             return true;
         }
 
-        protected override bool CanRunTool(GameObject selectedGameObject, ButtonWizardEditorSettings editorSettings, out string cannotRunReason)
+        protected override bool CanRunTool(GameObject selectedGameObject, out List<string> cannotRunReasons)
         {
-            if (RequireSettingsAndGameObjectValidation() && RequiredBuildingValidation())
+            bool canRun = true;
+
+            cannotRunReasons = new List<string>();
+            if (!RequireGameObjectValidation(out string requireGameObjectReason))
             {
-                cannotRunReason = string.Empty;
-                return true;
+                cannotRunReasons.Add(requireGameObjectReason);
+                canRun = false;
             }
 
-            cannotRunReason = $"{selectEditorSettingsAndGameObjectError}\n{buildingComponentRequiredError}";
-            return false;
+            if (!RequiredBuildingValidation(out string requiredBuildingReason))
+            {
+                cannotRunReasons.Add(requiredBuildingReason);
+                canRun = false;
+            }
+
+            if (!ValidateToolSettings(out string toolValidationReason))
+            {
+                cannotRunReasons.Add(toolValidationReason);
+                canRun = false;
+            }
+
+            return canRun;
         }
 
-        private static bool ValidateCombineMeshParameters(CombineMeshParameters combineMeshParameters)
+        private bool ValidateToolSettings(out string validationReason)
         {
             // Check the base asset folder exists
-            if (!Directory.Exists(combineMeshParameters.BaseAssetOutputPath))
+            if (!Directory.Exists(OutputAbsolutePath) && !createOutputFolder)
             {
-                Debug.LogError($"Combined Mesh base output folder does not exist: {combineMeshParameters.BaseAssetOutputPath}. Aborting!");
+                validationReason = $"Combined Mesh base output folder does not exist and 'createOutputFolder' is not ticked: {OutputAbsolutePath}!";
                 return false;
             }
 
-            string fullOutputPath = Path.Combine(combineMeshParameters.BaseAssetOutputPath, combineMeshParameters.AssetOutputFolder);
+            validationReason = string.Empty;
+            return true;
+        }
 
-            if (combineMeshParameters.CreateOutputFolder || Directory.Exists(fullOutputPath))
+        protected override void RunTool(GameObject selectedGameObject, string undoGroupName)
+        {
+            // Check the base asset folder exists
+            if (!Directory.Exists(OutputAbsolutePath) && createOutputFolder)
             {
-                return true;
+                Directory.CreateDirectory(OutputAbsolutePath);
             }
 
-            Debug.LogError($"Combined Mesh output folder does not exist: {fullOutputPath}. Aborting!");
-            return false;
+            OptimiseMeshes(selectedGameObject);
         }
 
-        protected override void RunTool(GameObject selectedGameObject, ButtonWizardEditorSettings editorSettings, string undoGroupName)
-        {
-            if (editorSettings is BuildingWizardEditorSettings buildingEditorSettings)
-            {
-                OptimiseMeshes(selectedGameObject, buildingEditorSettings);
-            }
-        }
-
-        #region Static Mesh Optimisation methods
-
-        /// <summary>
-        /// Struct to consolidate parameters for use with the 'CombineMesh' tool
-        /// </summary>
-        private struct CombineMeshParameters
-        {
-            internal string BaseAssetOutputPath;
-            internal string AssetOutputFolder;
-            internal string AssetFileNamePrefix;
-            internal bool CreateOutputFolder;
-            internal bool Is32BIT;
-            internal bool GenerateSecondaryUVs;
-        }
-
-        private static void OptimiseMeshes(GameObject parentGameObject, BuildingWizardEditorSettings buildingWizardSettings)
+        private void OptimiseMeshes(GameObject parentGameObject)
         {
             Building building = parentGameObject.GetComponent<Building>();
 
-            // Combine the exterior Prop meshes
-            CombineMeshParameters combineMeshParameters = new()
+            // Create a folder for this GameObjects meshes
+            string gameObjectAbsolutePath = Path.Combine(OutputAbsolutePath, $"{parentGameObject.name}");
+            string gameObjectRelativePath = Path.Combine(OutputRelativePath, $"{parentGameObject.name}");
+            if (!Directory.Exists(gameObjectAbsolutePath))
             {
-                BaseAssetOutputPath = buildingWizardSettings.meshAssetOutputPath,
-                AssetOutputFolder = parentGameObject.name,
-                CreateOutputFolder = true
-            };
+                log.AddToLog(LogLevel.Debug, $"Creating folder: {gameObjectAbsolutePath}");
+                Directory.CreateDirectory(gameObjectAbsolutePath);
+            }
 
             // Merge exterior meshes
-            OptimiseMeshGroup(building.exteriorProps, "exteriorProps", combineMeshParameters, buildingWizardSettings.buildingMeshSettings.exteriorPropMeshSettings);
-            OptimiseMeshGroup(building.exteriors, "exteriors", combineMeshParameters, buildingWizardSettings.buildingMeshSettings.exteriorMeshSettings);
+            OptimiseMeshGroup(building.exteriorProps, gameObjectAbsolutePath, gameObjectRelativePath, parentGameObject.name);
+            OptimiseMeshGroup(building.exteriors, gameObjectAbsolutePath, gameObjectRelativePath, parentGameObject.name);
 
             // Merge interior meshes
-            OptimiseMeshGroup(building.interiorProps, "interiorProps", combineMeshParameters, buildingWizardSettings.buildingMeshSettings.interiorPropMeshSettings);
-            OptimiseMeshGroup(building.interiors, "interiors", combineMeshParameters, buildingWizardSettings.buildingMeshSettings.interiorMeshSettings);
+            OptimiseMeshGroup(building.interiorProps, gameObjectAbsolutePath, gameObjectRelativePath, parentGameObject.name);
+            OptimiseMeshGroup(building.interiors, gameObjectAbsolutePath, gameObjectRelativePath, parentGameObject.name);
         }
 
-        private static void OptimiseMeshGroup(GameObject[] allGameObjects, string namePrefix, CombineMeshParameters combineMeshParameters,
-            MeshEditorPresetSettings newMeshParameters)
+        private void OptimiseMeshGroup(GameObject[] allGameObjects, string gameObjectAbsolutePath, string gameObjectRelativePath, string parentGameObjectName)
         {
-            foreach (GameObject gameObjectParent in allGameObjects)
+            foreach (GameObject containerGameObject in allGameObjects)
             {
-                combineMeshParameters.AssetFileNamePrefix = namePrefix;
-                CombineGameObjectMeshes(gameObjectParent, combineMeshParameters, newMeshParameters);
+                CombineGameObjectMeshes(containerGameObject, gameObjectAbsolutePath, gameObjectRelativePath, parentGameObjectName);
             }
         }
 
@@ -113,27 +122,26 @@ namespace DaftAppleGames.BuildingTools.Editor
         /// Combines all meshes in the given GameObject, writing the resulting Mesh as an asset to the given path.
         /// Any components with the 'MeshCombineExcluder' component will be ignored by the process
         /// </summary>
-        private static void CombineGameObjectMeshes(GameObject parentGameObject, CombineMeshParameters combineMeshParameters, MeshEditorPresetSettings newMeshParameters)
+        private void CombineGameObjectMeshes(GameObject containerGameObject, string gameObjectAbsolutePath, string gameObjectRelativePath, string parentGameObjectName)
         {
-            if (!ValidateCombineMeshParameters(combineMeshParameters))
+            // Create a child folder for this containers meshes
+            string instanceAbsolutePath = Path.Combine(gameObjectAbsolutePath, $"{parentGameObjectName}_{containerGameObject.name}");
+            string instanceRelativePath = Path.Combine(gameObjectRelativePath, $"{parentGameObjectName}_{containerGameObject.name}");
+            if (!Directory.Exists(instanceAbsolutePath))
             {
-                return;
+                log.AddToLog(LogLevel.Debug, $"Creating folder: {instanceAbsolutePath}");
+                Directory.CreateDirectory(instanceAbsolutePath);
             }
 
-            string fullOutputPath = Path.Combine(combineMeshParameters.BaseAssetOutputPath, combineMeshParameters.AssetOutputFolder);
+            log.AddToLog(LogLevel.Debug, $"Absolute destination folder: {instanceAbsolutePath}");
+            log.AddToLog(LogLevel.Debug, $"Relative destination folder: {instanceRelativePath}");
 
-            if (combineMeshParameters.CreateOutputFolder && !Directory.Exists(fullOutputPath))
-            {
-                Directory.CreateDirectory(fullOutputPath);
-                Debug.Log($"Created new folder for Mesh asset: {fullOutputPath}");
-            }
+            MeshFilter[] meshFilters = containerGameObject.GetComponentsInChildren<MeshFilter>(true);
+            Vector3 originalPosition = containerGameObject.transform.position;
+            Quaternion originalRotation = containerGameObject.transform.rotation;
 
-            MeshFilter[] meshFilters = parentGameObject.GetComponentsInChildren<MeshFilter>(true);
-            Vector3 originalPosition = parentGameObject.transform.position;
-            Quaternion originalRotation = parentGameObject.transform.rotation;
-
-            parentGameObject.transform.position = Vector3.zero;
-            parentGameObject.transform.rotation = Quaternion.identity;
+            containerGameObject.transform.position = Vector3.zero;
+            containerGameObject.transform.rotation = Quaternion.identity;
 
             Dictionary<Material, List<MeshFilter>> materialToMeshFilterList = new();
             List<GameObject> combinedObjects = new();
@@ -163,8 +171,8 @@ namespace DaftAppleGames.BuildingTools.Editor
                 if (materials.Length > 1)
                 {
                     // Rollback: return the object to original position
-                    parentGameObject.transform.position = originalPosition;
-                    parentGameObject.transform.rotation = originalRotation;
+                    containerGameObject.transform.position = originalPosition;
+                    containerGameObject.transform.rotation = originalRotation;
                     Debug.LogError(
                         "Objects with multiple materials on the same mesh are not supported. Create multiple meshes from this object's sub-meshes in an external 3D tool and assign separate materials to each. Aborted!");
                     return;
@@ -204,11 +212,11 @@ namespace DaftAppleGames.BuildingTools.Editor
                 }
 
                 // Create a new mesh using the combined properties
-                IndexFormat format = combineMeshParameters.Is32BIT ? IndexFormat.UInt32 : IndexFormat.UInt16;
+                IndexFormat format = is32BIT ? IndexFormat.UInt32 : IndexFormat.UInt16;
                 Mesh combinedMesh = new() { indexFormat = format };
                 combinedMesh.CombineMeshes(combine);
 
-                if (combineMeshParameters.GenerateSecondaryUVs)
+                if (generateSecondaryUVs)
                 {
                     bool secondaryUVsResult = Unwrapping.GenerateSecondaryUVSet(combinedMesh);
                     if (!secondaryUVsResult)
@@ -220,10 +228,12 @@ namespace DaftAppleGames.BuildingTools.Editor
 
                 // Create asset
                 materialName += "_" + combinedMesh.GetInstanceID();
-                AssetDatabase.CreateAsset(combinedMesh, Path.Combine(fullOutputPath, $"{combineMeshParameters.AssetFileNamePrefix}CombinedMeshes_{materialName}.asset"));
+                string meshAssetPath = Path.Combine(instanceRelativePath, $"{assetFileNamePrefix}CombinedMeshes_{materialName}.asset");
+                log.AddToLog(LogLevel.Debug, $"Saving mesh asset to: {meshAssetPath}");
+                AssetDatabase.CreateAsset(combinedMesh, meshAssetPath);
 
                 // Create game object
-                string combinedMeshGoName = materialToMeshFilterList.Count > 1 ? "CombinedMeshes_" + materialName : "CombinedMeshes_" + parentGameObject.name;
+                string combinedMeshGoName = materialToMeshFilterList.Count > 1 ? "CombinedMeshes_" + materialName : "CombinedMeshes_" + containerGameObject.name;
                 GameObject combinedMeshGameObject = new(combinedMeshGoName);
                 MeshFilter filter = combinedMeshGameObject.AddComponent<MeshFilter>();
                 filter.sharedMesh = combinedMesh;
@@ -232,14 +242,13 @@ namespace DaftAppleGames.BuildingTools.Editor
                 combinedObjects.Add(combinedMeshGameObject);
 
                 // Configure the new Mesh Renderer
-                newMeshParameters.ConfigureMeshOnGameObject(combinedMeshGameObject, log);
             }
 
             // If there was more than one material, and thus multiple GOs created, parent them and work with result
             GameObject resultGameObject;
             if (combinedObjects.Count > 1)
             {
-                resultGameObject = new GameObject("CombinedMeshes_" + parentGameObject.name);
+                resultGameObject = new GameObject("CombinedMeshes_" + containerGameObject.name);
                 foreach (GameObject combinedObject in combinedObjects) combinedObject.transform.parent = resultGameObject.transform;
             }
             else
@@ -248,22 +257,21 @@ namespace DaftAppleGames.BuildingTools.Editor
             }
 
             // Create prefab
-            string prefabPath = Path.Combine(fullOutputPath, resultGameObject.name + ".prefab");
+            string prefabPath = Path.Combine(instanceRelativePath, resultGameObject.name + ".prefab");
+            log.AddToLog(LogLevel.Debug, $"Saving prefab asset to: {prefabPath}");
             PrefabUtility.SaveAsPrefabAssetAndConnect(resultGameObject, prefabPath, InteractionMode.UserAction);
 
             // Return both to original positions
-            parentGameObject.transform.position = originalPosition;
-            parentGameObject.transform.rotation = originalRotation;
-            if (parentGameObject.transform.parent == null)
+            containerGameObject.transform.position = originalPosition;
+            containerGameObject.transform.rotation = originalRotation;
+            if (containerGameObject.transform.parent == null)
             {
                 return;
             }
 
-            resultGameObject.transform.SetParent(parentGameObject.transform.parent, false);
+            resultGameObject.transform.SetParent(containerGameObject.transform.parent, false);
             resultGameObject.transform.position = originalPosition;
             resultGameObject.transform.rotation = originalRotation;
         }
-
-        #endregion
     }
 }

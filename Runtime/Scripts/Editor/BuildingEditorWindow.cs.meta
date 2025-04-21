@@ -5,10 +5,9 @@ MonoImporter:
   serializedVersion: 2
   defaultReferences:
   - m_ViewDataDictionary: {instanceID: 0}
-  - baseVisualTree: {fileID: 9197481963319205126, guid: a3483176b2fda24479f45edf36b0bac7, type: 3}
+  - baseVisualTree: {fileID: 9197481963319205126, guid: 0fa7fa923c7e57646a1c2d7150a98f5f, type: 3}
   - customEditorVisualTree: {fileID: 9197481963319205126, guid: 0040e116e7dce6c4a987ac9186a45797, type: 3}
-  - editorToolsList: {fileID: 11400000, guid: ad66ab09b9f65e14dbf050254ba13e3b, type: 2}
-  - editorSettings: {fileID: 11400000, guid: b5889aec21a516d4dbf79dd0fcd92edd, type: 2}
+  - editorSettings: {instanceID: 0}
   - selectedGameObject: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}

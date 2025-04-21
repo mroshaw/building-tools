@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using DaftAppleGames.Buildings;
 using DaftAppleGames.Editor;
 using DaftAppleGames.Extensions;
@@ -8,18 +9,14 @@ using UnityEngine.Rendering.HighDefinition;
 #endif
 using UnityEngine;
 using UnityEngine.Rendering;
-
+#if ODIN_INSPECTOR
+using Sirenix.OdinInspector;
+#else
+using DaftAppleGames.Attributes;
+#endif
 
 namespace DaftAppleGames.BuildingTools.Editor
 {
-    [Serializable]
-    internal struct BuildingLightSettings
-    {
-        [SerializeField] internal BuildingLightTypeSettings indoorCandleTypeSettings;
-        [SerializeField] internal BuildingLightTypeSettings indoorFireTypeSettings;
-        [SerializeField] internal BuildingLightTypeSettings outdoorBuildingLightTypeSettings;
-    }
-
     /// <summary>
     /// This struct gives us an easy way of passing Lighting configuration around
     /// our various classes and methods
@@ -42,6 +39,10 @@ namespace DaftAppleGames.BuildingTools.Editor
     [CreateAssetMenu(fileName = "ConfigureLightingEditorTool", menuName = "Daft Apple Games/Building Tools/Configure Lighting Tool")]
     internal class SetUpLightsEditorTool : BuildingEditorTool
     {
+        [SerializeField] [BoxGroup("Settings")] internal BuildingLightTypeSettings indoorCandleTypeSettings;
+        [SerializeField] [BoxGroup("Settings")] internal BuildingLightTypeSettings indoorFireTypeSettings;
+        [SerializeField] [BoxGroup("Settings")] internal BuildingLightTypeSettings outdoorBuildingLightTypeSettings;
+
         protected override string GetToolName()
         {
             return "Set Up Lights";
@@ -57,93 +58,96 @@ namespace DaftAppleGames.BuildingTools.Editor
             return true;
         }
 
-        protected override bool CanRunTool(GameObject selectedGameObject, ButtonWizardEditorSettings editorSettings, out string cannotRunReason)
+        protected override bool CanRunTool(GameObject selectedGameObject, out List<string> cannotRunReasons)
         {
-            if (RequireSettingsAndGameObjectValidation() && RequiredBuildingValidation())
+            bool canRun = true;
+
+            cannotRunReasons = new List<string>();
+            if (!RequireGameObjectValidation(out string requireGameObjectReason))
             {
-                cannotRunReason = string.Empty;
-                return true;
+                cannotRunReasons.Add(requireGameObjectReason);
+                canRun = false;
             }
 
-            cannotRunReason = $"{selectEditorSettingsAndGameObjectError}\n{buildingComponentRequiredError}";
-            return false;
-        }
-
-        protected override void RunTool(GameObject selectedGameObject, ButtonWizardEditorSettings editorSettings, string undoGroupName)
-        {
-            if (editorSettings is BuildingWizardEditorSettings buildingEditorSettings)
+            if (!RequiredBuildingValidation(out string requiredBuildingReason))
             {
-                ConfigureLighting(selectedGameObject, buildingEditorSettings.buildingLightSettings);
+                cannotRunReasons.Add(requiredBuildingReason);
+                canRun = false;
             }
+
+            return canRun;
         }
 
-        #region Static Lighting methods
+        protected override void RunTool(GameObject selectedGameObject, string undoGroupName)
+        {
+            ConfigureLighting(selectedGameObject);
+        }
 
-        private static void ConfigureLighting(GameObject parentGameObject, BuildingLightSettings buildingLightSettings)
+        private void ConfigureLighting(GameObject parentGameObject)
         {
             LightingController lightingController = parentGameObject.EnsureComponent<LightingController>();
-            log.Log(LogLevel.Info, $"Added Lighting Controller component to {parentGameObject.name}.");
+            log.AddToLog(LogLevel.Info, $"Added Lighting Controller component to {parentGameObject.name}.");
 
             Transform[] allChildren = parentGameObject.GetComponentsInChildren<Transform>(true);
 
             // Configure interior candles
             foreach (Transform childTransform in allChildren)
             {
-                if (buildingLightSettings.indoorCandleTypeSettings.meshNames.ItemInString(childTransform.gameObject.name))
+                if (indoorCandleTypeSettings.meshNames.ItemInString(childTransform.gameObject.name))
                 {
-                    ConfigureBuildingLight(childTransform.gameObject, buildingLightSettings.indoorCandleTypeSettings);
+                    ConfigureBuildingLight(childTransform.gameObject, indoorCandleTypeSettings);
                 }
             }
 
             // Configure interior fires
             foreach (Transform childTransform in allChildren)
             {
-                if (buildingLightSettings.indoorFireTypeSettings.meshNames.ItemInString(childTransform.gameObject.name))
+                if (indoorFireTypeSettings.meshNames.ItemInString(childTransform.gameObject.name))
                 {
-                    ConfigureBuildingLight(childTransform.gameObject, buildingLightSettings.indoorFireTypeSettings);
+                    ConfigureBuildingLight(childTransform.gameObject, indoorFireTypeSettings);
                 }
             }
 
             // Configure exterior lights
             foreach (Transform childTransform in allChildren)
             {
-                if (buildingLightSettings.outdoorBuildingLightTypeSettings.meshNames.ItemInString(childTransform.gameObject.name))
+                if (outdoorBuildingLightTypeSettings.meshNames.ItemInString(childTransform.gameObject.name))
                 {
-                    ConfigureBuildingLight(childTransform.gameObject, buildingLightSettings.outdoorBuildingLightTypeSettings);
+                    ConfigureBuildingLight(childTransform.gameObject, outdoorBuildingLightTypeSettings);
                 }
             }
 
             lightingController.ConfigureInEditor();
         }
 
-        private static void ConfigureBuildingLight(GameObject lightGameObject, BuildingLightTypeSettings lightingTypeSettings)
+        private void ConfigureBuildingLight(GameObject lightGameObject, BuildingLightTypeSettings lightTypeSettings)
         {
             if (!lightGameObject.TryGetComponentInChildren(out Light light, true))
             {
-                log.Log(LogLevel.Warning, $"No light found on parent mesh {lightGameObject.name}.");
+                log.AddToLog(LogLevel.Warning, $"No light found on parent mesh {lightGameObject.name}.");
                 return;
             }
 
             if (!lightGameObject.TryGetComponentInChildren(out ParticleSystem flameParticleSystem, true))
             {
-                log.Log(LogLevel.Debug, $"No flame particle system found on parent mesh {lightGameObject.name}.");
+                log.AddToLog(LogLevel.Debug, $"No flame particle system found on parent mesh {lightGameObject.name}.");
             }
 
             BuildingLight buildingLight = lightGameObject.EnsureComponent<BuildingLight>();
-            buildingLight.ConfigureInEditor(lightingTypeSettings.buildingLightType, light, flameParticleSystem);
+            buildingLight.ConfigureInEditor(lightTypeSettings.buildingLightType, light, flameParticleSystem);
 
-            log.Log(LogLevel.Debug, $"Configuring light on : {lightGameObject.name}...");
-            ConfigureLight(lightGameObject, light, lightingTypeSettings);
-            log.Log(LogLevel.Debug, $"Configuring light on : {lightGameObject.name}... DONE!");
+            log.AddToLog(LogLevel.Debug, $"Configuring light on : {lightGameObject.name}...");
+            ConfigureLight(lightGameObject, light, lightTypeSettings);
+            log.AddToLog(LogLevel.Debug, $"Configuring light on : {lightGameObject.name}... DONE!");
         }
 
-        private static void ConfigureLight(GameObject lightGameObject, Light light, BuildingLightTypeSettings lightingTypeSettings)
+        private void ConfigureLight(GameObject lightGameObject, Light light, BuildingLightTypeSettings lightingTypeSettings)
         {
-            log.Log(LogLevel.Debug, $"Configuring light on : {lightGameObject.name}...");
+            log.AddToLog(LogLevel.Debug, $"Configuring light on : {lightGameObject.name}...");
 
             if (!lightingTypeSettings.presetSettings)
             {
-                log.Log(LogLevel.Error, $"No presets found on {lightingTypeSettings.buildingLightType}.");
+                log.AddToLog(LogLevel.Error, $"No presets found on {lightingTypeSettings.buildingLightType}.");
             }
 
             // Look for old Lens Flare and destroy it - not supported in URP or HDRP
@@ -152,7 +156,7 @@ namespace DaftAppleGames.BuildingTools.Editor
             {
                 DestroyImmediate(oldLensFlare);
 
-                log.Log(LogLevel.Debug, $"Destroyed old Lens Flare component on: {lightGameObject.name}.");
+                log.AddToLog(LogLevel.Debug, $"Destroyed old Lens Flare component on: {lightGameObject.name}.");
             }
 
             // Set up Lens Flare, if it's selected
@@ -165,15 +169,15 @@ namespace DaftAppleGames.BuildingTools.Editor
                 newLensFlare.useOcclusion = true;
                 newLensFlare.allowOffScreen = false;
 
-                log.Log(LogLevel.Debug, $"Configured an SRP Lens Flare component to: {lightGameObject.name}.");
+                log.AddToLog(LogLevel.Debug, $"Configured an SRP Lens Flare component to: {lightGameObject.name}.");
             }
 #endif
 
-            log.Log(LogLevel.Debug, $"Setting light properties on: {lightGameObject.name}.");
+            log.AddToLog(LogLevel.Debug, $"Setting light properties on: {lightGameObject.name}.");
             lightingTypeSettings.presetSettings.ApplyPreset(light);
         }
 
-        private static void ConfigureOnDemandShadowMap(Light light, BuildingLightTypeSettings lightingSettings)
+        private void ConfigureOnDemandShadowMap(Light light, BuildingLightTypeSettings lightingSettings)
         {
 #if DAG_HDRP
             HDAdditionalLightData hdLightData = light.GetComponent<HDAdditionalLightData>();
@@ -186,7 +190,5 @@ namespace DaftAppleGames.BuildingTools.Editor
 
 #endif
         }
-
-        #endregion
     }
 }
