@@ -7,16 +7,8 @@ using Sirenix.OdinInspector;
 #else
 using DaftAppleGames.Attributes;
 #endif
-#if DAG_HDRP
-using HDRenderingLayerMask = UnityEngine.Rendering.HighDefinition.RenderingLayerMask;
-using UnityEngine.Rendering.HighDefinition;
-#else
-using RenderingLayerMask = UnityEngine.RenderingLayerMask;
-#endif
 
-#if DAG_HDRP || DAG_URP
 using UnityEngine.Rendering;
-#endif
 
 namespace DaftAppleGames.Editor
 {
@@ -61,7 +53,7 @@ namespace DaftAppleGames.Editor
         /// <summary>
         /// Applies the Mesh settings to all Meshes on the given Game Object
         /// </summary>
-        internal void ConfigureMeshOnGameObject(GameObject parentGameObject, EditorLog log)
+        private void ConfigureMeshOnGameObject(GameObject parentGameObject, EditorLog log)
         {
             MeshRenderer[] meshRenderers = parentGameObject.GetComponentsInChildren<MeshRenderer>();
             if (meshRenderers.Length == 0)
