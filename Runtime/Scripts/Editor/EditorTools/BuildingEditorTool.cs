@@ -11,6 +11,12 @@ namespace DaftAppleGames.BuildingTools.Editor
     {
         protected bool RequiredBuildingValidation(out string failedReason)
         {
+            if (!SelectedGameObject)
+            {
+                failedReason = string.Empty;
+                return true;
+            }
+
             if (SelectedGameObject.HasComponent<Building>())
             {
                 failedReason = string.Empty;
