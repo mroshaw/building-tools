@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9cf1b1b76bd30ef4797c16d307045921, type: 3}
-  m_Name: MixedExteriorLightsBIRP
+  m_Name: MixedInteriorCandleLightsURP
   m_EditorClassIdentifier: 
   range: 2
   intensity: 6

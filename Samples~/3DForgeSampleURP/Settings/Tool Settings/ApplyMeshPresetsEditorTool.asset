@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e3ca56d3e8d1ac4a82ad69e5b3e7543, type: 3}
   m_Name: ApplyMeshPresetsEditorTool
   m_EditorClassIdentifier: 
-  interiorMeshSettings: {fileID: 11400000, guid: 96c72ef7cd781b245a374757a6eab51a, type: 2}
-  exteriorMeshSettings: {fileID: 11400000, guid: e21424dcaa592da43a3031a3d7370078, type: 2}
-  interiorPropMeshSettings: {fileID: 11400000, guid: 8bca6ba9e4513d8488ce298b0efee6ce, type: 2}
-  exteriorPropMeshSettings: {fileID: 11400000, guid: e94e72fceba6721439a6affa54965c16, type: 2}
+  interiorMeshSettings: {fileID: 11400000, guid: 784853756f360544d819d4f2e6354e16, type: 2}
+  exteriorMeshSettings: {fileID: 11400000, guid: 1548705ae9bf1f64cb95c90fbdbef199, type: 2}
+  interiorPropMeshSettings: {fileID: 11400000, guid: 9c81a2489b252f545aec9722df9f7fda, type: 2}
+  exteriorPropMeshSettings: {fileID: 11400000, guid: 892035b7dead5554cafd02c88165e6be, type: 2}

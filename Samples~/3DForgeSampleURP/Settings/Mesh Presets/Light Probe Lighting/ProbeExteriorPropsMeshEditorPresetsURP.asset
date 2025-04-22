@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4ed1726f92333da43a33d37739dc7e28, type: 3}
-  m_Name: ProbeExteriorMeshEditorPresetsBIRP
+  m_Name: ProbeExteriorPropsMeshEditorPresetsURP
   m_EditorClassIdentifier: 
-  layerName: BuildingExterior
+  layerName: ExteriorProps
   staticEditorFlags: -1
   shadowCastingMode: 1
   staticShadowCaster: 1

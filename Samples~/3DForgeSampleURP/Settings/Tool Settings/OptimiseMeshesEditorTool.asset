@@ -17,4 +17,4 @@ MonoBehaviour:
   createOutputFolder: 1
   is32BIT: 0
   generateSecondaryUVs: 0
-  combinedMeshPresets: {fileID: 11400000, guid: 2500fc8c015060a46a7dc7c25e9c42e3, type: 2}
+  combinedMeshPresets: {fileID: 11400000, guid: 4dd77c7d4db5758438f88705a1822140, type: 2}
