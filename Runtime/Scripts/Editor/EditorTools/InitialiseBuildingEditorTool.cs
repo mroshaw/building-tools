@@ -18,7 +18,7 @@ namespace DaftAppleGames.BuildingTools.Editor
     [CreateAssetMenu(fileName = "InitialiseBuildingEditorTool", menuName = "Daft Apple Games/Building Tools/Initialise Building Tool")]
     internal class InitialiseBuildingEditorTool : BuildingEditorTool
     {
-        [SerializeField] [BoxGroup("Settings)")] internal float adjustAnchorHeight;
+        [SerializeField] [BoxGroup("Settings")] internal float adjustAnchorHeight;
 
         protected override string GetToolName()
         {
