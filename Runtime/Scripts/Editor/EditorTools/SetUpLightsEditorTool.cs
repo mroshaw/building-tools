@@ -62,7 +62,7 @@ namespace DaftAppleGames.BuildingTools.Editor
             if (!RequireGameObjectValidation(out string requireGameObjectReason))
             {
                 cannotRunReasons.Add(requireGameObjectReason);
-                canRun = false;
+                return false;
             }
 
             if (!RequiredBuildingValidation(out string requiredBuildingReason))
