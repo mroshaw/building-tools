@@ -8,7 +8,6 @@ using RenderingLayerMask = UnityEngine.Rendering.HighDefinition.RenderingLayerMa
 
 #if DAG_URP
 using UnityEngine.Rendering.Universal;
-using RenderingLayerMask = UnityEngine.Rendering.Universal.RenderingLayerMask;
 #endif
 
 #if ODIN_INSPECTOR
