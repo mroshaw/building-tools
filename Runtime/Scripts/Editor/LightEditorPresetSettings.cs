@@ -60,8 +60,8 @@ namespace DaftAppleGames.Editor
 
 #if DAG_URP
             UniversalAdditionalLightData urpLightData = light.GetComponent<UniversalAdditionalLightData>();
-            urpLightData.shapeRadius = radius;
-            urpLightData.range = range;
+            // urpLightData.shapeRadius = radius;
+            light.range = range;
             urpLightData.renderingLayers = renderingLayerMask;
             float convertedIntensity = LightUnitUtils.ConvertIntensity(light, intensity, LightUnit.Lumen, light.lightUnit);
             light.intensity = convertedIntensity;
