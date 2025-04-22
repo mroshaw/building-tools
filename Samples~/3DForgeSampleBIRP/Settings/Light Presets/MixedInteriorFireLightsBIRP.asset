@@ -13,9 +13,8 @@ MonoBehaviour:
   m_Name: MixedInteriorFireLightsBIRP
   m_EditorClassIdentifier: 
   range: 1
-  intensity: 15
+  intensity: 6
   radius: 0.025
-  renderingLayerMask: 4
   filterColor: {r: 0.8962264, g: 0.5720058, b: 0.32551616, a: 1}
   temperature: 6570
-  lightmapBakeType: 2
+  lightmapBakeType: 1

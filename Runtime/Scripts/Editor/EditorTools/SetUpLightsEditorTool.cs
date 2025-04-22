@@ -50,10 +50,6 @@ namespace DaftAppleGames.BuildingTools.Editor
 
         protected override bool IsSupported(out string notSupportedReason)
         {
-#if !DAG_HDRP
-            notSupportedReason = "Only currently supported on HDRP - URP and BIRP support is on it's way!";
-            return false;
-#endif
             notSupportedReason = string.Empty;
             return true;
         }
