@@ -13,10 +13,12 @@ MonoBehaviour:
   m_Name: BuildingTools-3DForge-BIRP-Probes
   m_EditorClassIdentifier: 
   toolsList:
-  - {fileID: 11400000, guid: 6ee9b0d05982c1f4f86a69d7b2890ddc, type: 2}
-  - {fileID: 11400000, guid: c82f3316461f65848aaac8cebad46e26, type: 2}
-  - {fileID: 11400000, guid: 27e7271b497c5a44f9517db953bbdcec, type: 2}
-  - {fileID: 11400000, guid: 2500fc8c015060a46a7dc7c25e9c42e3, type: 2}
-  - {fileID: 11400000, guid: 65e5ba2e5cc80634ea66809658163475, type: 2}
-  - {fileID: 11400000, guid: 9a4b7cd4c648d5045af3732741577bdc, type: 2}
-  - {fileID: 11400000, guid: 89437058bd181de47b2098ea9e36f5e6, type: 2}
+  - {fileID: 11400000, guid: c81fb0d27a29ef24f9fa595e145c2467, type: 2}
+  - {fileID: 11400000, guid: 49cefc82e10fd8c48aa4ea3c42ea2460, type: 2}
+  - {fileID: 11400000, guid: 334ba359b26a148448f9baa40595d98a, type: 2}
+  - {fileID: 11400000, guid: d3b27a0a9fb287d43ad5361f923e9134, type: 2}
+  - {fileID: 11400000, guid: 35f844d625dd07f4ea31446a0a8fadf7, type: 2}
+  - {fileID: 11400000, guid: 1c9f94ac2a5f9094d8bd998353067122, type: 2}
+  - {fileID: 11400000, guid: 8edbd356498b5ea47a2a58f9e1ac45b6, type: 2}
+  - {fileID: 11400000, guid: 00fd533532c9be746a54eb66526ba2cf, type: 2}
+  - {fileID: 11400000, guid: a25adb7273aec854e8aeda3a8954676f, type: 2}
