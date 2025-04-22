@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5f5db9f93cabb44cb52ff3227a2e83f, type: 3}
+  m_Name: AddDoorsEditorTool
+  m_EditorClassIdentifier: 
+  doorNames:
+  - vil_door
+  doorOpeningClips:
+  - {fileID: 8300000, guid: 60c475a6d5bffdb43bb4b71eb69b9132, type: 3}
+  doorOpenClips: []
+  doorClosingClips:
+  - {fileID: 8300000, guid: 60c475a6d5bffdb43bb4b71eb69b9132, type: 3}
+  doorClosedClips:
+  - {fileID: 8300000, guid: 80f85f7c9156d914890d35c6b2be956f, type: 3}
+  doorSfxGroup: {fileID: -8991655405756310492, guid: d4cb3dd8c857cad4599292f12c8e37c2, type: 2}
+  doorTriggerLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  doorTriggerTags:
+  - Player
+  moveableMeshStaticFlags: 0
