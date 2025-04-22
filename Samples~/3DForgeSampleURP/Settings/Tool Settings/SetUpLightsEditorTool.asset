@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: afd29f880645f4f42a1292a22dcf1a7e, type: 3}
+  m_Name: SetUpLightsEditorTool
+  m_EditorClassIdentifier: 
+  indoorCandleTypeSettings:
+    buildingLightType: 0
+    meshNames:
+    - props_candle
+    flameNames:
+    - Flame
+    useLensFlare: 1
+    presetSettings: {fileID: 11400000, guid: 7bc751bc2ea28ab41982c23f84d174c5, type: 2}
+  indoorFireTypeSettings:
+    buildingLightType: 1
+    meshNames:
+    - cooking_fire
+    flameNames:
+    - Flame
+    useLensFlare: 0
+    presetSettings: {fileID: 11400000, guid: 24e3cc9f7820aa1458c48a07b1c79924, type: 2}
+  outdoorBuildingLightTypeSettings:
+    buildingLightType: 2
+    meshNames: []
+    flameNames: []
+    useLensFlare: 1
+    presetSettings: {fileID: 11400000, guid: 983b10ef7c23f734689b171ee3e0bcd4, type: 2}

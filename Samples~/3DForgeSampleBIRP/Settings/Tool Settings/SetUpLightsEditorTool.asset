@@ -19,6 +19,9 @@ MonoBehaviour:
     flameNames:
     - Flame
     useLensFlare: 1
+    shadowRefreshRate: 0
+    lensFlareIntensity: 0
+    lensFlareData: {fileID: 11400000, guid: 03c3c79a844ac354da32e61c8eb709c3, type: 2}
     presetSettings: {fileID: 11400000, guid: 7bc751bc2ea28ab41982c23f84d174c5, type: 2}
   indoorFireTypeSettings:
     buildingLightType: 1
@@ -27,10 +30,16 @@ MonoBehaviour:
     flameNames:
     - Flame
     useLensFlare: 0
+    shadowRefreshRate: 0
+    lensFlareIntensity: 0
+    lensFlareData: {fileID: 11400000, guid: 03c3c79a844ac354da32e61c8eb709c3, type: 2}
     presetSettings: {fileID: 11400000, guid: 24e3cc9f7820aa1458c48a07b1c79924, type: 2}
   outdoorBuildingLightTypeSettings:
     buildingLightType: 2
     meshNames: []
     flameNames: []
     useLensFlare: 1
+    shadowRefreshRate: 0
+    lensFlareIntensity: 0
+    lensFlareData: {fileID: 11400000, guid: 03c3c79a844ac354da32e61c8eb709c3, type: 2}
     presetSettings: {fileID: 11400000, guid: 983b10ef7c23f734689b171ee3e0bcd4, type: 2}
