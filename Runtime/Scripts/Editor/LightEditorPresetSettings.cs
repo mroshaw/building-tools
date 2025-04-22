@@ -6,10 +6,8 @@ using Sirenix.OdinInspector;
 using DaftAppleGames.Attributes;
 #endif
 #if DAG_HDRP
-using HDRenderingLayerMask = UnityEngine.Rendering.HighDefinition.RenderingLayerMask;
 using UnityEngine.Rendering.HighDefinition;
-#else
-using RenderingLayerMask = UnityEngine.RenderingLayerMask;
+using HDRenderingLayerMask = UnityEngine.Rendering.HighDefinition.RenderingLayerMask;
 #endif
 
 #if DAG_HDRP || DAG_URP
@@ -31,11 +29,15 @@ namespace DaftAppleGames.Editor
 #if DAG_HDRP
         public HDRenderingLayerMask renderingLayerMask;
 #endif
-
+#if DAG_URP
+        public RenderingLayerMask renderingLayerMask;
+#endif
+#if DAG_BIRP
+        public LayerMask cullingLayerMask;
+#endif
         public Color filterColor;
         public float temperature;
         public LightmapBakeType lightmapBakeType;
-
 
         /// <summary>
         /// Given a Light object, applies the presets
@@ -49,9 +51,20 @@ namespace DaftAppleGames.Editor
             hdLightData.lightlayersMask = renderingLayerMask;
             float convertedIntensity = LightUnitUtils.ConvertIntensity(light, intensity, LightUnit.Lumen, light.lightUnit);
             light.intensity = convertedIntensity;
-#else
+#endif
+
+#if DAG_BIRP
             light.intensity = intensity;
             light.range = range;
+#endif
+
+#if DAG_URP
+            UniversalAdditionalLightData urpLightData = directionalLight.GetComponent<UniversalAdditionalLightData>();
+            urpLightData.shapeRadius = radius;
+            urpLightData.range = range;
+            urpLightData.renderingLayers = renderingLayerMask;
+            float convertedIntensity = LightUnitUtils.ConvertIntensity(light, intensity, LightUnit.Lumen, light.lightUnit);
+            light.intensity = convertedIntensity;
 #endif
             light.color = filterColor;
             light.useColorTemperature = true;
