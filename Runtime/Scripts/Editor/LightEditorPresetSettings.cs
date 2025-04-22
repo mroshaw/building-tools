@@ -9,10 +9,10 @@ using DaftAppleGames.Attributes;
 using UnityEngine.Rendering.HighDefinition;
 using HDRenderingLayerMask = UnityEngine.Rendering.HighDefinition.RenderingLayerMask;
 #endif
-
-#if DAG_HDRP || DAG_URP
-using UnityEngine.Rendering;
+#if DAG_URP
+using UnityEngine.Rendering.Universal;
 #endif
+using UnityEngine.Rendering;
 
 namespace DaftAppleGames.Editor
 {
@@ -59,7 +59,7 @@ namespace DaftAppleGames.Editor
 #endif
 
 #if DAG_URP
-            UniversalAdditionalLightData urpLightData = directionalLight.GetComponent<UniversalAdditionalLightData>();
+            UniversalAdditionalLightData urpLightData = light.GetComponent<UniversalAdditionalLightData>();
             urpLightData.shapeRadius = radius;
             urpLightData.range = range;
             urpLightData.renderingLayers = renderingLayerMask;
