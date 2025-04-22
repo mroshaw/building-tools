@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: BuildingTools-3DForge-HDRP-Probes
   m_EditorClassIdentifier: 
   toolsList:
-  - {fileID: 11400000, guid: 6ee9b0d05982c1f4f86a69d7b2890ddc, type: 2}
+  - {fileID: 11400000, guid: b53fe6b23b4ec504eba6f88dafa318f1, type: 2}
+  - {fileID: 11400000, guid: 51730ba2f5b6c0c4992a62aa3261bff9, type: 2}
   - {fileID: 11400000, guid: c82f3316461f65848aaac8cebad46e26, type: 2}
   - {fileID: 11400000, guid: 27e7271b497c5a44f9517db953bbdcec, type: 2}
   - {fileID: 11400000, guid: 2500fc8c015060a46a7dc7c25e9c42e3, type: 2}

@@ -1,0 +1,90 @@
+using System.Collections.Generic;
+using DaftAppleGames.Editor;
+using UnityEngine;
+#if ODIN_INSPECTOR
+using Sirenix.OdinInspector;
+#else
+using DaftAppleGames.Attributes;
+#endif
+
+namespace DaftAppleGames.BuildingTools.Editor
+{
+    /// <summary>
+    /// Implementation of the initial setup tool, to create and amend layers, tags and render layer config
+    /// </summary>
+    [CreateAssetMenu(fileName = "ConfigureProjectEditorTool", menuName = "Daft Apple Games/Building Tools/Configure Project Tool")]
+    internal class ConfigureProjectEditorTool : BuildingEditorTool
+    {
+        [SerializeField] [BoxGroup("Settings")] internal string exteriorLayerName = "BuildingExterior";
+        [SerializeField] [BoxGroup("Settings")] internal string interiorLayerName = "BuildingInterior";
+        [SerializeField] [BoxGroup("Settings")] internal string interiorPropsLayerName = "InteriorProps";
+        [SerializeField] [BoxGroup("Settings")] internal string exteriorPropsLayerName = "ExteriorProps";
+
+#if DAG_HDRP || DAG_URP
+        [SerializeField] [BoxGroup("HDRP/URP Settings")] internal string exteriorRenderLayerName = "Exterior";
+        [SerializeField] [BoxGroup("HDRP/URP Settings")] internal string interiorRenderLayerName = "Interior";
+#endif
+
+        protected override string GetToolName()
+        {
+#if DAG_HDRP
+            return "Configure Project (HDRP)";
+#endif
+#if DAG_URP
+            return "Configure Project (URP)";
+#endif
+#if DAG_BIRP
+            return "Configure Project (BIRP)";
+#endif
+        }
+
+        protected override bool IsSupported(out string notSupportedReason)
+        {
+            notSupportedReason = string.Empty;
+            return true;
+        }
+
+        protected override bool CanRunTool(GameObject selectedGameObject, out List<string> cannotRunReasons)
+        {
+            cannotRunReasons = new List<string>();
+
+            // Check to see if setup has already been run or settings added manually
+            if (!CustomEditorTools.DoLayersExist(new[] { exteriorLayerName, interiorLayerName, interiorPropsLayerName, exteriorPropsLayerName }))
+            {
+                return true;
+            }
+
+            cannotRunReasons.Add("Project setup has already been run, or the required layers/tags etc have been manually added.");
+            return false;
+        }
+
+        /// <summary>
+        /// Implementation of the "Set Up" tool
+        /// </summary>
+        protected override void RunTool(GameObject selectedGameObject, string undoGroupName)
+        {
+            log.AddToLog(LogLevel.Info, "Running setup...");
+            log.AddToLog(LogLevel.Info, "Creating tags...");
+            CustomEditorTools.AddTag("Player");
+            log.AddToLog(LogLevel.Info, "Creating layers...");
+            log.AddToLog(LogLevel.Debug, $"Adding layer: {exteriorLayerName}");
+            CustomEditorTools.AddLayer(exteriorLayerName);
+            log.AddToLog(LogLevel.Debug, $"Adding layer: {interiorLayerName}");
+            CustomEditorTools.AddLayer(interiorLayerName);
+            log.AddToLog(LogLevel.Debug, $"Adding layer: {interiorPropsLayerName}.");
+            CustomEditorTools.AddLayer(interiorPropsLayerName);
+            log.AddToLog(LogLevel.Debug, $"Adding layer: {exteriorPropsLayerName}");
+            CustomEditorTools.AddLayer(exteriorPropsLayerName);
+
+#if DAG_HDRP || DAG_URP
+
+            log.AddToLog(LogLevel.Info, "Renaming Rendering Layers...");
+            log.AddToLog(LogLevel.Debug, $"Renaming index 1 to {exteriorRenderLayerName}.");
+            CustomEditorTools.RenameRenderingLayer(1, exteriorRenderLayerName);
+            log.AddToLog(LogLevel.Debug, $"Renaming index 2 to {interiorRenderLayerName}.");
+            CustomEditorTools.RenameRenderingLayer(2, interiorRenderLayerName);
+            log.AddToLog(LogLevel.Info, "Done!");
+#endif
+        }
+    }
+}
