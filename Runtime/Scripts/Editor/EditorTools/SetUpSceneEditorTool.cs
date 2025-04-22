@@ -80,7 +80,7 @@ namespace DaftAppleGames.BuildingTools.Editor
 
 #if DAG_BIRP
             log.AddToLog(LogLevel.Debug, "Configuring BIRP light...");
-            light.cullingMask = directionLightCullingLayerMask;
+            directionalLight.cullingMask = directionLightCullingLayerMask;
 #endif
         }
 
