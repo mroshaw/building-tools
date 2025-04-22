@@ -15,9 +15,8 @@ MonoBehaviour:
   meshSizeIgnoreNames: []
   meshSizeIncludeLayers:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 320
   interiorVolumeGameObjectName: Interior Volume
-  interiorVolumeProfile: {fileID: 0}
   indoorSnapshot: {fileID: -1796804499125752488, guid: d4cb3dd8c857cad4599292f12c8e37c2, type: 2}
   outdoorSnapshot: {fileID: 24500006, guid: d4cb3dd8c857cad4599292f12c8e37c2, type: 2}
   volumeTriggerTags:
