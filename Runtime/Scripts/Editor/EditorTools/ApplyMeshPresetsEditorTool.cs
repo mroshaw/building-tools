@@ -55,13 +55,6 @@ namespace DaftAppleGames.BuildingTools.Editor
                 return false;
             }
 
-
-            if (!LayerSetupValidation(selectedGameObject, out string layerSetupReason))
-            {
-                cannotRunReasons.Add(layerSetupReason);
-                canRun = false;
-            }
-
             if (!ValidateToolSettings(out string toolSettingsReason))
             {
                 cannotRunReasons.Add(toolSettingsReason);

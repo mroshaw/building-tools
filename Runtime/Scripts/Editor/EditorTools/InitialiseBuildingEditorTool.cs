@@ -51,7 +51,7 @@ namespace DaftAppleGames.BuildingTools.Editor
             if (!AddBuildingComponent(selectedGameObject))
             {
                 ShowPopupWindow("Daft Apple Building Tools", "IMPORTANT! ACTION REQUIRED!",
-                    "You must now expand the 'Meshes' foldout in the new 'Building' component, and drag 'Interior', 'Exterior', and 'Prop' parent game objects into the appropriate array. If prop Game Objects are children of building mesh game objects, please 'un-parent' them now.");
+                    "You must now expand the 'Meshes' foldout in the new 'Building' component, and drag 'Interior', 'Exterior', and 'Prop' parent game objects into the appropriate array.");
             }
 
             log.AddToLog(LogLevel.Info, "Adding Building component (if not already there). DONE!");

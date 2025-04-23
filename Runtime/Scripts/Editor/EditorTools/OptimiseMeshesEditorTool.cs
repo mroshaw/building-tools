@@ -101,32 +101,28 @@ namespace DaftAppleGames.BuildingTools.Editor
                 Directory.CreateDirectory(gameObjectAbsolutePath);
             }
 
-            // Merge exterior meshes
-            OptimiseMeshGroup(building.exteriorProps, gameObjectAbsolutePath, gameObjectRelativePath, parentGameObject.name);
-            OptimiseMeshGroup(building.exteriors, gameObjectAbsolutePath, gameObjectRelativePath, parentGameObject.name);
+            // Merge building meshes
+            CombineMeshLayer(parentGameObject, combinedMeshPresets.exteriorMeshSettings.layerName, gameObjectAbsolutePath, gameObjectRelativePath);
+            CombineMeshLayer(parentGameObject, combinedMeshPresets.interiorMeshSettings.layerName, gameObjectAbsolutePath, gameObjectRelativePath);
 
-            // Merge interior meshes
-            OptimiseMeshGroup(building.interiorProps, gameObjectAbsolutePath, gameObjectRelativePath, parentGameObject.name);
-            OptimiseMeshGroup(building.interiors, gameObjectAbsolutePath, gameObjectRelativePath, parentGameObject.name);
-        }
-
-        private void OptimiseMeshGroup(GameObject[] allGameObjects, string gameObjectAbsolutePath, string gameObjectRelativePath, string parentGameObjectName)
-        {
-            foreach (GameObject containerGameObject in allGameObjects)
-            {
-                CombineGameObjectMeshes(containerGameObject, gameObjectAbsolutePath, gameObjectRelativePath, parentGameObjectName);
-            }
+            // Merge prop meshes
+            CombineMeshLayer(parentGameObject, combinedMeshPresets.exteriorPropMeshSettings.layerName, gameObjectAbsolutePath, gameObjectRelativePath);
+            CombineMeshLayer(parentGameObject, combinedMeshPresets.interiorPropMeshSettings.layerName, gameObjectAbsolutePath, gameObjectRelativePath);
         }
 
         /// <summary>
         /// Combines all meshes in the given GameObject, writing the resulting Mesh as an asset to the given path.
         /// Any components with the 'MeshCombineExcluder' component will be ignored by the process
         /// </summary>
-        private void CombineGameObjectMeshes(GameObject containerGameObject, string gameObjectAbsolutePath, string gameObjectRelativePath, string parentGameObjectName)
+        private void CombineMeshLayer(GameObject parentGameObject, string layerName, string gameObjectAbsolutePath, string gameObjectRelativePath)
         {
+            // Derive a unique name for our combined assets
+            string newMeshName = $"{assetFileNamePrefix}_{parentGameObject.name}_{layerName}_Mesh";
+            string newPrefabAssetName = $"{assetFileNamePrefix}_{parentGameObject.name}_{layerName}_Prefab";
+
             // Create a child folder for this containers meshes
-            string instanceAbsolutePath = Path.Combine(gameObjectAbsolutePath, $"{parentGameObjectName}_{containerGameObject.name}");
-            string instanceRelativePath = Path.Combine(gameObjectRelativePath, $"{parentGameObjectName}_{containerGameObject.name}");
+            string instanceAbsolutePath = Path.Combine(gameObjectAbsolutePath, $"{parentGameObject.name}_{layerName}");
+            string instanceRelativePath = Path.Combine(gameObjectRelativePath, $"{parentGameObject.name}_{layerName}");
             if (!Directory.Exists(instanceAbsolutePath))
             {
                 log.AddToLog(LogLevel.Debug, $"Creating folder: {instanceAbsolutePath}");
@@ -136,22 +132,29 @@ namespace DaftAppleGames.BuildingTools.Editor
             log.AddToLog(LogLevel.Debug, $"Absolute destination folder: {instanceAbsolutePath}");
             log.AddToLog(LogLevel.Debug, $"Relative destination folder: {instanceRelativePath}");
 
-            MeshFilter[] meshFilters = containerGameObject.GetComponentsInChildren<MeshFilter>(true);
-            Vector3 originalPosition = containerGameObject.transform.position;
-            Quaternion originalRotation = containerGameObject.transform.rotation;
+            MeshFilter[] meshFilters = parentGameObject.GetComponentsInChildren<MeshFilter>(true);
+            Vector3 originalPosition = parentGameObject.transform.position;
+            Quaternion originalRotation = parentGameObject.transform.rotation;
 
-            containerGameObject.transform.position = Vector3.zero;
-            containerGameObject.transform.rotation = Quaternion.identity;
+            // Move the GameObject to zero, otherwise mesh positions go wonky
+            parentGameObject.transform.position = Vector3.zero;
+            parentGameObject.transform.rotation = Quaternion.identity;
 
             Dictionary<Material, List<MeshFilter>> materialToMeshFilterList = new();
             List<GameObject> combinedObjects = new();
 
             foreach (MeshFilter meshFilter in meshFilters)
             {
+                // If the MeshFilter isn't on our layer, skip it
+                if (LayerMask.LayerToName(meshFilter.gameObject.layer) != layerName)
+                {
+                    continue;
+                }
+
                 MeshRenderer meshRenderer = meshFilter.GetComponent<MeshRenderer>();
                 if (meshRenderer == null)
                 {
-                    Debug.LogWarning("The Mesh Filter on object " + meshFilter.name + " has no Mesh Renderer component attached. Skipping.");
+                    log.AddToLog(LogLevel.Debug, "The Mesh Filter on object " + meshFilter.name + " has no Mesh Renderer component attached. Skipping.");
                     continue;
                 }
 
@@ -171,8 +174,8 @@ namespace DaftAppleGames.BuildingTools.Editor
                 if (materials.Length > 1)
                 {
                     // Rollback: return the object to original position
-                    containerGameObject.transform.position = originalPosition;
-                    containerGameObject.transform.rotation = originalRotation;
+                    parentGameObject.transform.position = originalPosition;
+                    parentGameObject.transform.rotation = originalRotation;
                     Debug.LogError(
                         "Objects with multiple materials on the same mesh are not supported. Create multiple meshes from this object's sub-meshes in an external 3D tool and assign separate materials to each. Aborted!");
                     return;
@@ -221,34 +224,33 @@ namespace DaftAppleGames.BuildingTools.Editor
                     bool secondaryUVsResult = Unwrapping.GenerateSecondaryUVSet(combinedMesh);
                     if (!secondaryUVsResult)
                     {
-                        Debug.LogWarning(
+                        log.AddToLog(LogLevel.Warning,
                             "Could not generate secondary UVs.");
                     }
                 }
 
                 // Create asset
                 materialName += "_" + combinedMesh.GetInstanceID();
-                string meshAssetPath = Path.Combine(instanceRelativePath, $"{assetFileNamePrefix}CombinedMeshes_{materialName}.asset");
+                string meshAssetPath = Path.Combine(instanceRelativePath, $"{newMeshName}_{materialName}.asset");
                 log.AddToLog(LogLevel.Debug, $"Saving mesh asset to: {meshAssetPath}");
                 AssetDatabase.CreateAsset(combinedMesh, meshAssetPath);
 
                 // Create game object
-                string combinedMeshGoName = materialToMeshFilterList.Count > 1 ? "CombinedMeshes_" + materialName : "CombinedMeshes_" + containerGameObject.name;
+                string combinedMeshGoName = materialToMeshFilterList.Count > 1 ? $"{newMeshName}_{materialName}" : $"{newMeshName}";
                 GameObject combinedMeshGameObject = new(combinedMeshGoName);
                 MeshFilter filter = combinedMeshGameObject.AddComponent<MeshFilter>();
                 filter.sharedMesh = combinedMesh;
+                log.AddToLog(LogLevel.Debug, $"Set mesh on {filter.name} to {combinedMesh.name}");
                 MeshRenderer renderer = combinedMeshGameObject.AddComponent<MeshRenderer>();
                 renderer.sharedMaterial = entry.Key;
                 combinedObjects.Add(combinedMeshGameObject);
-
-                // Configure the new Mesh Renderer
             }
 
-            // If there was more than one material, and thus multiple GOs created, parent them and work with result
+            // If there was more than one material parent them and work with result
             GameObject resultGameObject;
             if (combinedObjects.Count > 1)
             {
-                resultGameObject = new GameObject("CombinedMeshes_" + containerGameObject.name);
+                resultGameObject = new GameObject(newPrefabAssetName);
                 foreach (GameObject combinedObject in combinedObjects) combinedObject.transform.parent = resultGameObject.transform;
             }
             else
@@ -262,14 +264,10 @@ namespace DaftAppleGames.BuildingTools.Editor
             PrefabUtility.SaveAsPrefabAssetAndConnect(resultGameObject, prefabPath, InteractionMode.UserAction);
 
             // Return both to original positions
-            containerGameObject.transform.position = originalPosition;
-            containerGameObject.transform.rotation = originalRotation;
-            if (containerGameObject.transform.parent == null)
-            {
-                return;
-            }
-
-            resultGameObject.transform.SetParent(containerGameObject.transform.parent, false);
+            parentGameObject.transform.position = originalPosition;
+            parentGameObject.transform.rotation = originalRotation;
+            log.AddToLog(LogLevel.Debug, $"Setting parent of {resultGameObject.name} to {parentGameObject.name}");
+            resultGameObject.transform.SetParent(parentGameObject.transform, false);
             resultGameObject.transform.position = originalPosition;
             resultGameObject.transform.rotation = originalRotation;
         }
