@@ -7,7 +7,7 @@ namespace DaftAppleGames.BuildingTools.Editor
     /// <summary>
     /// Sits on top of EditorTool to provide some building specific validation methods
     /// </summary>
-    public abstract class BuildingEditorTool : EditorTool
+    internal abstract class BuildingEditorTool : EditorTool
     {
         protected bool RequiredBuildingValidation(out string failedReason)
         {

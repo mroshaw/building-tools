@@ -25,6 +25,10 @@ namespace DaftAppleGames.BuildingTools.Editor
         [SerializeField] [BoxGroup("Settings")] internal AudioMixerGroup doorSfxGroup;
         [SerializeField] [BoxGroup("Settings")] internal LayerMask doorTriggerLayerMask;
         [SerializeField] [BoxGroup("Settings")] internal string[] doorTriggerTags;
+        [SerializeField] [BoxGroup("Settings")] internal float doorColliderHeight = 2.0f;
+        [SerializeField] [BoxGroup("Settings")] internal float doorColliderDepth = 1.0f;
+        [SerializeField] [BoxGroup("Settings")] internal bool overrideColliderWidth = false;
+        [SerializeField] [BoxGroup("Settings")] internal float doorColliderWidth = 1.0f;
         [SerializeField] [BoxGroup("Settings")] internal StaticEditorFlags moveableMeshStaticFlags;
 
         protected override string GetToolName()
@@ -138,8 +142,11 @@ namespace DaftAppleGames.BuildingTools.Editor
 
             BoxCollider boxCollider = doorTrigger.GetComponent<BoxCollider>();
 
-            boxCollider.size = new Vector3(1.0f, 1.0f, triggerWidth);
-            boxCollider.center = new Vector3(distanceFromDoor, 0, triggerLocalCenter);
+            boxCollider.size = overrideColliderWidth
+                ? new Vector3(doorColliderDepth, doorColliderHeight, doorColliderWidth)
+                : new Vector3(doorColliderDepth, doorColliderHeight, triggerWidth);
+
+            boxCollider.center = new Vector3(distanceFromDoor, doorColliderHeight / 2, triggerLocalCenter);
             boxCollider.isTrigger = true;
         }
     }
