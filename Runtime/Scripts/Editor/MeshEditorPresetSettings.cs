@@ -16,7 +16,7 @@ namespace DaftAppleGames.Editor
     /// Lighting presets to apply consistent settings to lights, independent of render pipeline
     /// </summary>
     [CreateAssetMenu(fileName = "MeshEditorPresets", menuName = "Daft Apple Games/Building Tools/Mesh Editor Presets", order = 1)]
-    public class MeshEditorPresetSettings : ScriptableObject
+    public class MeshEditorPresetSettings : EnhancedScriptableObject
     {
         [BoxGroup("Game Object")] public string layerName;
         [BoxGroup("Game Object")] public StaticEditorFlags staticEditorFlags;

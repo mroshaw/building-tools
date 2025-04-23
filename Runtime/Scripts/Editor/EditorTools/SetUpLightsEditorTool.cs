@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using DaftAppleGames.Buildings;
 using DaftAppleGames.Editor;
 using DaftAppleGames.Extensions;
@@ -72,6 +73,33 @@ namespace DaftAppleGames.BuildingTools.Editor
             }
 
             return canRun;
+        }
+
+        /// <summary>
+        /// Save the associated Light Settings too
+        /// </summary>
+        public override EnhancedScriptableObject SaveCopy(string pathToSave, string fileName, string childFolder)
+        {
+            SetUpLightsEditorTool newTool = base.SaveCopy(pathToSave, fileName, childFolder) as SetUpLightsEditorTool;
+
+            if (!newTool)
+            {
+                return this;
+            }
+
+            string newBaseFolder = Path.Combine(pathToSave, childFolder);
+
+            LightEditorPresetSettings newCandleSettings =
+                indoorCandleTypeSettings.presetSettings.SaveCopy(newBaseFolder, string.Empty, "Light Settings") as LightEditorPresetSettings;
+            LightEditorPresetSettings newFireSettings = indoorFireTypeSettings.presetSettings.SaveCopy(newBaseFolder, string.Empty, "Light Settings") as LightEditorPresetSettings;
+            LightEditorPresetSettings newOutdoorSettings =
+                outdoorBuildingLightTypeSettings.presetSettings.SaveCopy(newBaseFolder, string.Empty, "Light Settings") as LightEditorPresetSettings;
+
+            newTool.indoorFireTypeSettings.presetSettings = newCandleSettings;
+            newTool.indoorFireTypeSettings.presetSettings = newFireSettings;
+            newTool.outdoorBuildingLightTypeSettings.presetSettings = newOutdoorSettings;
+
+            return newTool;
         }
 
         protected override void RunTool(GameObject selectedGameObject, string undoGroupName)

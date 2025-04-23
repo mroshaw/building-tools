@@ -20,7 +20,7 @@ namespace DaftAppleGames.Editor
     /// Lighting presets to apply consistent settings to lights, independent of render pipeline
     /// </summary>
     [CreateAssetMenu(fileName = "LightEditorPresets", menuName = "Daft Apple Games/Building Tools/Light Editor Presets", order = 1)]
-    public class LightEditorPresetSettings : ScriptableObject
+    public class LightEditorPresetSettings : EnhancedScriptableObject
     {
         public float range;
         public float intensity;

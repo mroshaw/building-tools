@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 using DaftAppleGames.Buildings;
 using DaftAppleGames.Editor;
 using DaftAppleGames.Extensions;
@@ -80,6 +81,34 @@ namespace DaftAppleGames.BuildingTools.Editor
 
             validationReason = "Mesh presets are missing from the selected settings!";
             return false;
+        }
+
+        /// <summary>
+        /// Save the associated Mesh Settings too
+        /// </summary>
+        public override EnhancedScriptableObject SaveCopy(string pathToSave, string fileName, string childFolder)
+        {
+            ApplyMeshPresetsEditorTool newTool = base.SaveCopy(pathToSave, fileName, childFolder) as ApplyMeshPresetsEditorTool;
+
+            if (!newTool)
+            {
+                return this;
+            }
+
+            string newBaseFolder = Path.Combine(pathToSave, childFolder);
+
+            MeshEditorPresetSettings newInteriorMeshSettings =
+                interiorMeshSettings.SaveCopy(newBaseFolder, string.Empty, "Mesh Settings") as MeshEditorPresetSettings;
+            MeshEditorPresetSettings newExteriorMeshSettings = exteriorMeshSettings.SaveCopy(newBaseFolder, string.Empty, "Mesh Settings") as MeshEditorPresetSettings;
+            MeshEditorPresetSettings newInteriorPropMeshSettings = interiorPropMeshSettings.SaveCopy(newBaseFolder, string.Empty, "Mesh Settings") as MeshEditorPresetSettings;
+            MeshEditorPresetSettings newExteriorPropMeshSettings = exteriorPropMeshSettings.SaveCopy(newBaseFolder, string.Empty, "Mesh Settings") as MeshEditorPresetSettings;
+
+            newTool.interiorMeshSettings = newInteriorMeshSettings;
+            newTool.exteriorMeshSettings = newExteriorMeshSettings;
+            newTool.interiorPropMeshSettings = newInteriorPropMeshSettings;
+            newTool.exteriorPropMeshSettings = newExteriorPropMeshSettings;
+
+            return newTool;
         }
 
         protected override void RunTool(GameObject selectedGameObject, string undoGroupName)
