@@ -27,4 +27,8 @@ MonoBehaviour:
     m_Bits: 4294967295
   doorTriggerTags:
   - Player
+  doorColliderHeight: 2
+  doorColliderDepth: 2
+  overrideColliderWidth: 0
+  doorColliderWidth: 1
   moveableMeshStaticFlags: 0
