@@ -39,6 +39,7 @@ namespace DaftAppleGames.Editor
         /// </summary>
         private void ApplyPreset(MeshRenderer meshRenderer)
         {
+            meshRenderer.gameObject.layer = LayerMask.NameToLayer(layerName);
             meshRenderer.shadowCastingMode = shadowCastingMode;
             meshRenderer.staticShadowCaster = staticShadowCaster;
             meshRenderer.receiveGI = receiveGI;
@@ -53,7 +54,7 @@ namespace DaftAppleGames.Editor
         /// <summary>
         /// Applies the Mesh settings to all Meshes on the given Game Object
         /// </summary>
-        private void ConfigureMeshOnGameObject(GameObject parentGameObject, EditorLog log)
+        internal void ConfigureMeshOnGameObject(GameObject parentGameObject, EditorLog log)
         {
             MeshRenderer[] meshRenderers = parentGameObject.GetComponentsInChildren<MeshRenderer>();
             if (meshRenderers.Length == 0)

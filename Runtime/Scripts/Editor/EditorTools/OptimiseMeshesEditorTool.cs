@@ -17,6 +17,7 @@ namespace DaftAppleGames.BuildingTools.Editor
     [CreateAssetMenu(fileName = "OptimiseMeshesEditorTool", menuName = "Daft Apple Games/Building Tools/Optimise Meshes Tool")]
     internal class OptimiseMeshesEditorTool : BuildingEditorTool
     {
+        [BoxGroup("Settings")] [SerializeField] internal bool combineMeshesByLayer = true;
         [BoxGroup("Settings")] [SerializeField] internal string assetOutputFolder;
         [BoxGroup("Settings")] [SerializeField] internal string assetFileNamePrefix;
         [BoxGroup("Settings")] [SerializeField] internal bool createOutputFolder;
@@ -101,28 +102,41 @@ namespace DaftAppleGames.BuildingTools.Editor
                 Directory.CreateDirectory(gameObjectAbsolutePath);
             }
 
-            // Merge building meshes
-            CombineMeshLayer(parentGameObject, combinedMeshPresets.exteriorMeshSettings.layerName, gameObjectAbsolutePath, gameObjectRelativePath);
-            CombineMeshLayer(parentGameObject, combinedMeshPresets.interiorMeshSettings.layerName, gameObjectAbsolutePath, gameObjectRelativePath);
+            if (combineMeshesByLayer)
+            {
+                // Merge building meshes
+                CombineMeshLayer(parentGameObject, combinedMeshPresets.exteriorMeshSettings, gameObjectAbsolutePath, gameObjectRelativePath);
+                CombineMeshLayer(parentGameObject, combinedMeshPresets.interiorMeshSettings, gameObjectAbsolutePath, gameObjectRelativePath);
 
-            // Merge prop meshes
-            CombineMeshLayer(parentGameObject, combinedMeshPresets.exteriorPropMeshSettings.layerName, gameObjectAbsolutePath, gameObjectRelativePath);
-            CombineMeshLayer(parentGameObject, combinedMeshPresets.interiorPropMeshSettings.layerName, gameObjectAbsolutePath, gameObjectRelativePath);
+                // Merge prop meshes
+                CombineMeshLayer(parentGameObject, combinedMeshPresets.exteriorPropMeshSettings, gameObjectAbsolutePath, gameObjectRelativePath);
+                CombineMeshLayer(parentGameObject, combinedMeshPresets.interiorPropMeshSettings, gameObjectAbsolutePath, gameObjectRelativePath);
+            }
+            else
+            {
+                // Combine everything in one go
+                CombineMeshLayer(parentGameObject, combinedMeshPresets.exteriorMeshSettings, gameObjectAbsolutePath, gameObjectRelativePath, true);
+            }
         }
 
         /// <summary>
         /// Combines all meshes in the given GameObject, writing the resulting Mesh as an asset to the given path.
         /// Any components with the 'MeshCombineExcluder' component will be ignored by the process
         /// </summary>
-        private void CombineMeshLayer(GameObject parentGameObject, string layerName, string gameObjectAbsolutePath, string gameObjectRelativePath)
+        private void CombineMeshLayer(GameObject parentGameObject, MeshEditorPresetSettings meshPresets, string gameObjectAbsolutePath, string gameObjectRelativePath,
+            bool combineEverything = false)
         {
             // Derive a unique name for our combined assets
-            string newMeshName = $"{assetFileNamePrefix}_{parentGameObject.name}_{layerName}_Mesh";
-            string newPrefabAssetName = $"{assetFileNamePrefix}_{parentGameObject.name}_{layerName}_Prefab";
+            string newMeshName = combineEverything
+                ? $"{assetFileNamePrefix}_{parentGameObject.name}_Mesh"
+                : $"{assetFileNamePrefix}_{parentGameObject.name}_{meshPresets.layerName}_Mesh";
+            string newPrefabAssetName =
+                combineEverything ? $"{assetFileNamePrefix}_{parentGameObject.name}_Prefab" : $"{assetFileNamePrefix}_{parentGameObject.name}_{meshPresets.layerName}_Prefab";
 
             // Create a child folder for this containers meshes
-            string instanceAbsolutePath = Path.Combine(gameObjectAbsolutePath, $"{parentGameObject.name}_{layerName}");
-            string instanceRelativePath = Path.Combine(gameObjectRelativePath, $"{parentGameObject.name}_{layerName}");
+            string folderName = combineEverything ? $"{parentGameObject.name}_{meshPresets.layerName}" : $"{parentGameObject.name}";
+            string instanceAbsolutePath = Path.Combine(gameObjectAbsolutePath, folderName);
+            string instanceRelativePath = Path.Combine(gameObjectRelativePath, folderName);
             if (!Directory.Exists(instanceAbsolutePath))
             {
                 log.AddToLog(LogLevel.Debug, $"Creating folder: {instanceAbsolutePath}");
@@ -146,7 +160,7 @@ namespace DaftAppleGames.BuildingTools.Editor
             foreach (MeshFilter meshFilter in meshFilters)
             {
                 // If the MeshFilter isn't on our layer, skip it
-                if (LayerMask.LayerToName(meshFilter.gameObject.layer) != layerName)
+                if (LayerMask.LayerToName(meshFilter.gameObject.layer) != meshPresets.layerName && !combineEverything)
                 {
                     continue;
                 }
@@ -257,6 +271,9 @@ namespace DaftAppleGames.BuildingTools.Editor
             {
                 resultGameObject = combinedObjects[0];
             }
+
+            // Apply Mesh Presets
+            meshPresets.ConfigureMeshOnGameObject(resultGameObject, log);
 
             // Create prefab
             string prefabPath = Path.Combine(instanceRelativePath, resultGameObject.name + ".prefab");
