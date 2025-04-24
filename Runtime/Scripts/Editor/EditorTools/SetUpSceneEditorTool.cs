@@ -60,10 +60,13 @@ namespace DaftAppleGames.BuildingTools.Editor
         protected override void RunTool(GameObject selectedGameObject, string undoGroupName)
         {
             log.AddToLog(LogLevel.Debug, "Configuring Directional Light in scene, if there is one...");
-            if (GetDirectionalLight(out Light directionalLight))
+            if (GetDirectionalLights(out List<Light> directionalLights))
             {
-                log.AddToLog(LogLevel.Debug, $"Found {directionalLight.name}...");
-                ConfigureDirectionalLight(directionalLight);
+                foreach (Light directionalLight in directionalLights)
+                {
+                    log.AddToLog(LogLevel.Debug, $"Configuring {directionalLight.name}...");
+                    ConfigureDirectionalLight(directionalLight);
+                }
             }
 
             log.AddToLog(LogLevel.Debug, "Configuring Directional Light... DONE.");
@@ -102,8 +105,10 @@ namespace DaftAppleGames.BuildingTools.Editor
         /// <summary>
         /// Searches for a Directional Light in the scene
         /// </summary>
-        private bool GetDirectionalLight(out Light directionalLight)
+        private bool GetDirectionalLights(out List<Light> directionalLights)
         {
+            directionalLights = new List<Light>();
+
             Light[] allLights = FindObjectsByType<Light>(FindObjectsSortMode.None);
 
             foreach (Light light in allLights)
@@ -111,13 +116,11 @@ namespace DaftAppleGames.BuildingTools.Editor
                 if (light.type == LightType.Directional)
                 {
                     log.AddToLog(LogLevel.Debug, $"Directional Light found: {light.name} at position {light.transform.position}");
-                    directionalLight = light;
-                    return true;
+                    directionalLights.Add(light);
                 }
             }
 
-            directionalLight = null;
-            return false;
+            return directionalLights.Count > 0;
         }
     }
 }
