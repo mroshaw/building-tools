@@ -212,7 +212,6 @@ GameObject:
   - component: {fileID: 157207113}
   - component: {fileID: 157207115}
   - component: {fileID: 157207116}
-  - component: {fileID: 157207117}
   m_Layer: 0
   m_Name: Sun
   m_TagString: Untagged
@@ -269,7 +268,7 @@ Light:
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_RenderingLayerMask: 6
+  m_RenderingLayerMask: 1
   m_Lightmapping: 4
   m_LightShadowCasterMode: 2
   m_AreaSize: {x: 0.5, y: 0.5}
@@ -378,7 +377,7 @@ MonoBehaviour:
   m_EvsmLightLeakBias: 0
   m_EvsmVarianceBias: 0.00001
   m_EvsmBlurPasses: 0
-  m_LightlayersMask: 6
+  m_LightlayersMask: 1
   m_LinkShadowLayers: 1
   m_ShadowNearPlane: 0.1
   m_BlockerSampleCount: 24
@@ -411,7 +410,7 @@ MonoBehaviour:
   m_PenumbraTint: 0
   m_NormalBias: 0.75
   m_SlopeBias: 0.5
-  m_ShadowUpdateMode: 2
+  m_ShadowUpdateMode: 0
   m_AlwaysDrawDynamicShadows: 0
   m_UpdateShadowOnLightMovement: 0
   m_CachedShadowTranslationThreshold: 0.01
@@ -573,39 +572,6 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
   lightOverride: {fileID: 0}
---- !u!114 &157207117
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 157207112}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5124f4d0e46fe3040ba93a00af037977, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  updateOnCameraMove: 0
-  cameraToTrack: {fileID: 0}
-  shadowMapToRefresh: 0
-  counterMode: 0
-  mainCamera: {fileID: 0}
-  fullShadowMapRefreshWaitFrames: 5
-  fullShadowMapRefreshWaitSeconds: 0
-  cascadesRefreshWaitFrames: 00000000000000000000000000000000
-  cascadesRefreshWaitSeconds:
-  - 0
-  - 0
-  - 0
-  - 0
-  subshadowsRefreshWaitFrames: 000000000000000000000000000000000000000000000000
-  subshadowsRefreshWaitSeconds:
-  - 0
-  - 0
-  - 0
-  - 0
-  - 0
-  - 0
 --- !u!1 &222420028
 GameObject:
   m_ObjectHideFlags: 0
