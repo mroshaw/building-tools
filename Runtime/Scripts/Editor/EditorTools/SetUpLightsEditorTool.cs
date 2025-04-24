@@ -29,8 +29,13 @@ namespace DaftAppleGames.BuildingTools.Editor
         public string[] meshNames;
         public string[] flameNames;
         public bool useLensFlare;
+#if DAG_HDRP
+        public bool addOnDemandShadowMapComponent;
+        public int shadowRefreshRate;
+#endif
+
 #if DAG_HDRP || DAG_URP
-        public float shadowRefreshRate;
+
         public float lensFlareIntensity;
         public LensFlareDataSRP lensFlareData;
 #endif
@@ -199,6 +204,14 @@ namespace DaftAppleGames.BuildingTools.Editor
 
             log.AddToLog(LogLevel.Debug, $"Setting light properties on: {lightGameObject.name}.");
             lightingTypeSettings.presetSettings.ApplyPreset(light);
+
+#if DAG_HDRP
+            if (lightingTypeSettings.addOnDemandShadowMapComponent)
+            {
+                log.AddToLog(LogLevel.Debug, "Adding OnDemandShadowMapUpdate component...");
+                ConfigureOnDemandShadowMap(light, lightingTypeSettings);
+            }
+#endif
         }
 
         private void ConfigureOnDemandShadowMap(Light light, BuildingLightTypeSettings lightingSettings)
@@ -210,7 +223,7 @@ namespace DaftAppleGames.BuildingTools.Editor
             OnDemandShadowMapUpdate shadowMapUpdate = light.EnsureComponent<OnDemandShadowMapUpdate>();
             shadowMapUpdate.counterMode = CounterMode.Frames;
             shadowMapUpdate.shadowMapToRefresh = ShadowMapToRefresh.EntireShadowMap;
-            shadowMapUpdate.fullShadowMapRefreshWaitSeconds = lightingSettings.shadowRefreshRate;
+            shadowMapUpdate.fullShadowMapRefreshWaitFrames = lightingSettings.shadowRefreshRate;
 
 #endif
         }

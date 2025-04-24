@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using DaftAppleGames.Editor;
+using DaftAppleGames.Extensions;
 using UnityEngine;
 #if DAG_HDRP
+using DaftAppleGames.Lighting;
 using UnityEngine.Rendering.HighDefinition;
 using RenderingLayerMask = UnityEngine.Rendering.HighDefinition.RenderingLayerMask;
 #endif
@@ -24,6 +26,10 @@ namespace DaftAppleGames.BuildingTools.Editor
     [CreateAssetMenu(fileName = "SetUpSceneEditorTool", menuName = "Daft Apple Games/Building Tools/Set Up Scene Tool")]
     internal class SetUpSceneEditorTool : BuildingEditorTool
     {
+#if DAG_HDRP
+        [SerializeField] [BoxGroup("Settings")] internal bool addOnDemandShadowMapComponent;
+        [SerializeField] [BoxGroup("Settings")] internal int shadowRefreshRate;
+#endif
 #if DAG_HDRP || DAG_URP
         [SerializeField] [BoxGroup("Settings")] internal RenderingLayerMask directionLightRenderingLayerMask;
 #endif
@@ -69,6 +75,16 @@ namespace DaftAppleGames.BuildingTools.Editor
             log.AddToLog(LogLevel.Debug, "Configuring HDRP light...");
             HDAdditionalLightData hdLightData = directionalLight.GetComponent<HDAdditionalLightData>();
             hdLightData.lightlayersMask = directionLightRenderingLayerMask;
+
+            if (addOnDemandShadowMapComponent)
+            {
+                log.AddToLog(LogLevel.Debug, "Adding OnDemandShadowMapUpdate component...");
+                hdLightData.shadowUpdateMode = ShadowUpdateMode.OnDemand;
+                OnDemandShadowMapUpdate shadowMapUpdate = directionalLight.EnsureComponent<OnDemandShadowMapUpdate>();
+                shadowMapUpdate.fullShadowMapRefreshWaitFrames = shadowRefreshRate;
+                shadowMapUpdate.counterMode = CounterMode.Frames;
+                shadowMapUpdate.shadowMapToRefresh = ShadowMapToRefresh.EntireShadowMap;
+            }
 #endif
 
 #if DAG_URP
