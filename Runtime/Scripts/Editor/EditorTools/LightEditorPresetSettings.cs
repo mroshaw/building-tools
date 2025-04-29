@@ -1,3 +1,4 @@
+using DaftAppleGames.Editor;
 using UnityEngine;
 
 #if ODIN_INSPECTOR
@@ -14,7 +15,7 @@ using UnityEngine.Rendering.Universal;
 #endif
 using UnityEngine.Rendering;
 
-namespace DaftAppleGames.Editor
+namespace DaftAppleGames.BuildingTools.Editor
 {
     /// <summary>
     /// Lighting presets to apply consistent settings to lights, independent of render pipeline

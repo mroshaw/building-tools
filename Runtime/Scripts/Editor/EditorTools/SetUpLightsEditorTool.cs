@@ -60,24 +60,46 @@ namespace DaftAppleGames.BuildingTools.Editor
             return true;
         }
 
-        protected override bool CanRunTool(GameObject selectedGameObject, out List<string> cannotRunReasons)
+        protected override bool CanRunTool(out List<string> cannotRunReasons)
         {
             bool canRun = true;
-
             cannotRunReasons = new List<string>();
+
             if (!RequireGameObjectValidation(out string requireGameObjectReason))
             {
                 cannotRunReasons.Add(requireGameObjectReason);
                 return false;
             }
 
-            if (!RequiredBuildingValidation(out string requiredBuildingReason))
+            if (!HasLights(out string lightsValidationReason))
+            {
+                cannotRunReasons.Add(lightsValidationReason);
+                return false;
+            }
+
+            if (!HasBuildingComponent(out string requiredBuildingReason))
             {
                 cannotRunReasons.Add(requiredBuildingReason);
                 canRun = false;
             }
 
             return canRun;
+        }
+
+        /// <summary>
+        /// Look for any lights, so we can skip this tool if there are none
+        /// </summary>
+        private bool HasLights(out string validationReason)
+        {
+            Light[] allLights = SelectedGameObject.GetComponentsInChildren<Light>(true);
+            if (allLights.Length > 0)
+            {
+                validationReason = string.Empty;
+                return true;
+            }
+
+            validationReason = "No Light components were found on the selected Game Object!";
+            return false;
         }
 
         /// <summary>
@@ -107,17 +129,17 @@ namespace DaftAppleGames.BuildingTools.Editor
             return newTool;
         }
 
-        protected override void RunTool(GameObject selectedGameObject, string undoGroupName)
+        protected override void RunTool(string undoGroupName)
         {
-            ConfigureLighting(selectedGameObject);
+            ConfigureLighting();
         }
 
-        private void ConfigureLighting(GameObject parentGameObject)
+        private void ConfigureLighting()
         {
-            LightingController lightingController = parentGameObject.EnsureComponent<LightingController>();
-            log.AddToLog(LogLevel.Info, $"Added Lighting Controller component to {parentGameObject.name}.");
+            LightingController lightingController = SelectedGameObject.EnsureComponent<LightingController>();
+            log.AddToLog(LogLevel.Info, $"Added Lighting Controller component to {SelectedGameObject.name}.");
 
-            Transform[] allChildren = parentGameObject.GetComponentsInChildren<Transform>(true);
+            Transform[] allChildren = SelectedGameObject.GetComponentsInChildren<Transform>(true);
 
             // Configure interior candles
             foreach (Transform childTransform in allChildren)

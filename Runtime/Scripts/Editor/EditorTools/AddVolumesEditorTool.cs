@@ -38,7 +38,7 @@ namespace DaftAppleGames.BuildingTools.Editor
             return true;
         }
 
-        protected override bool CanRunTool(GameObject selectedGameObject, out List<string> cannotRunReasons)
+        protected override bool CanRunTool(out List<string> cannotRunReasons)
         {
             bool canRun = true;
 
@@ -49,60 +49,66 @@ namespace DaftAppleGames.BuildingTools.Editor
                 canRun = false;
             }
 
-            if (!RequiredBuildingValidation(out string requiredBuildingReason))
+            if (!HasBuildingComponent(out string requiredBuildingReason))
             {
                 cannotRunReasons.Add(requiredBuildingReason);
+                canRun = false;
+            }
+
+            if (!HasMeshExteriorLayerConfigured(out string layerFailedReason))
+            {
+                cannotRunReasons.Add(layerFailedReason);
                 canRun = false;
             }
 
             return canRun;
         }
 
-        protected override void RunTool(GameObject selectedGameObject, string undoGroupName)
+        protected override void RunTool(string undoGroupName)
         {
 #if DAG_HDRP || DAG_UURP
             log.AddToLog(LogLevel.Info, "Configuring Lighting Volume...");
-            AddInteriorLightingVolume(selectedGameObject);
+            AddInteriorLightingVolume();
             log.AddToLog(LogLevel.Info, "Configuring Lighting Volume... DONE!");
 #endif
             log.AddToLog(LogLevel.Info, "Configuring Audio Volume...");
-            AddInteriorAudioVolume(selectedGameObject);
+            AddInteriorAudioVolume();
             log.AddToLog(LogLevel.Info, "Configuring Audio Volume... DONE!");
         }
 
 #if DAG_HDRP || DAG_UURP
-        private void AddInteriorLightingVolume(GameObject parentGameObject)
+        private void AddInteriorLightingVolume()
         {
-            log.AddToLog(LogLevel.Debug, $"Adding Interior Lighting Volume to {parentGameObject.name}...");
-            GameObject volumeGameObject = ConfigureVolumeGameObject(parentGameObject);
+            log.AddToLog(LogLevel.Debug, $"Adding Interior Lighting Volume to {SelectedGameObject.name}...");
+            GameObject volumeGameObject = ConfigureVolumeGameObject();
             Volume interiorVolume = volumeGameObject.EnsureComponent<Volume>();
             interiorVolume.sharedProfile = interiorVolumeProfile;
             interiorVolume.isGlobal = false;
         }
 #endif
-        private void AddInteriorAudioVolume(GameObject parentGameObject)
+        private void AddInteriorAudioVolume()
         {
-            log.AddToLog(LogLevel.Debug, $"Adding Interior Audio Volume to {parentGameObject.name}...");
-            GameObject volumeGameObject = ConfigureVolumeGameObject(parentGameObject);
+            log.AddToLog(LogLevel.Debug, $"Adding Interior Audio Volume to {SelectedGameObject.name}...");
+            GameObject volumeGameObject = ConfigureVolumeGameObject();
             InteriorAudioFilter audioFilter = volumeGameObject.EnsureComponent<InteriorAudioFilter>();
             audioFilter.ConfigureInEditor(volumeTriggerLayerMask, volumeTriggerTags,
                 indoorSnapshot, outdoorSnapshot);
-            log.AddToLog(LogLevel.Debug, $"Adding Interior Audio Volume to {parentGameObject.name}... DONE!");
+            log.AddToLog(LogLevel.Debug, $"Adding Interior Audio Volume to {SelectedGameObject.name}... DONE!");
         }
 
-        private GameObject ConfigureVolumeGameObject(GameObject parentGameObject)
+        private GameObject ConfigureVolumeGameObject()
         {
-            parentGameObject.GetMeshSize(meshSizeIncludeLayers, meshSizeIgnoreNames, out Vector3 buildingSize,
+            SelectedGameObject.GetMeshSize(meshSizeIncludeLayers, meshSizeIgnoreNames, out Vector3 buildingSize,
                 out Vector3 buildingCenter);
 
-            GameObject volumeGameObject = parentGameObject.FindChildGameObject(interiorVolumeGameObjectName);
+            GameObject volumeGameObject = SelectedGameObject.FindChildGameObject(interiorVolumeGameObjectName);
             if (!volumeGameObject)
             {
                 volumeGameObject = new GameObject(interiorVolumeGameObjectName)
                 {
                     transform =
                     {
-                        parent = parentGameObject.transform,
+                        parent = SelectedGameObject.transform,
                         localPosition = Vector3.zero,
                         localScale = Vector3.one,
                         localRotation = Quaternion.identity

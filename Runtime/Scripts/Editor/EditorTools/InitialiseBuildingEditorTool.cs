@@ -3,7 +3,6 @@ using DaftAppleGames.Buildings;
 using DaftAppleGames.Editor;
 using DaftAppleGames.Extensions;
 using UnityEngine;
-using UnityEngine.UIElements;
 #if ODIN_INSPECTOR
 using Sirenix.OdinInspector;
 #else
@@ -31,7 +30,7 @@ namespace DaftAppleGames.BuildingTools.Editor
             return true;
         }
 
-        protected override bool CanRunTool(GameObject selectedGameObject, out List<string> cannotRunReasons)
+        protected override bool CanRunTool(out List<string> cannotRunReasons)
         {
             bool canRun = true;
 
@@ -45,10 +44,10 @@ namespace DaftAppleGames.BuildingTools.Editor
             return canRun;
         }
 
-        protected override void RunTool(GameObject selectedGameObject, string undoGroupName)
+        protected override void RunTool(string undoGroupName)
         {
             log.AddToLog(LogLevel.Info, "Adding Building component (if not already there)...");
-            if (!AddBuildingComponent(selectedGameObject))
+            if (!AddBuildingComponent())
             {
                 ShowPopupWindow("Daft Apple Building Tools", "IMPORTANT! ACTION REQUIRED!",
                     "You must now expand the 'Meshes' foldout in the new 'Building' component, and drag 'Interior', 'Exterior', and 'Prop' parent game objects into the appropriate array.");
@@ -57,18 +56,17 @@ namespace DaftAppleGames.BuildingTools.Editor
             log.AddToLog(LogLevel.Info, "Adding Building component (if not already there). DONE!");
 
             log.AddToLog(LogLevel.Info, "Setting Building anchor...");
-            SetBuildingAnchor(selectedGameObject);
+            SetBuildingAnchor();
             log.AddToLog(LogLevel.Info, "Setting Building anchor... DONE!");
         }
 
         /// <summary>
         /// Adds the Building component
         /// </summary>
-        /// <param name="parentGameObject"></param>
-        private static bool AddBuildingComponent(GameObject parentGameObject)
+        private bool AddBuildingComponent()
         {
-            Building building = parentGameObject.EnsureComponent<Building>();
-            log.AddToLog(LogLevel.Info, $"Added Building component to {parentGameObject.name}.");
+            Building building = SelectedGameObject.EnsureComponent<Building>();
+            log.AddToLog(LogLevel.Info, $"Added Building component to {SelectedGameObject.name}.");
 
             return building && building.RequiredPropertiesSet();
         }
@@ -77,10 +75,10 @@ namespace DaftAppleGames.BuildingTools.Editor
         /// Adjusts the building anchor, by parenting the building, so that it is raised up over the anchor point
         /// This makes it easier to place on a non-flat surface or terrain
         /// </summary>
-        private void SetBuildingAnchor(GameObject parentGameObject)
+        private void SetBuildingAnchor()
         {
             // Move each child game object vertically by the settings amount
-            foreach (Transform child in parentGameObject.transform)
+            foreach (Transform child in SelectedGameObject.transform)
             {
                 Vector3 newPosition = new(0, adjustAnchorHeight, 0);
                 // child.position += Vector3.up * buildingEditorSettings.adjustAnchorHeight;

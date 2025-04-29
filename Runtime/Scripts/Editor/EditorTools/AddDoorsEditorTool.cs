@@ -29,7 +29,7 @@ namespace DaftAppleGames.BuildingTools.Editor
         [SerializeField] [BoxGroup("Settings")] internal float doorColliderDepth = 1.0f;
         [SerializeField] [BoxGroup("Settings")] internal bool overrideColliderWidth = false;
         [SerializeField] [BoxGroup("Settings")] internal float doorColliderWidth = 1.0f;
-        [SerializeField] [BoxGroup("Settings")] internal StaticEditorFlags moveableMeshStaticFlags;
+        [SerializeField] [BoxGroup("Settings")] internal StaticEditorFlags doorRendererStaticFlags;
 
         protected override string GetToolName()
         {
@@ -42,18 +42,24 @@ namespace DaftAppleGames.BuildingTools.Editor
             return true;
         }
 
-        protected override bool CanRunTool(GameObject selectedGameObject, out List<string> cannotRunReasons)
+        protected override bool CanRunTool(out List<string> cannotRunReasons)
         {
             bool canRun = true;
-
             cannotRunReasons = new List<string>();
+
+            if (!HasDoors(out string doorFailedReason))
+            {
+                cannotRunReasons.Add(doorFailedReason);
+                canRun = false;
+            }
+
             if (!RequireGameObjectValidation(out string requireGameObjectReason))
             {
                 cannotRunReasons.Add(requireGameObjectReason);
                 canRun = false;
             }
 
-            if (!RequiredBuildingValidation(out string requiredBuildingReason))
+            if (!HasBuildingComponent(out string requiredBuildingReason))
             {
                 cannotRunReasons.Add(requiredBuildingReason);
                 canRun = false;
@@ -62,17 +68,36 @@ namespace DaftAppleGames.BuildingTools.Editor
             return canRun;
         }
 
-        protected override void RunTool(GameObject selectedGameObject, string undoGroupName)
+        protected override void RunTool(string undoGroupName)
         {
-            ConfigureDoors(selectedGameObject);
+            ConfigureDoors();
         }
 
-        private void ConfigureDoors(GameObject parentGameObject)
+        /// <summary>
+        /// Check to see if there are any doors to configure
+        /// </summary>
+        private bool HasDoors(out string validationReason)
         {
-            DoorController doorController = parentGameObject.EnsureComponent<DoorController>();
-            log.AddToLog(LogLevel.Debug, $"Added Door Controller component to {parentGameObject.name}.");
+            MeshRenderer[] allMeshRenderers = SelectedGameObject.GetComponentsInChildren<MeshRenderer>(true);
+            foreach (MeshRenderer renderer in allMeshRenderers)
+            {
+                if (doorNames.ItemInString(renderer.gameObject.name))
+                {
+                    validationReason = string.Empty;
+                    return true;
+                }
+            }
 
-            MeshRenderer[] allMeshRenderers = parentGameObject.GetComponentsInChildren<MeshRenderer>(true);
+            validationReason = "No GameObjects were founding matching any of the 'doorNames' listed in the tool config. That is, no doors were found!";
+            return false;
+        }
+
+        private void ConfigureDoors()
+        {
+            DoorController doorController = SelectedGameObject.EnsureComponent<DoorController>();
+            log.AddToLog(LogLevel.Debug, $"Added Door Controller component to {SelectedGameObject.name}.");
+
+            MeshRenderer[] allMeshRenderers = SelectedGameObject.GetComponentsInChildren<MeshRenderer>(true);
             foreach (MeshRenderer renderer in allMeshRenderers)
             {
                 if (!doorNames.ItemInString(renderer.gameObject.name))
@@ -90,9 +115,9 @@ namespace DaftAppleGames.BuildingTools.Editor
             log.AddToLog(LogLevel.Info, $"Configuring door on {doorGameObject.name}.");
             Door door = doorGameObject.EnsureComponent<Door>();
             // We don't want to combine this mesh, as it needs to move
-            doorGameObject.EnsureComponent<MeshCombineExcluder>();
+            doorGameObject.EnsureComponent<DynamicMeshRenderer>();
             // Set the static flags, as the door will move
-            GameObjectUtility.SetStaticEditorFlags(door.gameObject, moveableMeshStaticFlags);
+            GameObjectUtility.SetStaticEditorFlags(door.gameObject, doorRendererStaticFlags);
             door.ConfigureInEditor(doorSfxGroup, doorOpeningClips, doorOpenClips,
                 doorClosingClips,
                 doorClosedClips);

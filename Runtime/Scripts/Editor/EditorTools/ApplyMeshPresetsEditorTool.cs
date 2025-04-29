@@ -32,7 +32,7 @@ namespace DaftAppleGames.BuildingTools.Editor
             return true;
         }
 
-        protected override bool CanRunTool(GameObject selectedGameObject, out List<string> cannotRunReasons)
+        protected override bool CanRunTool(out List<string> cannotRunReasons)
         {
             bool canRun = true;
 
@@ -43,13 +43,13 @@ namespace DaftAppleGames.BuildingTools.Editor
                 return false;
             }
 
-            if (!RequiredBuildingValidation(out string requiredBuildingReason))
+            if (!HasBuildingComponent(out string requiredBuildingReason))
             {
                 cannotRunReasons.Add(requiredBuildingReason);
                 return false;
             }
 
-            if (!RequiredBuildingMeshValidation(out string requiredBuildingMeshReason))
+            if (!HasExteriorConfigured(out string requiredBuildingMeshReason))
             {
                 cannotRunReasons.Add(requiredBuildingMeshReason);
                 return false;
@@ -104,9 +104,9 @@ namespace DaftAppleGames.BuildingTools.Editor
             return newTool;
         }
 
-        protected override void RunTool(GameObject selectedGameObject, string undoGroupName)
+        protected override void RunTool(string undoGroupName)
         {
-            Building building = selectedGameObject.GetComponent<Building>();
+            Building building = SelectedGameObject.GetComponent<Building>();
             interiorMeshSettings.ConfigureMeshOnAllGameObjects(building.interiors, log);
             exteriorMeshSettings.ConfigureMeshOnAllGameObjects(building.exteriors, log);
             interiorPropMeshSettings.ConfigureMeshOnAllGameObjects(building.interiorProps, log);
@@ -116,10 +116,10 @@ namespace DaftAppleGames.BuildingTools.Editor
         /// <summary>
         /// Checks to see if it's possible to configure the layers as we want them
         /// </summary>
-        private bool LayerSetupValidation(GameObject selectedGameObject, out string validationReason)
+        private bool LayerSetupValidation(out string validationReason)
         {
             // If not a prefab or prefab instance, then we're good
-            if (!PrefabUtility.IsPartOfAnyPrefab(selectedGameObject) || !ArePropsInMainBuildingStructure(selectedGameObject))
+            if (!PrefabUtility.IsPartOfAnyPrefab(SelectedGameObject) || !ArePropsInMainBuildingStructure(SelectedGameObject))
             {
                 validationReason = string.Empty;
                 return true;

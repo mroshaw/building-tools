@@ -1,3 +1,6 @@
+using DaftAppleGames.Buildings;
+using DaftAppleGames.Editor;
+using DaftAppleGames.Extensions;
 using UnityEditor;
 using UnityEngine;
 using RenderingLayerMask = UnityEngine.RenderingLayerMask;
@@ -10,21 +13,21 @@ using DaftAppleGames.Attributes;
 
 using UnityEngine.Rendering;
 
-namespace DaftAppleGames.Editor
+namespace DaftAppleGames.BuildingTools.Editor
 {
     /// <summary>
-    /// Lighting presets to apply consistent settings to lights, independent of render pipeline
+    /// Mesh presets to apply consistent settings to MehRenderers, independent of render pipeline
     /// </summary>
     [CreateAssetMenu(fileName = "MeshEditorPresets", menuName = "Daft Apple Games/Building Tools/Mesh Editor Presets", order = 1)]
     public class MeshEditorPresetSettings : EnhancedScriptableObject
     {
         [BoxGroup("Game Object")] public string layerName;
         [BoxGroup("Game Object")] public StaticEditorFlags staticEditorFlags;
+        [BoxGroup("Game Object")] public StaticEditorFlags dynamicMeshStaticFlags;
 
         [BoxGroup("Lighting")] public ShadowCastingMode shadowCastingMode;
         [BoxGroup("Lighting")] public bool staticShadowCaster;
         [BoxGroup("Lighting")] public ReceiveGI receiveGI;
-        [BoxGroup("Lighting")] public bool contributeGI;
         [BoxGroup("Lighting")] public LightProbeUsage lightProbeUsage;
 
         [BoxGroup("Light Mapping")] public float scaleInLightmap;
@@ -72,10 +75,15 @@ namespace DaftAppleGames.Editor
             // Set the layer
             parentGameObject.layer = LayerMask.NameToLayer(layerName);
 
-            // Update the static flags, based on whether ConfigureGI is true or false
-            StaticEditorFlags flags = GameObjectUtility.GetStaticEditorFlags(parentGameObject);
-            GameObjectUtility.SetStaticEditorFlags(parentGameObject,
-                contributeGI ? flags | StaticEditorFlags.ContributeGI : flags & ~StaticEditorFlags.ContributeGI);
+            // Update the static flags
+            if (parentGameObject.HasComponent<DynamicMeshRenderer>())
+            {
+                GameObjectUtility.SetStaticEditorFlags(parentGameObject, dynamicMeshStaticFlags);
+            }
+            else
+            {
+                GameObjectUtility.SetStaticEditorFlags(parentGameObject, staticEditorFlags);
+            }
         }
 
         /// <summary>

@@ -12,24 +12,21 @@ namespace DaftAppleGames.Buildings
     /// </summary>
     public class Windmill : MonoBehaviour
     {
-        [BoxGroup("General Settings")]
-        public GameObject windMillBlades;
-        [BoxGroup("Speed Settings")]
-        public float rotateSpeed = 0.5f;
+        [BoxGroup("Settings")] [SerializeField] private GameObject windMillBlades;
+        [BoxGroup("Settings")] [SerializeField] private float rotateSpeed = 5.0f;
 
-        public void Start()
+        private void Start()
         {
             if (!windMillBlades)
             {
                 windMillBlades = gameObject;
             }
-
         }
 
         /// <summary>
         /// Rotate the windmill
         /// </summary>
-        public void Update()
+        private void Update()
         {
             windMillBlades.transform.Rotate(rotateSpeed * Time.deltaTime, 0.0f, 0.0f, Space.Self);
         }

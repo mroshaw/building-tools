@@ -1,6 +1,7 @@
 using DaftAppleGames.Buildings;
 using DaftAppleGames.Editor;
 using DaftAppleGames.Extensions;
+using UnityEngine;
 
 namespace DaftAppleGames.BuildingTools.Editor
 {
@@ -9,7 +10,7 @@ namespace DaftAppleGames.BuildingTools.Editor
     /// </summary>
     internal abstract class BuildingEditorTool : EditorTool
     {
-        protected bool RequiredBuildingValidation(out string failedReason)
+        protected bool HasBuildingComponent(out string failedReason)
         {
             if (!SelectedGameObject)
             {
@@ -27,16 +28,66 @@ namespace DaftAppleGames.BuildingTools.Editor
             return false;
         }
 
-        protected bool RequiredBuildingMeshValidation(out string failedReason)
+        /// <summary>
+        /// Many tools need at least the `Exterior` mesh renderers to be configured. This checks to see if that's the case
+        /// </summary>
+        protected bool HasMeshExteriorLayerConfigured(out string failedReason)
         {
-            if (SelectedGameObject && SelectedGameObject.TryGetComponent(out Building building) && building.interiors != null && building.interiors.Length != 0 &&
+            // Tool must check for required components first
+            if (SelectedGameObject && SelectedGameObject.TryGetComponent(out Building building) && building.exteriors != null && building.exteriors.Length != 0)
+            {
+                // Check to see if we have any "unconfigured" exterior meshes, by looking for 'Default' layers
+                bool isValid = true;
+                foreach (MeshRenderer meshRenderer in SelectedGameObject.GetComponentsInChildren<MeshRenderer>(true))
+                {
+                    if (meshRenderer.gameObject.layer == LayerMask.NameToLayer("Default"))
+                    {
+                        isValid = false;
+                        break;
+                    }
+                }
+
+                if (isValid)
+                {
+                    failedReason = string.Empty;
+                    return true;
+                }
+
+                failedReason = "You must configure run the 'Apply Mesh Presets' tool first. Exterior MeshRenderers found still in the 'Default' layer!";
+                return false;
+            }
+
+            failedReason = "You must configure the Exterior meshes on this Game Object, via the Building component, and run the 'Apply Mesh Presets' tool!";
+            return false;
+        }
+
+        /// <summary>
+        /// Checks if Props have been allocated to the Building arrays
+        /// </summary>
+        protected bool HasPropsConfigured(out string failedReason)
+        {
+            if (SelectedGameObject && SelectedGameObject.TryGetComponent(out Building building) &&
+                building.interiorProps != null && building.exteriors.Length != 0 &&
+                building.exteriorProps != null && building.exteriorProps.Length != 0)
+            {
+                failedReason = string.Empty;
+                return true;
+            }
+
+            failedReason = "No 'Props' have been configured on the 'Building' component for the selected GameObject!";
+            return false;
+        }
+
+        protected bool HasExteriorConfigured(out string failedReason)
+        {
+            if (SelectedGameObject && SelectedGameObject.TryGetComponent(out Building building) &&
                 building.exteriors != null && building.exteriors.Length != 0)
             {
                 failedReason = string.Empty;
                 return true;
             }
 
-            failedReason = "You must configure the Mesh properties on the Building Component!";
+            failedReason = "You must set the 'Exterior' Mesh properties on the Building Component, and 'Interior' and 'Prop' properties if appropriate!";
             return false;
         }
     }

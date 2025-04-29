@@ -44,7 +44,7 @@ namespace DaftAppleGames.BuildingTools.Editor
             return true;
         }
 
-        protected override bool CanRunTool(GameObject selectedGameObject, out List<string> cannotRunReasons)
+        protected override bool CanRunTool(out List<string> cannotRunReasons)
         {
             cannotRunReasons = new List<string>();
 
@@ -61,7 +61,7 @@ namespace DaftAppleGames.BuildingTools.Editor
         /// <summary>
         /// Implementation of the "Set Up" tool
         /// </summary>
-        protected override void RunTool(GameObject selectedGameObject, string undoGroupName)
+        protected override void RunTool(string undoGroupName)
         {
             log.AddToLog(LogLevel.Info, "Running setup...");
             log.AddToLog(LogLevel.Info, "Creating tags...");
