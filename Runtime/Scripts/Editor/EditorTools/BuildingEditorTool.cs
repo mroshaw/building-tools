@@ -66,9 +66,8 @@ namespace DaftAppleGames.BuildingTools.Editor
         /// </summary>
         protected bool HasPropsConfigured(out string failedReason)
         {
-            if (SelectedGameObject && SelectedGameObject.TryGetComponent(out Building building) &&
-                building.interiorProps != null && building.exteriors.Length != 0 &&
-                building.exteriorProps != null && building.exteriorProps.Length != 0)
+            if (SelectedGameObject && SelectedGameObject.TryGetComponent(out Building building) && building && (
+                    (building.interiorProps != null && building.exteriors.Length != 0) || (building.exteriorProps != null && building.exteriorProps.Length != 0)))
             {
                 failedReason = string.Empty;
                 return true;

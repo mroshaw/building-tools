@@ -133,19 +133,20 @@ namespace DaftAppleGames.BuildingTools.Editor
             {
                 log.AddToLog(LogLevel.Debug, $"Processing prop container: {externalPropParent.gameObject.name}...");
 
-                foreach (MeshRenderer propRenderer in externalPropParent.GetComponentsInChildren<MeshRenderer>(true))
+                foreach (Transform propGameObjectTransform in externalPropParent.transform)
                 {
-                    log.AddToLog(LogLevel.Debug, $"Processing prop {propRenderer.name}...");
-                    // Check to see if the renderer is already on top of another mesh renderer
-                    if (IsGameObjectOnMeshRenderer(propRenderer.gameObject))
+                    GameObject propGameObject = propGameObjectTransform.gameObject;
+                    log.AddToLog(LogLevel.Debug, $"Processing prop {propGameObject.name}...");
+                    // Check to see if the gameobject is already on top of another mesh renderer
+                    if (IsGameObjectOnMeshRenderer(propGameObject))
                     {
-                        log.AddToLog(LogLevel.Debug, $"Prop {propRenderer.gameObject.name} is already on top of an existing mesh so won't be aligned.");
+                        log.AddToLog(LogLevel.Debug, $"Prop {propGameObject.name} is already on top of an existing mesh so won't be aligned.");
                         continue;
                     }
 
                     // If not, align to terrain
-                    log.AddToLog(LogLevel.Debug, $"Aligning prop to terrain: {propRenderer.gameObject.name}.");
-                    Terrain.activeTerrain.AlignObject(propRenderer.gameObject, terrainAlignPosition, terrainAlignRotation,
+                    log.AddToLog(LogLevel.Debug, $"Aligning prop to terrain: {propGameObject.name}.");
+                    Terrain.activeTerrain.AlignObject(propGameObject, terrainAlignPosition, terrainAlignRotation,
                         terrainAlignX, terrainAlignY, terrainAlignZ);
                 }
             }
