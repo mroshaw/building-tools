@@ -1,4 +1,5 @@
 using DaftAppleGames.Editor;
+using DaftAppleGames.Extensions;
 using UnityEngine;
 
 #if ODIN_INSPECTOR
@@ -46,7 +47,7 @@ namespace DaftAppleGames.BuildingTools.Editor
         public void ApplyPreset(Light light)
         {
 #if DAG_HDRP
-            HDAdditionalLightData hdLightData = light.GetComponent<HDAdditionalLightData>();
+            HDAdditionalLightData hdLightData = light.EnsureComponent<HDAdditionalLightData>();
             hdLightData.shapeRadius = radius;
             hdLightData.range = range;
             hdLightData.lightlayersMask = renderingLayerMask;
