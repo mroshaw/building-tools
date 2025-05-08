@@ -8,7 +8,7 @@ using UnityEngine;
 namespace DaftAppleGames.Buildings
 {
     /// <summary>
-    /// Simple Windmill blade spinner Monobehaviour
+    /// Simple Windmill blade spinner
     /// </summary>
     public class Windmill : MonoBehaviour
     {
