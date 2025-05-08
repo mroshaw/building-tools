@@ -8,17 +8,27 @@ using UnityEngine;
 
 namespace DaftAppleGames.Buildings
 {
+    public enum DoorTriggerLocation
+    {
+        Inside,
+        Outside
+    }
+
     [RequireComponent(typeof(BoxCollider))]
     public class DoorTrigger : ActionTrigger
     {
         [SerializeField] private Door door;
-        [SerializeField] private DoorOpenDirection doorOpenDirection;
-
-        public DoorOpenDirection DoorOpenDirection => doorOpenDirection;
+        [SerializeField] private DoorTriggerLocation doorTriggerLocation;
+        public DoorTriggerLocation DoorTriggerLocation => doorTriggerLocation;
 
         private void Start()
         {
             // Move from parent so not animated with the door
+            if (!door.transform.parent)
+            {
+                return;
+            }
+
             GameObject doorParent = door.transform.parent.gameObject;
             gameObject.transform.SetParent(doorParent.transform);
         }
@@ -36,14 +46,14 @@ namespace DaftAppleGames.Buildings
         [Button("Open and Close Door")]
         private void OpenAndCloseDoor()
         {
-            door.OpenAndCloseDoor(doorOpenDirection);
+            door.OpenAndCloseDoor(doorTriggerLocation);
         }
 
 
         [Button("Open Door")]
         private void OpenDoor()
         {
-            door.OpenDoor(doorOpenDirection);
+            door.OpenDoor(doorTriggerLocation, false);
         }
 
         [Button("Close Door")]
@@ -55,10 +65,10 @@ namespace DaftAppleGames.Buildings
         #region Unity Editor methods
 
 #if UNITY_EDITOR
-        public void ConfigureInEditor(Door newDoor, LayerMask newTriggerLayerMask, string[] newTriggerTags, DoorOpenDirection newDoorOpenDirection)
+        public void ConfigureInEditor(Door newDoor, LayerMask newTriggerLayerMask, string[] newTriggerTags, DoorTriggerLocation newTriggerLocation)
         {
             door = newDoor;
-            doorOpenDirection = newDoorOpenDirection;
+            doorTriggerLocation = newTriggerLocation;
             base.ConfigureInEditor(newTriggerLayerMask, newTriggerTags);
         }
 #endif

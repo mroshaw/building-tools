@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using DaftAppleGames.Extensions;
 #if ODIN_INSPECTOR
 using Sirenix.OdinInspector;
 #else
@@ -8,16 +9,34 @@ using DaftAppleGames.Attributes;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.Events;
-using DaftAppleGames.Extensions;
 
 namespace DaftAppleGames.Buildings
 {
+    /// <summary>
+    /// This is important to know when rotating the door open
+    /// </summary>
+    public enum DoorPivotLocation
+    {
+        Unknown,
+        BottomLeft,
+        BottomRight,
+        Center
+    }
+
+
+    /// <summary>
+    /// Depending on where the open is triggered, the door needs to move in a particular direction
+    /// so as not to hit the triggering collider
+    /// </summary>
     public enum DoorOpenDirection
     {
         Inwards,
         Outwards
     }
 
+    /// <summary>
+    /// The door has a "state machine" as it can only be in one of these states
+    /// </summary>
     internal enum DoorState
     {
         Open,
@@ -28,10 +47,11 @@ namespace DaftAppleGames.Buildings
 
     public class Door : MonoBehaviour
     {
+        [BoxGroup("Settings")] [SerializeField] private DoorPivotLocation doorPivotLocation;
         [BoxGroup("Settings")] [SerializeField] private float openAngle = 110.0f;
-        [BoxGroup("Settings")] [SerializeField] private float openingTime = 2.0f;
-        [BoxGroup("Settings")] [SerializeField] private float stayOpenTime = 5.0f;
-        [BoxGroup("Settings")] [SerializeField] private float closingTime = 2.0f;
+        [BoxGroup("Settings")] [SerializeField] private float openingDuration = 2.0f;
+        [BoxGroup("Settings")] [SerializeField] private float stayOpenDuration = 5.0f;
+        [BoxGroup("Settings")] [SerializeField] private float closingDuration = 2.0f;
 
         [BoxGroup("Audio")] [SerializeField] private AudioClip[] openingClips;
         [BoxGroup("Audio")] [SerializeField] private AudioClip[] closingClips;
@@ -44,69 +64,85 @@ namespace DaftAppleGames.Buildings
         [FoldoutGroup("Events")] public UnityEvent closingStartEvent;
         [FoldoutGroup("Events")] public UnityEvent closingEndEvent;
 
-        private List<Transform> _blockers;
-
-        private AudioSource _audioSource;
+        public DoorPivotLocation DoorPivotLocation => doorPivotLocation;
 
         private bool IsOpen => _doorState == DoorState.Open;
         private bool IsMoving => _doorState == DoorState.Opening || _doorState == DoorState.Closing;
 
+        private List<Transform> _blockers;
+        private AudioSource _audioSource;
+
         private DoorState _doorState = DoorState.Closed;
         private Quaternion _doorClosedRotation;
 
+        private void OnEnable()
+        {
+            SetDoorPivotLocation();
+            _blockers = new List<Transform>();
+        }
+
         private void Start()
         {
+            // Assume door is initially closed
             _doorClosedRotation = transform.localRotation;
-            _audioSource = GetComponent<AudioSource>();
-
             _doorState = DoorState.Closed;
+
+            _audioSource = GetComponent<AudioSource>();
             StopAllCoroutines();
         }
 
+        /// <summary>
+        /// Adds a 'blocking' transform that prevents the door from closing
+        /// </summary>
         public void AddBlocker(Transform blocker)
         {
             _blockers.Add(blocker);
         }
 
+        /// <summary>
+        /// Removes a 'blocking' transform. If all blockers are removed, the door can close
+        /// </summary>
         public void RemoveBlocker(Transform blocker)
         {
             _blockers.Remove(blocker);
         }
 
+        /// <summary>
+        /// Determines whether there are blockers preventing the door from closing
+        /// </summary>
         private bool CanClose()
         {
-            return _blockers.Count == 0;
+            return _blockers == null || _blockers.Count == 0;
         }
 
-        public void OpenAndCloseDoor(DoorOpenDirection doorOpenDirection)
+        public void OpenAndCloseDoor(DoorTriggerLocation doorTriggerLocation)
         {
             if (IsMoving || IsOpen)
             {
                 return;
             }
 
-            StartCoroutine(OpenAndCloseDoorAsync(doorOpenDirection));
+            DoorOpenDirection openDirection = GetDoorOpenDirection(doorTriggerLocation);
+            StartCoroutine(OpenAndCloseDoorAsync(openDirection));
         }
 
-        public void OpenDoor(DoorOpenDirection direction, bool immediate = false)
+        public void OpenDoor(DoorTriggerLocation doorTriggerLocation, bool immediate)
         {
             if (IsMoving || IsOpen)
             {
                 return;
             }
 
-            if (immediate)
-            {
-                transform.localRotation = gameObject.transform.localRotation *
-                                          Quaternion.Euler(gameObject.transform.up * (direction == DoorOpenDirection.Inwards ? -openAngle : openAngle));
-                _doorState = DoorState.Open;
-                return;
-            }
+            DoorOpenDirection openDirection = GetDoorOpenDirection(doorTriggerLocation);
 
-            StartCoroutine(OpenDoorAsync(direction));
+            Debug.Log($"Trigger Location is: {doorTriggerLocation}, Pivot is: {doorPivotLocation}, Door opening: {openDirection}");
+
+            float duration = immediate ? 0.0f : openingDuration;
+
+            StartCoroutine(OpenDoorAsync(openDirection, duration));
         }
 
-        private IEnumerator OpenDoorAsync(DoorOpenDirection direction)
+        private IEnumerator OpenDoorAsync(DoorOpenDirection direction, float moveDuration)
         {
             _doorState = DoorState.Opening;
             PlayRandomClip(openingClips);
@@ -126,9 +162,9 @@ namespace DaftAppleGames.Buildings
             Quaternion doorOpenRotation = gameObject.transform.localRotation *
                                           Quaternion.Euler(gameObject.transform.up * (direction == DoorOpenDirection.Inwards ? -openAngle : openAngle));
 
-            while (timer < openingTime)
+            while (timer < moveDuration)
             {
-                transform.localRotation = Quaternion.Lerp(startValue, doorOpenRotation, timer / openingTime);
+                transform.localRotation = Quaternion.Lerp(startValue, doorOpenRotation, timer / moveDuration);
                 timer += Time.deltaTime;
                 yield return null;
             }
@@ -137,34 +173,65 @@ namespace DaftAppleGames.Buildings
             openingEndEvent.Invoke();
         }
 
-        public void CloseDoor(bool immediate = false)
+        [Button("Open Door (From Outside)")]
+        public void OpenDoorFromOutsideImmediate()
         {
-            if (IsMoving || !IsOpen)
-            {
-                return;
-            }
-
-            if (immediate)
-            {
-                transform.localRotation = _doorClosedRotation;
-                _doorState = DoorState.Closed;
-                return;
-            }
-
-            StartCoroutine(CloseDoorAsync());
+            OpenDoor(DoorTriggerLocation.Outside, false);
         }
 
-        private IEnumerator CloseDoorAsync()
+        [Button("Open Door (From Inside)")]
+        public void OpenDoorFromInside()
         {
+            OpenDoor(DoorTriggerLocation.Inside, false);
+        }
+
+        /// <summary>
+        /// Determines which direction to open the door, based on where trigger is located and the pivot position of the door
+        /// </summary>
+        private DoorOpenDirection GetDoorOpenDirection(DoorTriggerLocation doorTriggerLocation)
+        {
+            return (doorTriggerLocation == DoorTriggerLocation.Inside && doorPivotLocation == DoorPivotLocation.BottomLeft) ||
+                   (doorTriggerLocation == DoorTriggerLocation.Outside && doorPivotLocation == DoorPivotLocation.BottomRight)
+                ? DoorOpenDirection.Inwards
+                : DoorOpenDirection.Outwards;
+        }
+
+        [Button("Close Door")]
+        public void CloseDoor()
+        {
+            CloseDoor(false);
+        }
+
+        public void CloseDoor(bool immediate)
+        {
+            // If already closed or closing, don't need to do anything
+            if (_doorState == DoorState.Closed || _doorState == DoorState.Closing)
+            {
+                return;
+            }
+
+            float duration = immediate ? 0.0f : closingDuration;
+
+            StartCoroutine(CloseDoorAsync(duration));
+        }
+
+        private IEnumerator CloseDoorAsync(float closeDuration)
+        {
+            // If the door is opening, wait for it to finish, then close
+            while (_doorState == DoorState.Opening)
+            {
+                yield return null;
+            }
+
             // Door closes
             _doorState = DoorState.Closing;
             PlayRandomClip(closingClips);
             closingStartEvent.Invoke();
             float timer = 0;
             Quaternion startValue = transform.localRotation;
-            while (timer < closingTime)
+            while (timer < closeDuration)
             {
-                transform.localRotation = Quaternion.Lerp(startValue, _doorClosedRotation, timer / closingTime);
+                transform.localRotation = Quaternion.Lerp(startValue, _doorClosedRotation, timer / closeDuration);
                 timer += Time.deltaTime;
                 yield return null;
             }
@@ -179,13 +246,13 @@ namespace DaftAppleGames.Buildings
         private IEnumerator OpenAndCloseDoorAsync(DoorOpenDirection doorOpenDirection)
         {
             // Door opening
-            yield return OpenDoorAsync(doorOpenDirection);
+            yield return OpenDoorAsync(doorOpenDirection, openingDuration);
 
             // Door stays open
-            yield return new WaitForSeconds(stayOpenTime);
+            yield return new WaitForSeconds(stayOpenDuration);
 
             // Door closes
-            yield return CloseDoorAsync();
+            yield return CloseDoorAsync(closingDuration);
         }
 
         private void PlayRandomClip(AudioClip[] clips)
@@ -198,9 +265,85 @@ namespace DaftAppleGames.Buildings
             _audioSource.PlayOneShot(clips[Random.Range(0, clips.Length)]);
         }
 
-        #region Unity Editor methods
+
+        /// <summary>
+        /// Sets the pivot location on the door
+        /// </summary>
+        private void SetDoorPivotLocation()
+        {
+            doorPivotLocation = CalculatePivotLocation();
+        }
+
+        /// <summary>
+        /// Gets the location of the pivot on the door, so that we can accurately position the colliders
+        /// This is set on the basis of transform.forward - in the case of 3D Forge assets, some doors are facing 'outwards'
+        /// and so the pivot location may look wrong when looking from outside a building
+        /// </summary>
+        private DoorPivotLocation CalculatePivotLocation()
+        {
+            MeshFilter meshFilter = GetComponent<MeshFilter>();
+            if (meshFilter == null || meshFilter.sharedMesh == null)
+            {
+                Debug.LogWarning("No MeshFilter or mesh found.");
+                return DoorPivotLocation.Unknown;
+            }
+
+            Mesh mesh = meshFilter.sharedMesh;
+            Bounds bounds = mesh.bounds;
+
+            // Step 1: Determine inferred facing direction based on largest face
+            Vector3 size = bounds.size;
+            Vector3 facingAxis;
+
+            float xy = size.x * size.y;
+            float yz = size.y * size.z;
+            float xz = size.x * size.z;
+
+            if (xy >= yz && xy >= xz)
+            {
+                facingAxis = Vector3.forward; // Z
+            }
+            else if (yz >= xz)
+            {
+                facingAxis = Vector3.right; // X
+            }
+            else
+            {
+                facingAxis = Vector3.up; // Y
+            }
+
+            // Step 2: Decide what axis is considered "horizontal" (left vs right)
+            Vector3 rightAxis;
+            if (facingAxis == Vector3.forward || facingAxis == Vector3.back)
+            {
+                rightAxis = Vector3.right;
+            }
+            else if (facingAxis == Vector3.right || facingAxis == Vector3.left)
+            {
+                rightAxis = Vector3.forward;
+            }
+            else
+            {
+                rightAxis = Vector3.right;
+            }
+
+            // Step 3: Get mesh pivot offset in local space
+            Vector3 meshCenter = bounds.center;
+            float offset = Vector3.Dot(meshCenter, rightAxis);
+
+            float threshold = bounds.extents.magnitude * 0.05f; // 5% of size
+
+            if (Mathf.Abs(offset) < threshold)
+            {
+                return DoorPivotLocation.Center;
+            }
+
+            return offset > 0f ? DoorPivotLocation.BottomRight : DoorPivotLocation.BottomLeft;
+        }
+
 
 #if UNITY_EDITOR
+
         public void ConfigureInEditor(AudioMixerGroup audioMixerGroup, AudioClip[] newOpeningClips, AudioClip[] newOpenClips, AudioClip[] newClosingClips,
             AudioClip[] newClosedClips)
         {
@@ -216,45 +359,10 @@ namespace DaftAppleGames.Buildings
             openingClips = newOpeningClips;
             closingClips = newClosingClips;
             closedClips = newClosedClips;
+
+            SetDoorPivotLocation();
         }
 
-        [Button("Open Door (Inward Immediate)")]
-        private void OpenDoorInwardImmediateEditor()
-        {
-            OpenDoor(DoorOpenDirection.Inwards, true);
-        }
-
-        [Button("Open Door (Outward Immediate)")]
-        private void OpenDoorOutwardImmediateEditor()
-        {
-            OpenDoor(DoorOpenDirection.Outwards, true);
-        }
-
-        [Button("Close Door (Immediate)")]
-        private void CloseDoorImmediateEditor()
-        {
-            CloseDoor(true);
-        }
-
-        [Button("Open Door (Inward)")]
-        private void OpenDoorInwardEditor()
-        {
-            OpenDoor(DoorOpenDirection.Inwards, false);
-        }
-
-        [Button("Open Door (Outward)")]
-        private void OpenDoorOutwardEditor()
-        {
-            OpenDoor(DoorOpenDirection.Outwards, false);
-        }
-
-        [Button("Close Door")]
-        private void CloseDoorEditor()
-        {
-            CloseDoor(false);
-        }
 #endif
-
-        #endregion
     }
 }

@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using DaftAppleGames.Buildings;
 using DaftAppleGames.Editor;
-using DaftAppleGames.Editor.Extensions;
 using DaftAppleGames.Extensions;
 using UnityEditor;
 using UnityEngine;
@@ -25,11 +24,14 @@ namespace DaftAppleGames.BuildingTools.Editor
         [SerializeField] [BoxGroup("Settings")] internal AudioMixerGroup doorSfxGroup;
         [SerializeField] [BoxGroup("Settings")] internal LayerMask doorTriggerLayerMask;
         [SerializeField] [BoxGroup("Settings")] internal string[] doorTriggerTags;
-        [SerializeField] [BoxGroup("Settings")] internal float doorColliderHeight = 2.0f;
+        [SerializeField] [BoxGroup("Settings")] internal bool overrideColliderHeight;
+        [SerializeField] [BoxGroup("Settings")] internal float doorColliderOverrideHeight = 2.0f;
         [SerializeField] [BoxGroup("Settings")] internal float doorColliderDepth = 1.0f;
-        [SerializeField] [BoxGroup("Settings")] internal bool overrideColliderWidth = false;
-        [SerializeField] [BoxGroup("Settings")] internal float doorColliderWidth = 1.0f;
+        [SerializeField] [BoxGroup("Settings")] internal bool overrideColliderWidth;
+        [SerializeField] [BoxGroup("Settings")] internal float doorColliderOverrideWidth = 1.0f;
         [SerializeField] [BoxGroup("Settings")] internal StaticEditorFlags doorRendererStaticFlags;
+        [SerializeField] [BoxGroup("Settings")] internal string outsideTriggerName = "Outside Trigger";
+        [SerializeField] [BoxGroup("Settings")] internal string insideTriggerName = "Inside Trigger";
 
         protected override string GetToolName()
         {
@@ -92,6 +94,9 @@ namespace DaftAppleGames.BuildingTools.Editor
             return false;
         }
 
+        /// <summary>
+        /// Adds the DoorController then loops through child game object looking for doors to configure
+        /// </summary>
         private void ConfigureDoors()
         {
             DoorController doorController = SelectedGameObject.EnsureComponent<DoorController>();
@@ -110,69 +115,121 @@ namespace DaftAppleGames.BuildingTools.Editor
             }
         }
 
+        /// <summary>
+        /// Configures a Door component on the given Game Object
+        /// </summary>
         private Door ConfigureDoor(GameObject doorGameObject)
         {
             log.AddToLog(LogLevel.Info, $"Configuring door on {doorGameObject.name}.");
             Door door = doorGameObject.EnsureComponent<Door>();
+
             // We don't want to combine this mesh, as it needs to move
             doorGameObject.EnsureComponent<DynamicMeshRenderer>();
+
             // Set the static flags, as the door will move
             GameObjectUtility.SetStaticEditorFlags(door.gameObject, doorRendererStaticFlags);
             door.ConfigureInEditor(doorSfxGroup, doorOpeningClips, doorOpenClips,
                 doorClosingClips,
                 doorClosedClips);
-            CreateOrUpdateDoorTriggers(door);
+
+            // Process the door triggers
+            ConfigureTriggerColliders(door);
             return door;
         }
 
-        private void CreateOrUpdateDoorTriggers(Door door)
+        private GameObject ConfigureDoorTrigger(Door door, string triggerName, DoorTriggerLocation doorTriggerLocation)
         {
-            DoorTrigger[] doorTriggers = door.GetComponentsInChildren<DoorTrigger>(true);
-
-            if (doorTriggers.Length == 0)
-            {
-                // We need to create new door triggers
-                CreateDoorTrigger(door, DoorOpenDirection.Inwards);
-                CreateDoorTrigger(door, DoorOpenDirection.Outwards);
-            }
-            else
-            {
-                // We want to reconfigure existing triggers
-                foreach (DoorTrigger existingDoorTrigger in doorTriggers)
-                {
-                    ConfigureDoorTrigger(door, existingDoorTrigger, existingDoorTrigger.DoorOpenDirection);
-                }
-            }
-        }
-
-        private void CreateDoorTrigger(Door door, DoorOpenDirection openDirection)
-        {
-            string gameObjectName = openDirection == DoorOpenDirection.Outwards ? "Inside Trigger" : "Outside Trigger";
-            GameObject triggerGameObject = new(gameObjectName);
-            triggerGameObject.transform.SetParent(door.gameObject.transform);
+            Transform triggerTransform = door.transform.Find(triggerName);
+            GameObject triggerGameObject = triggerTransform != null ? triggerTransform.gameObject : new GameObject(triggerName);
+            triggerGameObject.transform.SetParent(door.transform);
             triggerGameObject.transform.localPosition = Vector3.zero;
+            triggerGameObject.transform.localScale = Vector3.one;
             triggerGameObject.transform.localRotation = Quaternion.identity;
-            triggerGameObject.EnsureComponent<BoxCollider>();
-            DoorTrigger trigger = triggerGameObject.EnsureComponent<DoorTrigger>();
-            ConfigureDoorTrigger(door, trigger, openDirection);
+
+            DoorTrigger doorTrigger = triggerGameObject.EnsureComponent<DoorTrigger>();
+            doorTrigger.ConfigureInEditor(door, doorTriggerLayerMask, doorTriggerTags, doorTriggerLocation);
+            return triggerGameObject;
         }
 
-        private void ConfigureDoorTrigger(Door door, DoorTrigger doorTrigger, DoorOpenDirection openDirection)
+        private void ConfigureTriggerColliders(Door door)
         {
-            doorTrigger.ConfigureInEditor(door, doorTriggerLayerMask, doorTriggerTags, openDirection);
-            doorTrigger.transform.parent.gameObject.GetMeshSize(~0, new string[] { }, out Vector3 meshSize, out Vector3 _);
-            float distanceFromDoor = openDirection == DoorOpenDirection.Inwards ? 0.3f : -(0.3f + meshSize.x);
-            float triggerWidth = meshSize.z;
-            float triggerLocalCenter = meshSize.z / 2;
+            GameObject insideTriggerGameObject = ConfigureDoorTrigger(door, insideTriggerName, DoorTriggerLocation.Inside);
+            GameObject outsideTriggerGameObject = ConfigureDoorTrigger(door, outsideTriggerName, DoorTriggerLocation.Outside);
 
-            BoxCollider boxCollider = doorTrigger.GetComponent<BoxCollider>();
+            Transform doorTransform = door.transform;
 
-            boxCollider.size = overrideColliderWidth
-                ? new Vector3(doorColliderDepth, doorColliderHeight, doorColliderWidth)
-                : new Vector3(doorColliderDepth, doorColliderHeight, triggerWidth);
+            // Configure the colliders
+            // Capture current rotation, and set to zero. Makes positioning the colliders easier.
 
-            boxCollider.center = new Vector3(distanceFromDoor, doorColliderHeight / 2, triggerLocalCenter);
-            boxCollider.isTrigger = true;
+            Quaternion doorRotation = doorTransform.rotation;
+            doorTransform.rotation = Quaternion.identity;
+
+            Renderer renderer = door.GetComponent<Renderer>();
+
+            Bounds bounds = renderer.bounds;
+            Vector3 size = bounds.size;
+            Vector3 center = bounds.center;
+
+            // Determine the depth axis (smallest dimension)
+            int depthAxis = GetSmallestAxis(size);
+            Vector3 normal = GetAxisVector(depthAxis, door.transform);
+
+            float height = size.y;
+            float width = depthAxis == 0 ? size.z : size.x; // whichever is not depth
+            float doorDepth = size[depthAxis];
+
+            // Determine if we need to rotate the colliders
+            bool rotateColliders = depthAxis == 0; // X-axis = transform.right
+
+            CreateWorldAlignedCollider(door.gameObject, outsideTriggerGameObject, center + normal * (doorDepth / 2f + doorColliderDepth / 2f), doorTransform.rotation, width,
+                height,
+                doorColliderDepth, rotateColliders);
+            CreateWorldAlignedCollider(door.gameObject, insideTriggerGameObject, center - normal * (doorDepth / 2f + doorColliderDepth / 2f), doorTransform.rotation, width,
+                height,
+                doorColliderDepth, rotateColliders);
+
+            // Restore the door rotation
+            doorTransform.rotation = doorRotation;
+        }
+
+        private void CreateWorldAlignedCollider(GameObject doorGameObject, GameObject colliderGameObject, Vector3 worldPosition, Quaternion doorRotation, float width, float height,
+            float depth,
+            bool rotateY)
+        {
+            // Compute final rotation
+            Quaternion finalRotation = doorRotation;
+            if (rotateY)
+            {
+                finalRotation *= Quaternion.Euler(0f, 90f, 0f); // Apply 90° Y rotation in world space
+            }
+
+            colliderGameObject.transform.SetPositionAndRotation(worldPosition, finalRotation);
+
+            BoxCollider box = colliderGameObject.EnsureComponent<BoxCollider>();
+            box.size = new Vector3(width, height, depth);
+            box.center = Vector3.zero;
+            box.isTrigger = true;
+            // Parent to door while preserving world transform
+            colliderGameObject.transform.SetParent(doorGameObject.transform, true);
+        }
+
+
+        private int GetSmallestAxis(Vector3 v)
+        {
+            if (v.x <= v.y && v.x <= v.z) return 0;
+            if (v.y <= v.x && v.y <= v.z) return 1;
+            return 2;
+        }
+
+        private Vector3 GetAxisVector(int axis, Transform t)
+        {
+            return axis switch
+            {
+                0 => t.right,
+                1 => t.up,
+                2 => t.forward,
+                _ => Vector3.forward
+            };
         }
     }
 }

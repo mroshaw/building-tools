@@ -37,25 +37,6 @@ namespace DaftAppleGames.Buildings
             }
         }
 
-        public void OpenAllDoorsInwards(bool immediate = true)
-        {
-            OpenAllDoors(DoorOpenDirection.Inwards, immediate);
-        }
-
-        public void OpenAllDoorsOutwards(bool immediate = true)
-        {
-            OpenAllDoors(DoorOpenDirection.Outwards, immediate);
-        }
-
-
-        private void OpenAllDoors(DoorOpenDirection doorOpenDirection, bool immediate)
-        {
-            foreach (Door door in doors)
-            {
-                door.OpenDoor(doorOpenDirection, immediate);
-            }
-        }
-
         public void AddDoor(Door newDoor)
         {
             if (!doors.Contains(newDoor))
@@ -65,18 +46,6 @@ namespace DaftAppleGames.Buildings
         }
 
 #if UNITY_EDITOR
-        [Button("Open Doors (Inward)")]
-        private void OpenDoorsInwardEditor()
-        {
-            OpenAllDoorsInwards(true);
-        }
-
-        [Button("Open Doors (Outwards)")]
-        private void OpenDoorsOutwardEditor()
-        {
-            OpenAllDoorsOutwards(true);
-        }
-
         [Button("Close Doors")]
         private void CloseDoorsEditor()
         {
