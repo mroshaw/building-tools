@@ -96,14 +96,21 @@ namespace DaftAppleGames.BuildingTools.Editor
         /// </summary>
         private void SetBuildingPivot()
         {
+            // Cache then reset building rotation
+            Quaternion currentRotation = SelectedGameObject.transform.rotation;
+            SelectedGameObject.transform.rotation = Quaternion.identity;
+
             // Move each direct child game object vertically by the settings amount
             foreach (Transform child in SelectedGameObject.transform)
             {
                 // Vector3 newPosition = new(child.localPosition.x, adjustPivotHeight, child.localPosition.z);
-                Vector3 newPosition = child.transform.position + child.transform.up * adjustPivotHeight;
+                Vector3 newPosition = new(child.transform.localPosition.x, child.transform.localPosition.y + adjustPivotHeight, child.transform.localPosition.z);
                 child.localPosition = newPosition;
                 log.AddToLog(LogLevel.Debug, $"Moved child {child.name} to position {newPosition}.");
             }
+
+            // Restore rotation
+            SelectedGameObject.transform.rotation = currentRotation;
         }
     }
 }
