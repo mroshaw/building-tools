@@ -10,7 +10,7 @@ namespace DaftAppleGames.BuildingTools.Editor
     /// </summary>
     internal abstract class BuildingEditorTool : EditorTool
     {
-        protected bool HasBuildingComponent(out string failedReason)
+        protected bool HasRequiredBuildingComponent(out string failedReason)
         {
             if (!SelectedGameObject)
             {

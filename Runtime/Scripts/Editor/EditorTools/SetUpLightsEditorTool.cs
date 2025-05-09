@@ -77,7 +77,7 @@ namespace DaftAppleGames.BuildingTools.Editor
                 return false;
             }
 
-            if (!HasBuildingComponent(out string requiredBuildingReason))
+            if (!HasRequiredBuildingComponent(out string requiredBuildingReason))
             {
                 cannotRunReasons.Add(requiredBuildingReason);
                 canRun = false;

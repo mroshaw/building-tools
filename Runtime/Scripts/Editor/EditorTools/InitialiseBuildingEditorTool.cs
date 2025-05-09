@@ -39,10 +39,28 @@ namespace DaftAppleGames.BuildingTools.Editor
             if (!RequireGameObjectValidation(out string requireGameObjectReason))
             {
                 cannotRunReasons.Add(requireGameObjectReason);
+                return false;
+            }
+
+            if (AlreadyHasBuildingComponent(out string alreadyConfiguredReason))
+            {
+                cannotRunReasons.Add(alreadyConfiguredReason);
                 canRun = false;
             }
 
             return canRun;
+        }
+
+        private bool AlreadyHasBuildingComponent(out string failedReason)
+        {
+            if (SelectedGameObject && SelectedGameObject.HasComponent<Building>())
+            {
+                failedReason = "This game object has already been configured as a building!";
+                return true;
+            }
+
+            failedReason = string.Empty;
+            return false;
         }
 
         protected override void RunTool(string undoGroupName)
@@ -78,11 +96,11 @@ namespace DaftAppleGames.BuildingTools.Editor
         /// </summary>
         private void SetBuildingPivot()
         {
-            // Move each child game object vertically by the settings amount
+            // Move each direct child game object vertically by the settings amount
             foreach (Transform child in SelectedGameObject.transform)
             {
-                Vector3 newPosition = new(child.localPosition.x, adjustPivotHeight, child.localPosition.z);
-                // child.position += Vector3.up * buildingEditorSettings.adjustAnchorHeight;
+                // Vector3 newPosition = new(child.localPosition.x, adjustPivotHeight, child.localPosition.z);
+                Vector3 newPosition = child.transform.position + child.transform.up * adjustPivotHeight;
                 child.localPosition = newPosition;
                 log.AddToLog(LogLevel.Debug, $"Moved child {child.name} to position {newPosition}.");
             }

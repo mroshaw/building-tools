@@ -49,7 +49,7 @@ namespace DaftAppleGames.BuildingTools.Editor
                 canRun = false;
             }
 
-            if (!HasBuildingComponent(out string requiredBuildingReason))
+            if (!HasRequiredBuildingComponent(out string requiredBuildingReason))
             {
                 cannotRunReasons.Add(requiredBuildingReason);
                 canRun = false;
