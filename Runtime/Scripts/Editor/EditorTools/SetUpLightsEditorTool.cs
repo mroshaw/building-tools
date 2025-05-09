@@ -49,6 +49,9 @@ namespace DaftAppleGames.BuildingTools.Editor
         [SerializeField] [BoxGroup("Settings")] internal BuildingLightTypeSettings indoorFireTypeSettings;
         [SerializeField] [BoxGroup("Settings")] internal BuildingLightTypeSettings outdoorBuildingLightTypeSettings;
 
+        [SerializeField] [BoxGroup("Settings")] internal bool addLightManager = true;
+        [SerializeField] [BoxGroup("Settings")] internal string lightManagerGameObjectName = "Building Light Manager";
+
         protected override string GetToolName()
         {
             return "Set Up Lights";
@@ -136,7 +139,7 @@ namespace DaftAppleGames.BuildingTools.Editor
 
         private void ConfigureLighting()
         {
-            LightingController lightingController = SelectedGameObject.EnsureComponent<LightingController>();
+            BuildingLightController buildingLightController = SelectedGameObject.EnsureComponent<BuildingLightController>();
             log.AddToLog(LogLevel.Info, $"Added Lighting Controller component to {SelectedGameObject.name}.");
 
             Transform[] allChildren = SelectedGameObject.GetComponentsInChildren<Transform>(true);
@@ -168,7 +171,14 @@ namespace DaftAppleGames.BuildingTools.Editor
                 }
             }
 
-            lightingController.UpdateLightLists();
+            buildingLightController.UpdateLightLists();
+
+            if (addLightManager)
+            {
+                log.AddToLog(LogLevel.Debug, $"Adding light manager...");
+                AddLightManager();
+                log.AddToLog(LogLevel.Debug, $"Adding light manager... DONE!");
+            }
         }
 
         private void ConfigureBuildingLight(GameObject lightGameObject, BuildingLightTypeSettings lightTypeSettings)
@@ -248,6 +258,20 @@ namespace DaftAppleGames.BuildingTools.Editor
             shadowMapUpdate.fullShadowMapRefreshWaitFrames = lightingSettings.shadowRefreshRate;
 
 #endif
+        }
+
+        private void AddLightManager()
+        {
+            BuildingLightManager lightManager = FindFirstObjectByType<BuildingLightManager>();
+            if (lightManager)
+            {
+                log.AddToLog(LogLevel.Info, $"There is already a Light Manager in the scene.");
+                return;
+            }
+
+            GameObject newLightManagerGameObject = new(lightManagerGameObjectName);
+            BuildingLightManager newLightManager = newLightManagerGameObject.AddComponent<BuildingLightManager>();
+            newLightManager.RefreshLightControllers();
         }
     }
 }

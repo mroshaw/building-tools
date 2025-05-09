@@ -22,6 +22,7 @@ namespace DaftAppleGames.Buildings
         [BoxGroup("Lights")] [SerializeField] private Light lightComponent;
         [BoxGroup("Lights")] [SerializeField] private ParticleSystem particles;
         public BuildingLightType BuildingLightType => buildingLightType;
+        private bool _lightState;
 
         private void Awake()
         {
@@ -69,6 +70,12 @@ namespace DaftAppleGames.Buildings
         {
             lightComponent.gameObject.SetActive(state);
             particles.gameObject.SetActive(state);
+            _lightState = state;
+        }
+
+        public bool GetLightState()
+        {
+            return _lightState;
         }
     }
 }
