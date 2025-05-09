@@ -98,8 +98,9 @@ namespace DaftAppleGames.BuildingTools.Editor
 
         private GameObject ConfigureVolumeGameObject()
         {
-            SelectedGameObject.GetMeshSize(meshSizeIncludeLayers, meshSizeIgnoreNames, out Vector3 buildingSize,
-                out Vector3 buildingCenter);
+            SelectedGameObject.GetLocalMeshDimensions(meshSizeIncludeLayers, meshSizeIgnoreNames, out Vector3 buildingCenter, out Vector3 buildingSize);
+            log.AddToLog(LogLevel.Debug, $"Building size calculated as: {buildingSize}");
+            log.AddToLog(LogLevel.Debug, $"Center point is: {buildingCenter}");
 
             GameObject volumeGameObject = SelectedGameObject.FindChildGameObject(interiorVolumeGameObjectName);
             if (!volumeGameObject)

@@ -1,4 +1,3 @@
-using DaftAppleGames.Extensions;
 using UnityEngine;
 
 namespace DaftAppleGames.Editor.Extensions
@@ -6,46 +5,53 @@ namespace DaftAppleGames.Editor.Extensions
     public static class GameObjectExtensions
     {
         /// <summary>
-        /// Returns the size of a box that encloses the meshes in the Game Object
+        /// Returns true if the GameObject has any parent that contains any of the given strings
         /// </summary>
-        public static void GetMeshSize(this GameObject parentGameObject, LayerMask includeLayerMask, string[] ignoreNames, out Vector3 meshSize, out Vector3 meshCenter)
+        public static bool HasParentWithName(this GameObject gameObject, string[] nameStrings)
         {
-            Bounds meshBounds = GetMeshBounds(parentGameObject, includeLayerMask, ignoreNames);
-            meshSize = meshBounds.size;
-            meshCenter = meshBounds.center;
+            Transform currentGameObject = gameObject.transform;
+
+            while (currentGameObject != null)
+            {
+                foreach (string nameToTest in nameStrings)
+                {
+                    if (currentGameObject.name.Contains(nameToTest))
+                    {
+                        return true;
+                    }
+                }
+
+                currentGameObject = currentGameObject.parent;
+            }
+
+            return false;
         }
 
         /// <summary>
-        /// Return the bounds of the enclosing meshes in the Game Object
+        /// Return the local center and dimensions of box enclosing meshes of the Game Object
         /// </summary>
-        private static Bounds GetMeshBounds(GameObject gameObject, LayerMask includeLayerMask, string[] ignoreNames)
+        public static void GetLocalMeshDimensions(this GameObject gameObject, LayerMask includeLayerMask, string[] ignoreNames, out Vector3 localCenter, out Vector3 localSize)
         {
-            Bounds combinedBounds = new(Vector3.zero, Vector3.zero);
-            bool hasValidRenderer = false;
+            // Get all MeshRenderers
+            MeshRenderer[] meshRenderers = gameObject.GetComponentsInChildren<MeshRenderer>(true);
 
-            foreach (MeshRenderer childRenderer in gameObject.GetComponentsInChildren<MeshRenderer>(true))
+            // Compute combined bounds in world space
+            Bounds combinedBounds = new(meshRenderers[0].bounds.center, meshRenderers[0].bounds.size);
+
+            foreach (MeshRenderer meshRenderer in meshRenderers)
             {
-                if ((includeLayerMask & (1 << childRenderer.gameObject.layer)) == 0 ||
-                    (ignoreNames.Length != 0 && ignoreNames.ItemInString(childRenderer.gameObject.name)))
+                if ((includeLayerMask & (1 << meshRenderer.gameObject.layer)) == 0 ||
+                    (ignoreNames.Length != 0 && HasParentWithName(meshRenderer.gameObject, ignoreNames)))
                 {
                     continue;
                 }
 
-                Bounds meshBounds = childRenderer.localBounds;
-
-                // Initialize or expand the combined bounds
-                if (!hasValidRenderer)
-                {
-                    combinedBounds = meshBounds;
-                    hasValidRenderer = true;
-                }
-                else
-                {
-                    combinedBounds.Encapsulate(meshBounds);
-                }
+                combinedBounds.Encapsulate(meshRenderer.bounds);
             }
 
-            return combinedBounds;
+            // Inverse-transform the center from world space to local space
+            localCenter = gameObject.transform.InverseTransformPoint(combinedBounds.center);
+            localSize = combinedBounds.size;
         }
     }
 }
