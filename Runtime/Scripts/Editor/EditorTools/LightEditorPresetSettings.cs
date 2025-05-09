@@ -39,7 +39,7 @@ namespace DaftAppleGames.BuildingTools.Editor
 #endif
         public Color filterColor;
         public float temperature;
-        public LightmapBakeType lightmapBakeType;
+        [ForceEnumDropdown] public LightmapBakeType lightmapBakeType;
 
         /// <summary>
         /// Given a Light object, applies the presets
