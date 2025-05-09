@@ -12,5 +12,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d5a143c8ad55584b8f4b579be96ba29, type: 3}
   m_Name: AddVolumesEditorTool
   m_EditorClassIdentifier: 
-  visualTreeAsset: {fileID: 9197481963319205126, guid: e0bbe0599406fc649a5040a63575291a, type: 3}
-  runToolButtonName: ConfigureVoolumesButton
+  meshSizeIgnoreNames:
+  - Base
+  - fe_vil_Stall1
+  - fi_vil_roof_wooden01_ext_end
+  - fi_vil_roof_woodentile01
+  meshSizeIncludeLayers:
+    serializedVersion: 2
+    m_Bits: 256
+  interiorVolumeGameObjectName: Interior Volume
+  interiorVolumeProfile: {fileID: 11400000, guid: 1761b5ab9cf40da4d9c05adcf2661828, type: 2}
+  indoorSnapshot: {fileID: -1796804499125752488, guid: d4cb3dd8c857cad4599292f12c8e37c2, type: 2}
+  outdoorSnapshot: {fileID: 24500006, guid: d4cb3dd8c857cad4599292f12c8e37c2, type: 2}
+  volumeTriggerTags:
+  - Player
+  volumeTriggerLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295

@@ -12,8 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e7f063ae8754424a99f7e6f03e0d8b8, type: 3}
   m_Name: OptimiseMeshesEditorTool
   m_EditorClassIdentifier: 
+  combineMeshesByLayer: 1
   assetOutputFolder: BuildingOptimisedMeshes
-  assetFileNamePrefix: OptimisedMesh_
+  assetFileNamePrefix: OptimisedMesh
   createOutputFolder: 1
   is32BIT: 0
   generateSecondaryUVs: 0

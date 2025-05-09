@@ -12,7 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d5a143c8ad55584b8f4b579be96ba29, type: 3}
   m_Name: AddVolumesEditorTool
   m_EditorClassIdentifier: 
-  meshSizeIgnoreNames: []
+  meshSizeIgnoreNames:
+  - Base
+  - fe_vil_Stall1
+  - fi_vil_roof_wooden01_ext_end
+  - fi_vil_roof_woodentile01
   meshSizeIncludeLayers:
     serializedVersion: 2
     m_Bits: 256

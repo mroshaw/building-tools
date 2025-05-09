@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 754ecd0791b9fed47b32bac1de960c13, type: 3}
   m_Name: InitializeBuildingEditorTool
   m_EditorClassIdentifier: 
-  adjustAnchorHeight: 0.8
+  adjustPivotHeight: 0.8
