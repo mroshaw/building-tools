@@ -22,8 +22,6 @@ namespace DaftAppleGames.Buildings
         [BoxGroup("Outdoor Lights")] [SerializeField] private bool outdoorLightDefaultState;
         [BoxGroup("Outdoor Lights")] [SerializeField] private bool outdoorLightCurrentState;
 
-        #region Startup
-
         private void Awake()
         {
             if (findLightsOnAwake)
@@ -59,12 +57,8 @@ namespace DaftAppleGames.Buildings
             SetLightsState(outdoorLights, state);
         }
 
-        #endregion
-
-        #region Class Methods
-
         [Button("Update Light Lists")]
-        private void UpdateLightLists()
+        public void UpdateLightLists()
         {
             candleLights = new List<BuildingLight>();
             indoorFireLights = new List<BuildingLight>();
@@ -133,18 +127,5 @@ namespace DaftAppleGames.Buildings
                 currLight.SetLightState(state);
             }
         }
-
-        #endregion
-
-        #region Unity Editor Methods
-
-#if UNITY_EDITOR
-        public void ConfigureInEditor()
-        {
-            UpdateLightLists();
-        }
-#endif
-
-        #endregion
     }
 }

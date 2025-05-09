@@ -23,7 +23,6 @@ namespace DaftAppleGames.Buildings
         Center
     }
 
-
     /// <summary>
     /// Depending on where the open is triggered, the door needs to move in a particular direction
     /// so as not to hit the triggering collider
@@ -77,6 +76,11 @@ namespace DaftAppleGames.Buildings
 
         private void OnEnable()
         {
+            _audioSource = this.EnsureComponent<AudioSource>();
+            _audioSource.playOnAwake = false;
+            _audioSource.loop = false;
+            _audioSource.spatialBlend = 1.0f;
+
             SetDoorPivotLocation();
             _blockers = new List<Transform>();
         }
@@ -89,6 +93,19 @@ namespace DaftAppleGames.Buildings
 
             _audioSource = GetComponent<AudioSource>();
             StopAllCoroutines();
+        }
+
+        /// <summary>
+        /// Can be used to set the door audio configuration external to the Unity inspector
+        /// </summary>
+        public void SetDoorAudio(AudioMixerGroup audioMixerGroup, AudioClip[] newOpeningClips, AudioClip[] newOpenClips, AudioClip[] newClosingClips,
+            AudioClip[] newClosedClips)
+        {
+            _audioSource.outputAudioMixerGroup = audioMixerGroup;
+
+            openingClips = newOpeningClips;
+            closingClips = newClosingClips;
+            closedClips = newClosedClips;
         }
 
         /// <summary>
@@ -340,29 +357,5 @@ namespace DaftAppleGames.Buildings
 
             return offset > 0f ? DoorPivotLocation.BottomRight : DoorPivotLocation.BottomLeft;
         }
-
-
-#if UNITY_EDITOR
-
-        public void ConfigureInEditor(AudioMixerGroup audioMixerGroup, AudioClip[] newOpeningClips, AudioClip[] newOpenClips, AudioClip[] newClosingClips,
-            AudioClip[] newClosedClips)
-        {
-            if (!_audioSource)
-            {
-                _audioSource = this.EnsureComponent<AudioSource>();
-            }
-
-            _audioSource.playOnAwake = false;
-            _audioSource.outputAudioMixerGroup = audioMixerGroup;
-            _audioSource.loop = false;
-            _audioSource.spatialBlend = 1.0f;
-            openingClips = newOpeningClips;
-            closingClips = newClosingClips;
-            closedClips = newClosedClips;
-
-            SetDoorPivotLocation();
-        }
-
-#endif
     }
 }

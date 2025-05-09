@@ -168,7 +168,7 @@ namespace DaftAppleGames.BuildingTools.Editor
                 }
             }
 
-            lightingController.ConfigureInEditor();
+            lightingController.UpdateLightLists();
         }
 
         private void ConfigureBuildingLight(GameObject lightGameObject, BuildingLightTypeSettings lightTypeSettings)
@@ -185,7 +185,7 @@ namespace DaftAppleGames.BuildingTools.Editor
             }
 
             BuildingLight buildingLight = lightGameObject.EnsureComponent<BuildingLight>();
-            buildingLight.ConfigureInEditor(lightTypeSettings.buildingLightType, light, flameParticleSystem);
+            buildingLight.ConfigureLight(lightTypeSettings.buildingLightType, light, flameParticleSystem);
 
             log.AddToLog(LogLevel.Debug, $"Configuring light on : {lightGameObject.name}...");
             ConfigureLight(lightGameObject, light, lightTypeSettings);

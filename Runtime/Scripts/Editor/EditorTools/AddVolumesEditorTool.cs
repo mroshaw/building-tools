@@ -46,7 +46,7 @@ namespace DaftAppleGames.BuildingTools.Editor
             if (!RequireGameObjectValidation(out string requireGameObjectReason))
             {
                 cannotRunReasons.Add(requireGameObjectReason);
-                canRun = false;
+                return false;
             }
 
             if (!HasRequiredBuildingComponent(out string requiredBuildingReason))
@@ -91,8 +91,9 @@ namespace DaftAppleGames.BuildingTools.Editor
             log.AddToLog(LogLevel.Debug, $"Adding Interior Audio Volume to {SelectedGameObject.name}...");
             GameObject volumeGameObject = ConfigureVolumeGameObject();
             InteriorAudioFilter audioFilter = volumeGameObject.EnsureComponent<InteriorAudioFilter>();
-            audioFilter.ConfigureInEditor(volumeTriggerLayerMask, volumeTriggerTags,
-                indoorSnapshot, outdoorSnapshot);
+            audioFilter.TriggerLayerMask = volumeTriggerLayerMask;
+            audioFilter.TriggerTags = volumeTriggerTags;
+            audioFilter.SetSnapShots(indoorSnapshot, outdoorSnapshot);
             log.AddToLog(LogLevel.Debug, $"Adding Interior Audio Volume to {SelectedGameObject.name}... DONE!");
         }
 

@@ -15,15 +15,18 @@ namespace DaftAppleGames.BuildingTools
     /// </summary>
     public class InteriorAudioFilter : ActionTrigger
     {
-        #region Class Variables
-
         [BoxGroup("Snapshots")] [SerializeField] private AudioMixerSnapshot indoorSnapshot;
         [BoxGroup("Snapshots")] [SerializeField] private AudioMixerSnapshot outdoorSnapshot;
         [BoxGroup("Settings")] public float transitionTime = 0.1f;
 
-        #endregion
-
-        #region Class methods
+        /// <summary>
+        /// Allow the snapshots to be configured external to the inspector
+        /// </summary>
+        public void SetSnapShots(AudioMixerSnapshot newIndoorSnapshot, AudioMixerSnapshot newOutdoorSnapshot)
+        {
+            indoorSnapshot = newIndoorSnapshot;
+            outdoorSnapshot = newOutdoorSnapshot;
+        }
 
         protected override void TriggerEnter(Collider other)
         {
@@ -52,23 +55,5 @@ namespace DaftAppleGames.BuildingTools
         {
             outdoorSnapshot.TransitionTo(transitionTime);
         }
-
-        #endregion
-
-        #region Editor methods
-
-#if UNITY_EDITOR
-        public void ConfigureInEditor(LayerMask newTriggerLayerMask, string[] newTriggerTags, AudioMixerSnapshot newIndoorSnapshot, AudioMixerSnapshot newOutdoorSnapshot)
-        {
-            // Configure the ActionTrigger
-            base.ConfigureInEditor(newTriggerLayerMask, newTriggerTags);
-
-            // Configure the AudioMixer
-            indoorSnapshot = newIndoorSnapshot;
-            outdoorSnapshot = newOutdoorSnapshot;
-        }
-#endif
-
-        #endregion
     }
 }

@@ -128,9 +128,7 @@ namespace DaftAppleGames.BuildingTools.Editor
 
             // Set the static flags, as the door will move
             GameObjectUtility.SetStaticEditorFlags(door.gameObject, doorRendererStaticFlags);
-            door.ConfigureInEditor(doorSfxGroup, doorOpeningClips, doorOpenClips,
-                doorClosingClips,
-                doorClosedClips);
+            door.SetDoorAudio(doorSfxGroup, doorOpeningClips, doorOpenClips, doorClosingClips, doorClosedClips);
 
             // Process the door triggers
             ConfigureTriggerColliders(door);
@@ -147,7 +145,10 @@ namespace DaftAppleGames.BuildingTools.Editor
             triggerGameObject.transform.localRotation = Quaternion.identity;
 
             DoorTrigger doorTrigger = triggerGameObject.EnsureComponent<DoorTrigger>();
-            doorTrigger.ConfigureInEditor(door, doorTriggerLayerMask, doorTriggerTags, doorTriggerLocation);
+            doorTrigger.Door = door;
+            doorTrigger.TriggerLayerMask = doorTriggerLayerMask;
+            doorTrigger.TriggerTags = doorTriggerTags;
+            doorTrigger.DoorTriggerLocation = doorTriggerLocation;
             return triggerGameObject;
         }
 

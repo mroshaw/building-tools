@@ -17,17 +17,11 @@ namespace DaftAppleGames.Buildings
 
     public class BuildingLight : MonoBehaviour
     {
-        #region Class properties
-
         [BoxGroup("Settings")] [SerializeField] private bool findLightsOnAwake;
         [BoxGroup("Settings")] [SerializeField] public BuildingLightType buildingLightType;
         [BoxGroup("Lights")] [SerializeField] private Light lightComponent;
         [BoxGroup("Lights")] [SerializeField] private ParticleSystem particles;
         public BuildingLightType BuildingLightType => buildingLightType;
-
-        #endregion
-
-        #region Startup
 
         private void Awake()
         {
@@ -37,9 +31,15 @@ namespace DaftAppleGames.Buildings
             }
         }
 
-        #endregion
-
-        #region Class Methods
+        /// <summary>
+        /// Allow light to be configured externally, outside of Unity inspector
+        /// </summary>
+        public void ConfigureLight(BuildingLightType newLightType, Light newLight, ParticleSystem newParticles)
+        {
+            buildingLightType = newLightType;
+            lightComponent = newLight;
+            particles = newParticles;
+        }
 
         [Button("Update Lights")]
         public void UpdateLights()
@@ -70,23 +70,5 @@ namespace DaftAppleGames.Buildings
             lightComponent.gameObject.SetActive(state);
             particles.gameObject.SetActive(state);
         }
-
-        #endregion
-
-
-        #region Unity Editor methods
-
-#if UNITY_EDITOR
-        public void ConfigureInEditor(BuildingLightType newLightType, Light newLight, ParticleSystem newParticles)
-        {
-            buildingLightType = newLightType;
-            lightComponent = newLight;
-            particles = newParticles;
-        }
-
-        public Light LightComponent => lightComponent;
-#endif
-
-        #endregion
     }
 }

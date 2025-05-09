@@ -19,7 +19,16 @@ namespace DaftAppleGames.Buildings
     {
         [SerializeField] private Door door;
         [SerializeField] private DoorTriggerLocation doorTriggerLocation;
-        public DoorTriggerLocation DoorTriggerLocation => doorTriggerLocation;
+
+        public DoorTriggerLocation DoorTriggerLocation
+        {
+            set => doorTriggerLocation = value;
+        }
+
+        public Door Door
+        {
+            set => door = value;
+        }
 
         private void Start()
         {
@@ -61,18 +70,5 @@ namespace DaftAppleGames.Buildings
         {
             door.CloseDoor();
         }
-
-        #region Unity Editor methods
-
-#if UNITY_EDITOR
-        public void ConfigureInEditor(Door newDoor, LayerMask newTriggerLayerMask, string[] newTriggerTags, DoorTriggerLocation newTriggerLocation)
-        {
-            door = newDoor;
-            doorTriggerLocation = newTriggerLocation;
-            base.ConfigureInEditor(newTriggerLayerMask, newTriggerTags);
-        }
-#endif
-
-        #endregion
     }
 }
