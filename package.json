@@ -4,9 +4,6 @@
   "displayName": "Daft Apple Building Tools",
   "description": "Components and Editor Tools designed to help configure and optimise buildings in Unity projects",
   "unity": "6000.0",
-  "dependencies": {
-    "com.daftapplegames.daftapple-core": "https://github.com/mroshaw/daftapple-core.git#0.9.0"
-  },
   "documentationUrl": "https://mroshaw.github.io/unity-framework-docs/buildingtools/",
   "changelogUrl": "https://github.com/mroshaw/3dforge-tools/blob/main/README.md",
   "licensesUrl": "https://github.com/mroshaw/3dforge-tools/blob/main/LICENSE",
