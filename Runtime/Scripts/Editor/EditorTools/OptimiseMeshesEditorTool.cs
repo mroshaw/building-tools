@@ -397,7 +397,7 @@ namespace DaftAppleGames.BuildingTools.Editor
             resultGameObject.transform.SetParent(SelectedGameObject.transform);
 
             // Update the RollBack component
-            _meshCombineRollBack.SetResultGameObject(resultGameObject);
+            _meshCombineRollBack.AddResultGameObject(resultGameObject);
 
             // Apply Mesh Presets
             meshPresets.ConfigureMeshOnGameObject(resultGameObject, log);

@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
@@ -20,7 +21,7 @@ namespace DaftAppleGames.Buildings
         [BoxGroup("Settings")] [SerializeField] private bool deleteAssetFolder = true;
         [BoxGroup("Settings")] [SerializeField] private bool deleteSelf;
         [FoldoutGroup("Audit")] [SerializeField] private List<Renderer> deactivatedRenderers;
-        [FoldoutGroup("Audit")] [SerializeField] private GameObject resultGameObject;
+        [FoldoutGroup("Audit")] [SerializeField] private List<GameObject> resultGameObjects;
         [FoldoutGroup("Audit")] [SerializeField] private string assetAbsoluteFolderPath;
         [FoldoutGroup("Audit")] [SerializeField] private string assetRelativeFolderPath;
 
@@ -28,14 +29,15 @@ namespace DaftAppleGames.Buildings
         {
             isOptimised = false;
             deactivatedRenderers?.Clear();
-            resultGameObject = null;
+            resultGameObjects?.Clear();
             assetAbsoluteFolderPath = string.Empty;
             assetRelativeFolderPath = string.Empty;
         }
 
-        public void SetResultGameObject(GameObject newGameObject)
+        public void AddResultGameObject(GameObject newGameObject)
         {
-            resultGameObject = newGameObject;
+            resultGameObjects ??= new List<GameObject>();
+            resultGameObjects.Add(newGameObject);
         }
 
         public void SetPaths(string absolutePath, string relativePath)
@@ -65,8 +67,12 @@ namespace DaftAppleGames.Buildings
             }
 
             // Destroy the resultGameObject Game Object
-            DestroyImmediate(resultGameObject);
-            resultGameObject = null;
+            foreach (GameObject currGameObject in resultGameObjects)
+            {
+                DestroyImmediate(currGameObject);
+            }
+
+            resultGameObjects.Clear();
 
             string[] assetFolders = { assetRelativeFolderPath };
 
@@ -99,8 +105,21 @@ namespace DaftAppleGames.Buildings
             ClearAudit();
             if (deleteSelf)
             {
-                DestroyImmediate(this);
+                StartCoroutine(DestroySelf());
             }
+        }
+
+        private IEnumerator DestroySelf()
+        {
+            // Hide from inspector to stop it trying to redraw after it's been destroyed
+            hideFlags |= HideFlags.HideInInspector;
+
+            // Wait a a frame so Unity doesn't redraw the component
+            yield return null;
+
+            // Now we can destroy it
+            Debug.Log($"Deleting MeshCombineRollBack component on : {gameObject.name}");
+            DestroyImmediate(this);
         }
     }
 }
