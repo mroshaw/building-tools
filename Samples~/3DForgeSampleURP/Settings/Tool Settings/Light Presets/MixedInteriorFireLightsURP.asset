@@ -9,10 +9,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe58c27870a5ee047b08f29a1b1d2918, type: 3}
-  m_Name: SetUpSceneEditorTool
+  m_Script: {fileID: 11500000, guid: 9cf1b1b76bd30ef4797c16d307045921, type: 3}
+  m_Name: MixedInteriorFireLightsURP
   m_EditorClassIdentifier: 
-  toolNameAppendix: 
-  directionLightRenderingLayerMask:
+  range: 1
+  intensity: 15
+  radius: 0.025
+  renderingLayerMask:
     serializedVersion: 0
-    m_Bits: 3
+    m_Bits: 2
+  filterColor: {r: 0.8962264, g: 0.5720058, b: 0.32551616, a: 1}
+  temperature: 6570
+  lightmapBakeType: 1

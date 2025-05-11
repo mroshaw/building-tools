@@ -7,8 +7,8 @@ TerrainLayer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: MeadowGrass
-  m_DiffuseTexture: {fileID: 2800000, guid: 3d97f52958a40ae48a74720c532c76ae, type: 3}
-  m_NormalMapTexture: {fileID: 2800000, guid: d7acf60f3acdc1b4781adb05d815c710, type: 3}
+  m_DiffuseTexture: {fileID: 2800000, guid: 449611a5e1b7c1b41ace8d416b3b4d48, type: 3}
+  m_NormalMapTexture: {fileID: 2800000, guid: 557c45e25ff2a9f4aa1f54405e285a81, type: 3}
   m_MaskMapTexture: {fileID: 2800000, guid: cb99ca6b7451e514ea5886ac838d31b9, type: 3}
   m_TileSize: {x: 2, y: 2}
   m_TileOffset: {x: 0, y: 0}

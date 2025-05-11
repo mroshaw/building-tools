@@ -27,4 +27,11 @@ MonoBehaviour:
     m_Bits: 4294967295
   doorTriggerTags:
   - Player
-  moveableMeshStaticFlags: 0
+  overrideColliderHeight: 0
+  doorColliderOverrideHeight: 2
+  doorColliderDepth: 1
+  overrideColliderWidth: 0
+  doorColliderOverrideWidth: 1
+  doorRendererStaticFlags: 0
+  outsideTriggerName: Outside Trigger
+  insideTriggerName: Inside Trigger

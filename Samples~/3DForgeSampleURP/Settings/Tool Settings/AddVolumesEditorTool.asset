@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d5a143c8ad55584b8f4b579be96ba29, type: 3}
   m_Name: AddVolumesEditorTool
   m_EditorClassIdentifier: 
+  toolNameAppendix: 
   meshSizeIgnoreNames:
   - Base
   - fe_vil_Stall1
@@ -21,6 +22,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 256
   interiorVolumeGameObjectName: Interior Volume
+  interiorVolumeProfile: {fileID: 11400000, guid: 5244510cea8f50441b8646f543f44454, type: 2}
   indoorSnapshot: {fileID: -1796804499125752488, guid: d4cb3dd8c857cad4599292f12c8e37c2, type: 2}
   outdoorSnapshot: {fileID: 24500006, guid: d4cb3dd8c857cad4599292f12c8e37c2, type: 2}
   volumeTriggerTags:
