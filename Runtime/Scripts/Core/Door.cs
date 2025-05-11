@@ -107,6 +107,9 @@ namespace DaftAppleGames.Buildings
             }
 
             _audioSource.outputAudioMixerGroup = audioMixerGroup;
+            _audioSource.playOnAwake = false;
+            _audioSource.loop = false;
+            _audioSource.spatialBlend = 1.0f;
 
             openingClips = newOpeningClips;
             closingClips = newClosingClips;
