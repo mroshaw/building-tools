@@ -14,13 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   layerName: BuildingExterior
   staticEditorFlags: -1
+  dynamicMeshStaticFlags: 0
   shadowCastingMode: 1
   staticShadowCaster: 1
   receiveGI: 2
-  contributeGI: 0
   lightProbeUsage: 1
   scaleInLightmap: 0
-  motionVectors: 0
+  motionVectors: 1
   dynamicOcclusion: 0
   renderingLayerMask:
     serializedVersion: 0

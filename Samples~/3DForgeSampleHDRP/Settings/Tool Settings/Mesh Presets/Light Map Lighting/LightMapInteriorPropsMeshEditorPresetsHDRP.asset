@@ -14,13 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   layerName: InteriorProps
   staticEditorFlags: -1
+  dynamicMeshStaticFlags: 0
   shadowCastingMode: 1
   staticShadowCaster: 1
   receiveGI: 1
-  contributeGI: 1
   lightProbeUsage: 0
   scaleInLightmap: 0
-  motionVectors: 0
+  motionVectors: 1
   dynamicOcclusion: 0
   renderingLayerMask:
     serializedVersion: 0
