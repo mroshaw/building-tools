@@ -101,6 +101,11 @@ namespace DaftAppleGames.Buildings
         public void SetDoorAudio(AudioMixerGroup audioMixerGroup, AudioClip[] newOpeningClips, AudioClip[] newOpenClips, AudioClip[] newClosingClips,
             AudioClip[] newClosedClips)
         {
+            if (!_audioSource)
+            {
+                _audioSource = gameObject.AddComponent<AudioSource>();
+            }
+
             _audioSource.outputAudioMixerGroup = audioMixerGroup;
 
             openingClips = newOpeningClips;
