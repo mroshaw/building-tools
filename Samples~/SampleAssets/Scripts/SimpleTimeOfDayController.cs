@@ -25,8 +25,8 @@ namespace DaftAppleGames.Samples.BuildingTools
         // Yuma, sunniest place on Earth
         [BoxGroup("Settings")] [SerializeField] private float latitude = 32.6927f;
 
-        [BoxGroup("Events")] [SerializeField] private int dayStartsAtHour = 6;
-        [BoxGroup("Events")] [SerializeField] private int nightStartsAtHour = 20;
+        [BoxGroup("Event Settings")] [SerializeField] private int dayStartsAtHour = 6;
+        [BoxGroup("Event Settings")] [SerializeField] private int nightStartsAtHour = 20;
 
         [FoldoutGroup("Events")] public UnityEvent<float> timeChangedEvent;
         [FoldoutGroup("Events")] public UnityEvent<int> hourPassedEvent;

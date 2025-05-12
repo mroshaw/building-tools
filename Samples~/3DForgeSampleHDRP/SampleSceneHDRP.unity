@@ -897,7 +897,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 1
   m_IsActive: 1
 --- !u!65 &271666249
 BoxCollider:
@@ -1176,7 +1176,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1114459247}
   m_Layer: 0
-  m_Name: '*** Building Tools Components ***'
+  m_Name: '*** Building Tools ***'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

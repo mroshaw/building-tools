@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5f5db9f93cabb44cb52ff3227a2e83f, type: 3}
   m_Name: AddDoorsEditorTool
   m_EditorClassIdentifier: 
+  toolNameAppendix: 
   doorNames:
   - vil_door
   doorOpeningClips:
@@ -24,11 +25,14 @@ MonoBehaviour:
   doorSfxGroup: {fileID: -8991655405756310492, guid: d4cb3dd8c857cad4599292f12c8e37c2, type: 2}
   doorTriggerLayerMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 3895
   doorTriggerTags:
   - Player
-  doorColliderHeight: 2
+  overrideColliderHeight: 0
+  doorColliderOverrideHeight: 2
   doorColliderDepth: 2
   overrideColliderWidth: 0
-  doorColliderWidth: 1
-  moveableMeshStaticFlags: 0
+  doorColliderOverrideWidth: 1
+  doorRendererStaticFlags: 0
+  outsideTriggerName: Outside Trigger
+  insideTriggerName: Inside Trigger

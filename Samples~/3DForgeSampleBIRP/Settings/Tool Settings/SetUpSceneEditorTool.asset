@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe58c27870a5ee047b08f29a1b1d2918, type: 3}
   m_Name: SetUpSceneEditorTool
   m_EditorClassIdentifier: 
+  toolNameAppendix: 
   directionLightCullingLayerMask:
     serializedVersion: 2
     m_Bits: 3841

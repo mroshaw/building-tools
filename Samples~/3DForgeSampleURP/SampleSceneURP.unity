@@ -216,7 +216,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   timeOfDay: 14.27
   sun: {fileID: 1899781792}
-  timeProgression: 1
+  timeProgression: 0
   timeSpeed: 0.5
   latitude: 32.6927
   dayStartsAtHour: 6

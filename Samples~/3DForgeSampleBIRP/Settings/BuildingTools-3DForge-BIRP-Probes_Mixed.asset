@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c147e94f66bc230488ae51927b974bd3, type: 3}
+  m_Name: BuildingTools-3DForge-BIRP-Probes_Mixed
+  m_EditorClassIdentifier: 
+  toolsList:
+  - {fileID: 11400000, guid: c81fb0d27a29ef24f9fa595e145c2467, type: 2}
+  - {fileID: 11400000, guid: 49cefc82e10fd8c48aa4ea3c42ea2460, type: 2}
+  - {fileID: 11400000, guid: 334ba359b26a148448f9baa40595d98a, type: 2}
+  - {fileID: 11400000, guid: d3b27a0a9fb287d43ad5361f923e9134, type: 2}
+  - {fileID: 11400000, guid: 9a350b5acc33a7048b9315fdb93ae475, type: 2}
+  - {fileID: 11400000, guid: 1c9f94ac2a5f9094d8bd998353067122, type: 2}
+  - {fileID: 11400000, guid: 1e3bb38bfa69b0c479ac5fc84246280e, type: 2}
+  - {fileID: 11400000, guid: 8edbd356498b5ea47a2a58f9e1ac45b6, type: 2}
+  - {fileID: 11400000, guid: eb802b087e593564a85a71bcd46bf624, type: 2}

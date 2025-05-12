@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e3ca56d3e8d1ac4a82ad69e5b3e7543, type: 3}
+  m_Name: ApplyMeshPresetsEditorTool_Probes
+  m_EditorClassIdentifier: 
+  toolNameAppendix: Probes
+  interiorMeshSettings: {fileID: 11400000, guid: da8c27874d8b2ff46bb3793fc0acaf67, type: 2}
+  exteriorMeshSettings: {fileID: 11400000, guid: fbceef5377571094ba3d0efaaa483928, type: 2}
+  interiorPropMeshSettings: {fileID: 11400000, guid: fc1f2f69eb1cada42b41492cabcb5491, type: 2}
+  exteriorPropMeshSettings: {fileID: 11400000, guid: 08c1ca5a8ebafb74b90e841fa5ec7176, type: 2}
