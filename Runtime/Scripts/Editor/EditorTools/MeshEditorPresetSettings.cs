@@ -30,7 +30,7 @@ namespace DaftAppleGames.BuildingTools.Editor
         [BoxGroup("Lighting")] public ReceiveGI receiveGI;
 
         [BoxGroup("Probes")] public LightProbeUsage lightProbeUsage;
-#if BIRP
+#if DAG_BIRP
         [BoxGroup("Probes")] public ReflectionProbeUsage reflectionProbeUsage;
 #endif
 #if DAG_HDRP || DAG_URP
@@ -58,7 +58,7 @@ namespace DaftAppleGames.BuildingTools.Editor
             meshRenderer.rendererPriority = priority;
 #endif
             meshRenderer.lightProbeUsage = lightProbeUsage;
-#if BIRP
+#if DAG_BIRP
             meshRenderer.reflectionProbeUsage = reflectionProbeUsage;
 #endif
             meshRenderer.motionVectorGenerationMode = motionVectors;
