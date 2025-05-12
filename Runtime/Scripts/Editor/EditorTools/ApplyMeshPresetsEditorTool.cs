@@ -16,10 +16,10 @@ namespace DaftAppleGames.BuildingTools.Editor
     [CreateAssetMenu(fileName = "ConfigureMeshesEditorTool", menuName = "Daft Apple Games/Building Tools/Configure Meshes Tool")]
     internal class ApplyMeshPresetsEditorTool : BuildingEditorTool
     {
-        [SerializeField] [BoxGroup("Settings")] internal MeshEditorPresetSettings interiorMeshSettings;
-        [SerializeField] [BoxGroup("Settings")] internal MeshEditorPresetSettings exteriorMeshSettings;
-        [SerializeField] [BoxGroup("Settings")] internal MeshEditorPresetSettings interiorPropMeshSettings;
-        [SerializeField] [BoxGroup("Settings")] internal MeshEditorPresetSettings exteriorPropMeshSettings;
+        [InlineEditor] [SerializeField] [BoxGroup("Settings")] internal MeshEditorPresetSettings interiorMeshSettings;
+        [InlineEditor] [SerializeField] [BoxGroup("Settings")] internal MeshEditorPresetSettings exteriorMeshSettings;
+        [InlineEditor] [SerializeField] [BoxGroup("Settings")] internal MeshEditorPresetSettings interiorPropMeshSettings;
+        [InlineEditor] [SerializeField] [BoxGroup("Settings")] internal MeshEditorPresetSettings exteriorPropMeshSettings;
 
         protected override string GetToolName()
         {

@@ -39,7 +39,7 @@ namespace DaftAppleGames.BuildingTools.Editor
         public float lensFlareIntensity;
         public LensFlareDataSRP lensFlareData;
 #endif
-        public LightEditorPresetSettings presetSettings;
+        [InlineEditor] public LightEditorPresetSettings presetSettings;
     }
 
     [CreateAssetMenu(fileName = "ConfigureLightingEditorTool", menuName = "Daft Apple Games/Building Tools/Configure Lighting Tool")]

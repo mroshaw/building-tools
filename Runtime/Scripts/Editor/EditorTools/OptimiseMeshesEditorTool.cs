@@ -25,7 +25,7 @@ namespace DaftAppleGames.BuildingTools.Editor
         [BoxGroup("Settings")] [SerializeField] internal bool createOutputFolder;
         [BoxGroup("Settings")] [SerializeField] internal bool is32BIT;
         [BoxGroup("Settings")] [SerializeField] internal bool generateSecondaryUVs;
-        [BoxGroup("Settings")] [SerializeField] internal ApplyMeshPresetsEditorTool combinedMeshPresets;
+        [InlineEditor] [BoxGroup("Settings")] [SerializeField] internal ApplyMeshPresetsEditorTool combinedMeshPresets;
 
         // Pre-calculate some folder paths (absolute and relative to /Asset) to make it easier to save assets
         private string OutputAbsolutePath => Path.Combine(Application.dataPath, assetOutputFolder);
