@@ -87,7 +87,7 @@ namespace DaftAppleGames.BuildingTools.Editor
 
         protected override void RunTool(string undoGroupName)
         {
-#if DAG_HDRP || DAG_UURP
+#if DAG_HDRP || DAG_URP
             log.AddToLog(LogLevel.Info, "Configuring Lighting Volume...");
             AddInteriorLightingVolume();
             log.AddToLog(LogLevel.Info, "Configuring Lighting Volume... DONE!");
@@ -97,7 +97,7 @@ namespace DaftAppleGames.BuildingTools.Editor
             log.AddToLog(LogLevel.Info, "Configuring Audio Volume... DONE!");
         }
 
-#if DAG_HDRP || DAG_UURP
+#if DAG_HDRP || DAG_URP
         private void AddInteriorLightingVolume()
         {
             log.AddToLog(LogLevel.Debug, $"Adding Interior Lighting Volume to {SelectedGameObject.name}...");
