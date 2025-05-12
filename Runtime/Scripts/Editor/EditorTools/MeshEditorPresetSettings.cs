@@ -28,18 +28,21 @@ namespace DaftAppleGames.BuildingTools.Editor
         [BoxGroup("Lighting")] public ShadowCastingMode shadowCastingMode;
         [BoxGroup("Lighting")] public bool staticShadowCaster;
         [BoxGroup("Lighting")] public ReceiveGI receiveGI;
-        [BoxGroup("Lighting")] public LightProbeUsage lightProbeUsage;
 
-        [BoxGroup("Light Mapping")] public float scaleInLightmap;
-
-        [BoxGroup("Additional")] public MotionVectorGenerationMode motionVectors;
+        [BoxGroup("Probes")] public LightProbeUsage lightProbeUsage;
+#if BIRP
+        [BoxGroup("Probes")] public ReflectionProbeUsage reflectionProbeUsage;
+#endif
+#if DAG_HDRP || DAG_URP
+        [BoxGroup("Light Mapping")] public float scaleInLightmap = 1;
+#endif
+        [BoxGroup("Additional")] public MotionVectorGenerationMode motionVectors = MotionVectorGenerationMode.Object;
         [BoxGroup("Additional")] public bool dynamicOcclusion;
 
 #if DAG_HDRP || DAG_URP
         [BoxGroup("Additional")] public RenderingLayerMask renderingLayerMask;
-#endif
         [BoxGroup("Additional")] public int priority;
-
+#endif
         /// <summary>
         /// Given a Mesh Renderer object, applies the presets
         /// </summary>
@@ -51,9 +54,12 @@ namespace DaftAppleGames.BuildingTools.Editor
             meshRenderer.receiveGI = receiveGI;
 #if DAG_HDRP || DAG_URP
             meshRenderer.renderingLayerMask = renderingLayerMask;
+            meshRenderer.scaleInLightmap = scaleInLightmap;
 #endif
             meshRenderer.lightProbeUsage = lightProbeUsage;
-            meshRenderer.scaleInLightmap = scaleInLightmap;
+#if BIRP
+            meshRenderer.reflectionProbeUsage = reflectionProbeUsage;
+#endif
             meshRenderer.motionVectorGenerationMode = motionVectors;
             meshRenderer.allowOcclusionWhenDynamic = dynamicOcclusion;
             meshRenderer.rendererPriority = priority;
