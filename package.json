@@ -1,6 +1,6 @@
 {
   "name": "com.daftapplegames.building-tools",
-  "version": "0.9.0",
+  "version": "1.0.0",
   "displayName": "Daft Apple Building Tools",
   "description": "Components and Editor Tools designed to help configure and optimise buildings in Unity projects",
   "unity": "6000.0",
