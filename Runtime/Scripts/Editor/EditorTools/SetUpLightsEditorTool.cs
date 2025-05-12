@@ -4,7 +4,7 @@ using System.IO;
 using DaftAppleGames.Buildings;
 using DaftAppleGames.Editor;
 using DaftAppleGames.Extensions;
-#if DAG_HDRP || DAG_URP
+#if DAG_HDRP
 using DaftAppleGames.Lighting;
 using UnityEngine.Rendering.HighDefinition;
 #endif
