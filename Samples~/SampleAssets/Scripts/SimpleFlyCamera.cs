@@ -1,16 +1,21 @@
 using UnityEngine;
+#if ODIN_INSPECTOR
+using Sirenix.OdinInspector;
+#else
+using DaftAppleGames.Attributes;
+#endif
 
 namespace DaftAppleGames.Samples.BuildingTools
 {
     public class SimpleFlyCamera : MonoBehaviour
     {
-        public float acceleration = 50; // how fast you accelerate
-        public float accSprintMultiplier = 4; // how much faster you go when "sprinting"
-        public float lookSensitivity = 1; // mouse look sensitivity
-        public float dampingCoefficient = 5; // how quickly you break to a halt after you stop your input
-        public bool focusOnEnable = true; // whether or not to focus and lock cursor immediately on enable
+        [BoxGroup("Settings")] [SerializeField] private float acceleration = 50;
+        [BoxGroup("Settings")] [SerializeField] private float accSprintMultiplier = 4;
+        [BoxGroup("Settings")] [SerializeField] private float lookSensitivity = 1;
+        [BoxGroup("Settings")] [SerializeField] private float dampingCoefficient = 5;
+        [BoxGroup("Settings")] [SerializeField] private bool focusOnEnable = true;
 
-        private Vector3 _velocity; // current velocity
+        private Vector3 _velocity;
 
         private static bool Focused
         {
@@ -34,13 +39,15 @@ namespace DaftAppleGames.Samples.BuildingTools
 
         private void Update()
         {
-            // Input
             if (Focused)
+            {
                 UpdateInput();
+            }
             else if (Input.GetMouseButtonDown(0))
+            {
                 Focused = true;
+            }
 
-            // Physics
             _velocity = Vector3.Lerp(_velocity, Vector3.zero, dampingCoefficient * Time.deltaTime);
             transform.position += _velocity * Time.deltaTime;
         }
@@ -57,9 +64,10 @@ namespace DaftAppleGames.Samples.BuildingTools
             Quaternion vert = Quaternion.AngleAxis(mouseDelta.y, Vector3.right);
             transform.rotation = horiz * rotation * vert;
 
-            // Leave cursor lock
             if (Input.GetKeyDown(KeyCode.Escape))
+            {
                 Focused = false;
+            }
         }
 
         private Vector3 GetAccelerationVector()
@@ -69,7 +77,9 @@ namespace DaftAppleGames.Samples.BuildingTools
             void AddMovement(KeyCode key, Vector3 dir)
             {
                 if (Input.GetKey(key))
+                {
                     moveInput += dir;
+                }
             }
 
             AddMovement(KeyCode.W, Vector3.forward);
@@ -81,8 +91,10 @@ namespace DaftAppleGames.Samples.BuildingTools
             Vector3 direction = transform.TransformVector(moveInput.normalized);
 
             if (Input.GetKey(KeyCode.LeftShift))
-                return direction * (acceleration * accSprintMultiplier); // "sprinting"
-            return direction * acceleration; // "walking"
+            {
+                return direction * (acceleration * accSprintMultiplier);
+            }
+            return direction * acceleration;
         }
     }
 }
