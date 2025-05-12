@@ -27,15 +27,23 @@ namespace DaftAppleGames.BuildingTools.Editor
     internal class SetUpSceneEditorTool : BuildingEditorTool
     {
 #if DAG_HDRP
-        [SerializeField] [BoxGroup("Settings")] internal bool addOnDemandShadowMapComponent;
-        [SerializeField] [BoxGroup("Settings")] internal int shadowRefreshRate;
+        [SerializeField] [BoxGroup("Settings")]
+        [Tooltip(
+            "If true, an `OnDemandShadowMapUpdate` component will be added to your main Directional Light. This can be configured to update the shadow on the light every n frames or m seconds. This can be a significant performance improvement if you are currently updating shadows every frame.")]
+        internal bool addOnDemandShadowMapComponent;
+
+        [SerializeField] [BoxGroup("Settings")]
+        [Tooltip("Sets the number of frames to wait before refreshing the shadows of a light, driven by the new `OnDemandShadowUpdate` component.")] internal int shadowRefreshRate;
 #endif
 #if DAG_HDRP || DAG_URP
-        [SerializeField] [BoxGroup("Settings")] internal RenderingLayerMask directionLightRenderingLayerMask;
+        [SerializeField] [BoxGroup("Settings")]
+        [Tooltip(
+            "Determines which meshes are influence by the main directional light, driven by \"Rendering Layers\", which is a concept only supported in the \"Scriptable\" rendering pipelines.")]
+        internal RenderingLayerMask directionLightRenderingLayerMask;
 #endif
 
 #if DAG_BIRP
-        [SerializeField] [BoxGroup("Settings")] internal LayerMask directionLightCullingLayerMask;
+        [SerializeField] [BoxGroup("Settings")] [Tooltip("Determines which meshes are influence by the main directional light, driven by the mesh renderer Game Object layers.")] internal LayerMask directionLightCullingLayerMask;
 #endif
         protected override string GetToolName()
         {

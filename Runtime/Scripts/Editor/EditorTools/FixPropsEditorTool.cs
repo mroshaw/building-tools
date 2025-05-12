@@ -14,15 +14,36 @@ namespace DaftAppleGames.BuildingTools.Editor
     [CreateAssetMenu(fileName = "ConfigurePropsEditorTool", menuName = "Daft Apple Games/Building Tools/Configure Props Tool")]
     internal class FixPropsEditorTool : BuildingEditorTool
     {
-        [SerializeField] [BoxGroup("Collider Settings")] internal string[] boxColliderNames;
-        [SerializeField] [BoxGroup("Collider Settings")] internal string[] sphereColliderNames;
-        [SerializeField] [BoxGroup("Collider Settings")] internal string[] capsuleColliderNames;
-        [SerializeField] [BoxGroup("Collider Settings")] internal string[] meshColliderNames;
-        [SerializeField] [BoxGroup("Alignment Settings")] internal bool terrainAlignPosition;
-        [SerializeField] [BoxGroup("Alignment Settings")] internal bool terrainAlignRotation;
-        [SerializeField] [BoxGroup("Alignment Settings")] internal bool terrainAlignX;
-        [SerializeField] [BoxGroup("Alignment Settings")] internal bool terrainAlignY;
-        [SerializeField] [BoxGroup("Alignment Settings")] internal bool terrainAlignZ;
+        [SerializeField] [BoxGroup("Collider Settings")]
+        [Tooltip("Game Objects with this string in their name, that contain a Mesh Renderer, will have a `BoxCollider` added, if one does not exist.")]
+        internal string[] boxColliderNames;
+
+        [SerializeField] [BoxGroup("Collider Settings")]
+        [Tooltip("Game Objects with this string in their name, that contain a Mesh Renderer, will have a `SphereCollider` added, if one does not exist.")]
+        internal string[] sphereColliderNames;
+
+        [SerializeField] [BoxGroup("Collider Settings")]
+        [Tooltip("Game Objects with this string in their name, that contain a Mesh Renderer, will have a `CapsuleCollider` added, if one does not exist.")]
+        internal string[] capsuleColliderNames;
+
+        [SerializeField] [BoxGroup("Collider Settings")]
+        [Tooltip("Game Objects with this string in their name, that contain a Mesh Renderer, will have a `MeshCollider` added, if one does not exist.")]
+        internal string[] meshColliderNames;
+
+        [SerializeField] [BoxGroup("Alignment Settings")]
+        [Tooltip("If ticked, Game Objects on the terrain will be lowered to sit flush on the terrain.")] internal bool terrainAlignPosition;
+
+        [SerializeField] [BoxGroup("Alignment Settings")]
+        [Tooltip("If ticked, Game Objects will be rotated to align with the contact point on the terrain.")] internal bool terrainAlignRotation;
+
+        [SerializeField] [BoxGroup("Alignment Settings")]
+        [Tooltip("If ticked, align rotation will affect this axis. Untick to preserve the axis as is.")] internal bool terrainAlignX;
+
+        [SerializeField] [BoxGroup("Alignment Settings")]
+        [Tooltip("If ticked, align rotation will affect this axis. Untick to preserve the axis as is.")] internal bool terrainAlignY;
+
+        [SerializeField] [BoxGroup("Alignment Settings")]
+        [Tooltip("If ticked, align rotation will affect this axis. Untick to preserve the axis as is.")] internal bool terrainAlignZ;
 
         protected override string GetToolName()
         {

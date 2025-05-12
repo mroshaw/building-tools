@@ -25,21 +25,30 @@ namespace DaftAppleGames.BuildingTools.Editor
     [Serializable]
     public struct BuildingLightTypeSettings
     {
+        [Tooltip("The type of light to which these settings apply. You should only have one instance of each light type in a given tool configuration.")]
         public BuildingLightType buildingLightType;
-        public string[] meshNames;
+
+        [Tooltip("Game Objects that contain any of these strings will be configured as Lights by the tool.")] public string[] meshNames;
+
+        [Tooltip(
+            "Game Objects that contain any of these strings will be configured as flames by the tool. This is then used to toggle flames on and off along with the light itself.")]
         public string[] flameNames;
-        public bool useLensFlare;
+
+        [Tooltip("Determines whether Lens Flare components should be added and configured for this light type.")] public bool useLensFlare;
 #if DAG_HDRP
+        [Tooltip(
+            "If true, an `OnDemandShadowMapUpdate` component will be added to the light. This can be configured to update the shadow on the light every n frames or m seconds. This can be a significant performance improvement if you are currently updating shadows every frame.")]
         public bool addOnDemandShadowMapComponent;
-        public int shadowRefreshRate;
+
+        [Tooltip("Sets the number of frames to wait before refreshing the shadows of a light, driven by the new `OnDemandShadowUpdate` component.")] public int shadowRefreshRate;
 #endif
 
 #if DAG_HDRP || DAG_URP
 
-        public float lensFlareIntensity;
-        public LensFlareDataSRP lensFlareData;
+        [Tooltip("The intensity of the lens flare, if one is added.")] public float lensFlareIntensity;
+        [Tooltip("SRP Lens Flare configuration for the lens flare, if one is added.")] public LensFlareDataSRP lensFlareData;
 #endif
-        [InlineEditor] public LightEditorPresetSettings presetSettings;
+        [Tooltip("Light properties to be applied to each light.")] [InlineEditor] public LightEditorPresetSettings presetSettings;
     }
 
     [CreateAssetMenu(fileName = "ConfigureLightingEditorTool", menuName = "Daft Apple Games/Building Tools/Configure Lighting Tool")]

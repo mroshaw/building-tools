@@ -16,16 +16,37 @@ namespace DaftAppleGames.BuildingTools.Editor
     [CreateAssetMenu(fileName = "ConfigureVolumesEditorTool", menuName = "Daft Apple Games/Building Tools/Configure Volumes Tool")]
     internal class AddVolumesEditorTool : BuildingEditorTool
     {
-        [SerializeField] [BoxGroup("Settings")] internal string[] meshSizeIgnoreNames;
-        [SerializeField] [BoxGroup("Settings")] internal LayerMask meshSizeIncludeLayers;
-        [SerializeField] [BoxGroup("Settings")] internal string interiorVolumeGameObjectName;
+        [SerializeField] [BoxGroup("Settings")]
+        [Tooltip(
+            "When determining the \"bounds\" of a building, any mesh renderer Game Objects containing these names are ignored by the calculation, as are any of their children. Can be used to remove \"invisible\" meshes, such as those under the ground or that \"overhang\" the interior space, from the calculation.")]
+        internal string[] meshSizeIgnoreNames;
+
+        [SerializeField] [BoxGroup("Settings")]
+        [Tooltip("LayerMask containing layers that will be considered by the mesh size calculation. Only mesh renderers within these layers will be considered.")]
+        internal LayerMask meshSizeIncludeLayers;
+
+        [SerializeField] [BoxGroup("Settings")]
+        [Tooltip("Name of the Game Object created, if not there already, that contains the various volume components.")] internal string interiorVolumeGameObjectName;
 #if DAG_HDRP || DAG_URP
-        [SerializeField] [BoxGroup("Settings")] internal VolumeProfile interiorVolumeProfile;
+        [SerializeField] [BoxGroup("Settings")]
+        [Tooltip("Selected Volume Profile that will be applied when the player/camera enters the building.")] internal VolumeProfile interiorVolumeProfile;
 #endif
-        [SerializeField] [BoxGroup("Settings")] internal AudioMixerSnapshot indoorSnapshot;
-        [SerializeField] [BoxGroup("Settings")] internal AudioMixerSnapshot outdoorSnapshot;
-        [SerializeField] [BoxGroup("Settings")] internal string[] volumeTriggerTags;
-        [SerializeField] [BoxGroup("Settings")] internal LayerMask volumeTriggerLayerMask;
+        [SerializeField] [BoxGroup("Settings")]
+        [Tooltip(
+            "AudioMixer Snapshot corresponding to the AudioMixer profile that is applied when the player/camera enters the building. Typically contains \"Lowbypass/Highbypass\" filters to \"muffle\" the audio.")]
+        internal AudioMixerSnapshot indoorSnapshot;
+
+        [SerializeField] [BoxGroup("Settings")]
+        [Tooltip("AudioMixer Snapshot corresponding to the AudioMixer profile that is applied when the player/camera exists the building. Typically a \"clean\" snapshot profile.")]
+        internal AudioMixerSnapshot outdoorSnapshot;
+
+        [SerializeField] [BoxGroup("Settings")]
+        [Tooltip("When a collider enters the volume trigger collider, only colliders on Game Objects with one of these tags will trigger the volume effect.")]
+        internal string[] volumeTriggerTags;
+
+        [SerializeField] [BoxGroup("Settings")]
+        [Tooltip("When a collider enters the volume trigger collider, only colliders on Game Objects on one of these layerswill trigger the volume effect.")]
+        internal LayerMask volumeTriggerLayerMask;
 
         protected override string GetToolName()
         {

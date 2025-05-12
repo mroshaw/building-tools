@@ -16,22 +16,60 @@ namespace DaftAppleGames.BuildingTools.Editor
     [CreateAssetMenu(fileName = "ConfigureDoorsEditorTool", menuName = "Daft Apple Games/Building Tools/Configure Doors Tool")]
     internal class AddDoorsEditorTool : BuildingEditorTool
     {
-        [SerializeField] [BoxGroup("Settings")] internal string[] doorNames;
-        [SerializeField] [BoxGroup("Settings")] internal AudioClip[] doorOpeningClips;
-        [SerializeField] [BoxGroup("Settings")] internal AudioClip[] doorOpenClips;
-        [SerializeField] [BoxGroup("Settings")] internal AudioClip[] doorClosingClips;
-        [SerializeField] [BoxGroup("Settings")] internal AudioClip[] doorClosedClips;
-        [SerializeField] [BoxGroup("Settings")] internal AudioMixerGroup doorSfxGroup;
-        [SerializeField] [BoxGroup("Settings")] internal LayerMask doorTriggerLayerMask;
-        [SerializeField] [BoxGroup("Settings")] internal string[] doorTriggerTags;
-        [SerializeField] [BoxGroup("Settings")] internal bool overrideColliderHeight;
-        [SerializeField] [BoxGroup("Settings")] internal float doorColliderOverrideHeight = 2.0f;
-        [SerializeField] [BoxGroup("Settings")] internal float doorColliderDepth = 1.0f;
-        [SerializeField] [BoxGroup("Settings")] internal bool overrideColliderWidth;
-        [SerializeField] [BoxGroup("Settings")] internal float doorColliderOverrideWidth = 1.0f;
-        [SerializeField] [BoxGroup("Settings")] internal StaticEditorFlags doorRendererStaticFlags;
-        [SerializeField] [BoxGroup("Settings")] internal string outsideTriggerName = "Outside Trigger";
-        [SerializeField] [BoxGroup("Settings")] internal string insideTriggerName = "Inside Trigger";
+        [SerializeField] [BoxGroup("Settings")] [Tooltip("Game Objects that contain any of these strings will be configured as doors.")] internal string[] doorNames;
+
+        [SerializeField] [BoxGroup("Settings")]
+        [Tooltip("Optional audio clip(s) that play when the door starts opening. If multiple clips are added, a random clip will be played.")]
+        internal AudioClip[] doorOpeningClips;
+
+        [SerializeField] [BoxGroup("Settings")]
+        [Tooltip("Optional audio clip(s) that play when the door completes opening. If multiple clips are added, a random clip will be played.")]
+        internal AudioClip[] doorOpenClips;
+
+        [SerializeField] [BoxGroup("Settings")]
+        [Tooltip("Optional audio clip(s) that play when the door starts closing. If multiple clips are added, a random clip will be played.")]
+        internal AudioClip[] doorClosingClips;
+
+        [SerializeField] [BoxGroup("Settings")]
+        [Tooltip("Optional audio clip(s) that play when the door completes closing. If multiple clips are added, a random clip will be played.")]
+        internal AudioClip[] doorClosedClips;
+
+        [SerializeField] [BoxGroup("Settings")] [Tooltip("The AudioMixerGroup used to play the door audio sounds.")] internal AudioMixerGroup doorSfxGroup;
+
+        [SerializeField] [BoxGroup("Settings")]
+        [Tooltip("When a collider enters the door trigger, only colliders on any of the identified layers will be considered for triggering the door.")]
+        internal LayerMask doorTriggerLayerMask;
+
+        [SerializeField] [BoxGroup("Settings")]
+        [Tooltip("When a collider enters the door trigger, only colliders with any of the identified tags will be considered for triggering the door.")]
+        internal string[] doorTriggerTags;
+
+        [SerializeField] [BoxGroup("Settings")]
+        [Tooltip(
+            "By default, the colliders on either side of the door will match the height of the door mesh. If you want to override this, check this box and enter a value in the override.")]
+        internal bool overrideColliderHeight;
+
+        [SerializeField] [BoxGroup("Settings")]
+        [Tooltip("The height of the colliders created on either side of the door, if you've chosen to override the default.")] internal float doorColliderOverrideHeight = 2.0f;
+
+        [SerializeField] [BoxGroup("Settings")]
+        [Tooltip("The depth (distance from the door) of the colliders created on either side of the door.")] internal float doorColliderDepth = 1.0f;
+
+        [SerializeField] [BoxGroup("Settings")]
+        [Tooltip("By default, the trigger width is calculated based on the width of the door. Tick this to override that with a fixed value.")] internal bool overrideColliderWidth;
+
+        [SerializeField] [BoxGroup("Settings")] [Tooltip("The override width of the colliders, if the override flag is set.")] internal float doorColliderOverrideWidth = 1.0f;
+
+        [SerializeField] [BoxGroup("Settings")]
+        [Tooltip(
+            "| Static flag mask to be applied to the door. Generally \"Nothing\" to allow the door to be animated. |\n| ------------------------------------------------------------ |\n|                                                              |")]
+        internal StaticEditorFlags doorRendererStaticFlags;
+
+        [SerializeField] [BoxGroup("Settings")]
+        [Tooltip("The name of the Game Object created to hold the \"outside\" door trigger and collider.")] internal string outsideTriggerName = "Outside Trigger";
+
+        [SerializeField] [BoxGroup("Settings")]
+        [Tooltip("The name of the Game Object created to hold the \"inside\" door trigger and collider.")] internal string insideTriggerName = "Inside Trigger";
 
         protected override string GetToolName()
         {

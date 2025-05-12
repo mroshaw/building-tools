@@ -19,13 +19,28 @@ namespace DaftAppleGames.BuildingTools.Editor
     [CreateAssetMenu(fileName = "OptimiseMeshesEditorTool", menuName = "Daft Apple Games/Building Tools/Optimise Meshes Tool")]
     internal class OptimiseMeshesEditorTool : BuildingEditorTool
     {
-        [BoxGroup("Settings")] [SerializeField] internal bool combineMeshesByLayer = true;
-        [BoxGroup("Settings")] [SerializeField] internal string assetOutputFolder;
-        [BoxGroup("Settings")] [SerializeField] internal string assetFileNamePrefix;
-        [BoxGroup("Settings")] [SerializeField] internal bool createOutputFolder;
-        [BoxGroup("Settings")] [SerializeField] internal bool is32BIT;
-        [BoxGroup("Settings")] [SerializeField] internal bool generateSecondaryUVs;
-        [InlineEditor] [BoxGroup("Settings")] [SerializeField] internal ApplyMeshPresetsEditorTool combinedMeshPresets;
+        [BoxGroup("Settings")] [SerializeField]
+        [Tooltip(
+            "If checked, meshes will be combined separately for each of the BuildngExterior, BuildingInterior, ExteriorProps and InteriorProps layers. If unchecked, the whole building will be merged as one.")]
+        internal bool combineMeshesByLayer = true;
+
+        [BoxGroup("Settings")] [SerializeField] [Tooltip("Folder in the \"Assets\" folder where combined meshes and prefabs will be saved.")] internal string assetOutputFolder;
+        [BoxGroup("Settings")] [SerializeField] [Tooltip("Prefix that will be added to each generated combined mesh and prefab.")] internal string assetFileNamePrefix;
+
+        [BoxGroup("Settings")] [SerializeField]
+        [Tooltip("If the Asset Output Folder does not exist, checking this will cause the tool to create it.")] internal bool createOutputFolder;
+
+        [BoxGroup("Settings")] [SerializeField]
+        [Tooltip(
+            "If checked, forces the created mesh to use a 32-bit index format. Otherwise, it will use a 16-bit index format. See Mesh.indexFormat for more details.")]
+        internal bool is32BIT;
+
+        [BoxGroup("Settings")] [SerializeField] [Tooltip("Forces the tool to generate the UVs for the new combined meshes.")] internal bool generateSecondaryUVs;
+
+        [InlineEditor] [BoxGroup("Settings")]
+        [Tooltip(
+            "This is an instance of the Apply Mesh Presets Tool, and is used to apply pre-set parameters to the newly created merged meshes. Note that in the case of a \"whole building\" merge (if \"Combine Meshes By Layer\" is unchecked), then the resulting meshing will have the \"Building Exterior\" mesh pre-sets applied.")]
+        [SerializeField] internal ApplyMeshPresetsEditorTool combinedMeshPresets;
 
         // Pre-calculate some folder paths (absolute and relative to /Asset) to make it easier to save assets
         private string OutputAbsolutePath => Path.Combine(Application.dataPath, assetOutputFolder);

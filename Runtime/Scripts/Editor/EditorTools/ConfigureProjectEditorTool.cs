@@ -15,14 +15,24 @@ namespace DaftAppleGames.BuildingTools.Editor
     [CreateAssetMenu(fileName = "ConfigureProjectEditorTool", menuName = "Daft Apple Games/Building Tools/Configure Project Tool")]
     internal class ConfigureProjectEditorTool : BuildingEditorTool
     {
-        [SerializeField] [BoxGroup("Settings")] internal string exteriorLayerName = "BuildingExterior";
-        [SerializeField] [BoxGroup("Settings")] internal string interiorLayerName = "BuildingInterior";
-        [SerializeField] [BoxGroup("Settings")] internal string interiorPropsLayerName = "InteriorProps";
-        [SerializeField] [BoxGroup("Settings")] internal string exteriorPropsLayerName = "ExteriorProps";
+        [SerializeField] [BoxGroup("Settings")]
+        [Tooltip("Name of the layer on which building exteriors (think outer walls, etc) will sit.")] internal string exteriorLayerName = "BuildingExterior";
+
+        [SerializeField] [BoxGroup("Settings")]
+        [Tooltip("Name of the layer on which building interiors (think inner walls, etc) will sit.")] internal string interiorLayerName = "BuildingInterior";
+
+        [SerializeField] [BoxGroup("Settings")]
+        [Tooltip("Name of the layer on which interior props (think tables, chairs, rugs, etc) will sit.")] internal string interiorPropsLayerName = "InteriorProps";
+
+        [SerializeField] [BoxGroup("Settings")]
+        [Tooltip("Name of the layer on which exterior props (think barrels, carts, stables, etc) will sit.")] internal string exteriorPropsLayerName = "ExteriorProps";
 
 #if DAG_HDRP || DAG_URP
-        [SerializeField] [BoxGroup("HDRP/URP Settings")] internal string exteriorRenderLayerName = "Exterior";
-        [SerializeField] [BoxGroup("HDRP/URP Settings")] internal string interiorRenderLayerName = "Interior";
+        [SerializeField] [BoxGroup("HDRP/URP Settings")]
+        [Tooltip("Name of Rendering Layer that will be influenced by Exterior lights.")] internal string exteriorRenderLayerName = "Exterior";
+
+        [SerializeField] [BoxGroup("HDRP/URP Settings")]
+        [Tooltip("Name of Rendering Layer that will be influenced by Interior lights.")] internal string interiorRenderLayerName = "Interior";
 #endif
 
         protected override string GetToolName()

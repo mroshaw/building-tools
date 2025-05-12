@@ -16,10 +16,17 @@ namespace DaftAppleGames.BuildingTools.Editor
     [CreateAssetMenu(fileName = "ConfigureMeshesEditorTool", menuName = "Daft Apple Games/Building Tools/Configure Meshes Tool")]
     internal class ApplyMeshPresetsEditorTool : BuildingEditorTool
     {
-        [InlineEditor] [SerializeField] [BoxGroup("Settings")] internal MeshEditorPresetSettings interiorMeshSettings;
-        [InlineEditor] [SerializeField] [BoxGroup("Settings")] internal MeshEditorPresetSettings exteriorMeshSettings;
-        [InlineEditor] [SerializeField] [BoxGroup("Settings")] internal MeshEditorPresetSettings interiorPropMeshSettings;
-        [InlineEditor] [SerializeField] [BoxGroup("Settings")] internal MeshEditorPresetSettings exteriorPropMeshSettings;
+        [InlineEditor] [SerializeField] [BoxGroup("Settings")]
+        [Tooltip("Mesh presets to be applied to all interior building mesh renderers.")] internal MeshEditorPresetSettings interiorMeshSettings;
+
+        [InlineEditor] [SerializeField] [BoxGroup("Settings")]
+        [Tooltip("Mesh presets to be applied to all exterior building mesh renderers.")] internal MeshEditorPresetSettings exteriorMeshSettings;
+
+        [InlineEditor] [SerializeField] [BoxGroup("Settings")]
+        [Tooltip("Mesh presets to be applied to all interior prop mesh renderers.")] internal MeshEditorPresetSettings interiorPropMeshSettings;
+
+        [InlineEditor] [SerializeField] [BoxGroup("Settings")]
+        [Tooltip("Mesh presets to be applied to all exterior prop mesh renderers.")] internal MeshEditorPresetSettings exteriorPropMeshSettings;
 
         protected override string GetToolName()
         {
