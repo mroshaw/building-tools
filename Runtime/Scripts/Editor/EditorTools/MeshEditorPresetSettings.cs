@@ -34,7 +34,10 @@ namespace DaftAppleGames.BuildingTools.Editor
 
         [BoxGroup("Additional")] public MotionVectorGenerationMode motionVectors;
         [BoxGroup("Additional")] public bool dynamicOcclusion;
+
+#if DAG_HDRP || DAG_URP
         [BoxGroup("Additional")] public RenderingLayerMask renderingLayerMask;
+#endif
         [BoxGroup("Additional")] public int priority;
 
         /// <summary>
@@ -46,7 +49,9 @@ namespace DaftAppleGames.BuildingTools.Editor
             meshRenderer.shadowCastingMode = shadowCastingMode;
             meshRenderer.staticShadowCaster = staticShadowCaster;
             meshRenderer.receiveGI = receiveGI;
+#if DAG_HDRP || DAG_URP
             meshRenderer.renderingLayerMask = renderingLayerMask;
+#endif
             meshRenderer.lightProbeUsage = lightProbeUsage;
             meshRenderer.scaleInLightmap = scaleInLightmap;
             meshRenderer.motionVectorGenerationMode = motionVectors;
@@ -76,14 +81,7 @@ namespace DaftAppleGames.BuildingTools.Editor
             parentGameObject.layer = LayerMask.NameToLayer(layerName);
 
             // Update the static flags
-            if (parentGameObject.HasComponent<DynamicMeshRenderer>())
-            {
-                GameObjectUtility.SetStaticEditorFlags(parentGameObject, dynamicMeshStaticFlags);
-            }
-            else
-            {
-                GameObjectUtility.SetStaticEditorFlags(parentGameObject, staticEditorFlags);
-            }
+            GameObjectUtility.SetStaticEditorFlags(parentGameObject, parentGameObject.HasComponent<DynamicMeshRenderer>() ? dynamicMeshStaticFlags : staticEditorFlags);
         }
 
         /// <summary>

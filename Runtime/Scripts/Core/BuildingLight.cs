@@ -76,6 +76,7 @@ namespace DaftAppleGames.Buildings
         public bool GetLightState()
         {
             return _lightState;
+
         }
     }
 }
