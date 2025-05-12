@@ -160,8 +160,6 @@ namespace DaftAppleGames.Buildings
 
             DoorOpenDirection openDirection = GetDoorOpenDirection(doorTriggerLocation);
 
-            Debug.Log($"Trigger Location is: {doorTriggerLocation}, Pivot is: {doorPivotLocation}, Door opening: {openDirection}");
-
             float duration = immediate ? 0.0f : openingDuration;
 
             StartCoroutine(OpenDoorAsync(openDirection, duration));
@@ -294,7 +292,7 @@ namespace DaftAppleGames.Buildings
         /// <summary>
         /// Sets the pivot location on the door
         /// </summary>
-        private void SetDoorPivotLocation()
+        public void SetDoorPivotLocation()
         {
             doorPivotLocation = CalculatePivotLocation();
         }

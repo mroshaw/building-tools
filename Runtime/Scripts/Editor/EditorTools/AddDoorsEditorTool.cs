@@ -167,7 +167,7 @@ namespace DaftAppleGames.BuildingTools.Editor
             // Set the static flags, as the door will move
             GameObjectUtility.SetStaticEditorFlags(door.gameObject, doorRendererStaticFlags);
             door.SetDoorAudio(doorSfxGroup, doorOpeningClips, doorOpenClips, doorClosingClips, doorClosedClips);
-
+            door.SetDoorPivotLocation();
             // Process the door triggers
             ConfigureTriggerColliders(door);
             return door;
