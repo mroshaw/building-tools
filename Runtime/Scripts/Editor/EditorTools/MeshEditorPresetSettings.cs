@@ -55,6 +55,7 @@ namespace DaftAppleGames.BuildingTools.Editor
 #if DAG_HDRP || DAG_URP
             meshRenderer.renderingLayerMask = renderingLayerMask;
             meshRenderer.scaleInLightmap = scaleInLightmap;
+            meshRenderer.rendererPriority = priority;
 #endif
             meshRenderer.lightProbeUsage = lightProbeUsage;
 #if BIRP
@@ -62,7 +63,6 @@ namespace DaftAppleGames.BuildingTools.Editor
 #endif
             meshRenderer.motionVectorGenerationMode = motionVectors;
             meshRenderer.allowOcclusionWhenDynamic = dynamicOcclusion;
-            meshRenderer.rendererPriority = priority;
         }
 
         /// <summary>
