@@ -1,12 +1,7 @@
 using DaftAppleGames.Editor;
 using DaftAppleGames.Extensions;
 using UnityEngine;
-
-#if ODIN_INSPECTOR
-using Sirenix.OdinInspector;
-#else
 using DaftAppleGames.Attributes;
-#endif
 #if DAG_HDRP
 using UnityEngine.Rendering.HighDefinition;
 using HDRenderingLayerMask = UnityEngine.Rendering.HighDefinition.RenderingLayerMask;
