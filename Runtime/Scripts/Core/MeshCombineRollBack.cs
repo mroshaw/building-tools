@@ -16,6 +16,7 @@ namespace DaftAppleGames.Buildings
     /// </summary>
     public class MeshCombineRollBack : MonoBehaviour
     {
+#if UNITY_EDITOR
         [BoxGroup("Status")] [SerializeField] [ReadOnly] public bool isOptimised;
         [BoxGroup("Settings")] [SerializeField] private bool deleteAssets = true;
         [BoxGroup("Settings")] [SerializeField] private bool deleteAssetFolder = true;
@@ -121,5 +122,6 @@ namespace DaftAppleGames.Buildings
             Debug.Log($"Deleting MeshCombineRollBack component on : {gameObject.name}");
             DestroyImmediate(this);
         }
+#endif
     }
 }
