@@ -20,7 +20,7 @@ namespace DaftAppleGames.BuildingTools.Editor
         {
         }
 
-        [MenuItem("Daft Apple Games/Building Tools/Building Editor")]
+        [MenuItem("Tools/Daft Apple Games/Building Tools/Building Editor")]
         public static void ShowWindow()
         {
             BuildingEditorWindow packageInitWindow = GetWindow<BuildingEditorWindow>();
