@@ -5,7 +5,7 @@
   "description": "Components and Editor Tools designed to help configure and optimise buildings in Unity projects",
   "unity": "6000.0",
   "documentationUrl": "https://mroshaw.github.io/unity-framework-docs/buildingtools/",
-  "changelogUrl": "https://github.com/mroshaw/3dforge-tools/blob/main/README.md",
+  "changelogUrl": "https://mroshaw.github.io/unity-framework-docs/buildingtools/changelog.html",
   "licensesUrl": "https://github.com/mroshaw/3dforge-tools/blob/main/LICENSE",
   "samples": [
     {
