@@ -1,12 +1,12 @@
 {
   "name": "com.daftapplegames.building-tools",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "displayName": "Daft Apple Building Tools",
   "description": "Components and Editor Tools designed to help configure and optimise buildings in Unity projects",
   "unity": "6000.0",
   "documentationUrl": "https://mroshaw.github.io/unity-framework-docs/buildingtools/",
-  "changelogUrl": "https://github.com/mroshaw/3dforge-tools/blob/main/README.md",
-  "licensesUrl": "https://github.com/mroshaw/3dforge-tools/blob/main/LICENSE",
+  "changelogUrl": "https://mroshaw.github.io/unity-framework-docs/buildingtools/changelog.html",
+  "licensesUrl": "https://raw.githubusercontent.com/mroshaw/building-tools/refs/heads/main/LICENSE",
   "samples": [
     {
       "displayName": "Sample Assets",
