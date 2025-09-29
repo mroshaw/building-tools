@@ -3,6 +3,7 @@ using DaftAppleGames.Extensions;
 using UnityEngine;
 using DaftAppleGames.Attributes;
 using DaftAppleGames.Core;
+using DaftAppleGames.Utilities;
 #if DAG_HDRP
 using UnityEngine.Rendering.HighDefinition;
 using HDRenderingLayerMask = UnityEngine.Rendering.HighDefinition.RenderingLayerMask;
